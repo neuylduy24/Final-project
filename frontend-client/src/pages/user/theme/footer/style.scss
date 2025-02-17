@@ -1,0 +1,118 @@
+@use "sass:map";
+@import "styles/pages/theme";
+
+.footer {
+    background: #F3F6FA;
+    padding-top: 10px;
+    padding-bottom: 0;
+
+    .footer__about {
+        margin-bottom: 20px;
+        img {
+            cursor: pointer;
+            width: 150px;
+        }
+        .footer__about_logo {
+            display: inline-block;
+        }
+
+        ul li {
+            font-size: 16px;
+            color: map.get($theme-colors, "normal-text");
+            line-height: 36px;
+            list-style: none;
+        }
+    }
+
+    .footer__widget {
+        margin-bottom: 30px;
+        overflow: hidden;
+
+        h6 {
+            font-size: 18px;
+            color: map.get($theme-colors, "normal-text");
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        ul {
+            float: left;
+            width: 50%;
+
+            li {
+                list-style: none;
+
+                a {
+                    color: map.get($theme-colors, "normal-text");
+                    font-size: 15px;
+                    line-height: 32px;
+                    text-decoration: none;
+                }
+                :hover{
+                    color: map.get($theme-colors, "header-menu");
+                }
+            }
+        }
+        
+    }
+    p {
+        font-size: 14px;
+        color: map.get($theme-colors, "normal-text");
+        margin-bottom: 20px;
+    }
+    .footer_widget_social{
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+        margin-top: 20px;
+        div{
+            :hover{
+                background: map.get($theme-colors, "main");
+                color: #E5E5E5;
+                border-color: #E5E5E5;
+            }
+            svg{
+                font-size: 20px;
+                padding: 10px;
+                color: #404040;
+                border: 1px solid #ededed;
+                border-radius: 50%;
+                transition: all 0.3s;
+                background: #E5E5E5;
+                cursor: pointer;
+            }
+        }
+    }
+
+    form {
+        margin-bottom: 30px;
+
+        .input-group {
+            display: flex;
+            align-items: center;
+
+            input {
+                width: 100%;
+                font-size: 16px;
+                padding-left: 20px;
+                color: map.get($theme-colors, "normal-text");
+                height: 46px;
+                border: 1px solid #E5E5E5;
+
+                ::placeholder {
+                    color: map.get($theme-colors, "normal-text");
+                }
+            }
+
+            button {
+                padding: 0 26px;
+                height: 46px;
+                min-width: max-content;
+                cursor: pointer;
+            }
+            .button-submit:hover{
+                background: map.get($theme-colors, "main");
+            }
+        }
+    }
+}

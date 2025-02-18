@@ -48,11 +48,11 @@ public class User {
         this.username = username;
     }
 
-    public Role getRole() {
+    public Role getRoles() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRoles(Role role) {
         this.role = role;
     }
 

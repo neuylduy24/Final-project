@@ -18,11 +18,30 @@ public class UserService {
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     public User createUser(User user) {
         // Hash the password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email is already in use!");
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username is already taken!");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
         return userRepository.save(user);
     }
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
@@ -35,16 +54,17 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User updateUser(String id, User updatedUser) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setUsername(updatedUser.getUsername());
-            user.setRole(updatedUser.getRole());
-            user.setAvatar(updatedUser.getAvatar());
+    public User updateUser(String id, User userDetails) {
+        return userRepository.findById(id).map(user -> {
+            user.setUsername(userDetails.getUsername());
+            user.setEmail(userDetails.getEmail());
+            user.setRole(userDetails.getRole());
+            user.setAvatar(userDetails.getAvatar());
+            if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(userDetails.getPassword())); // Hash new password
+            }
             return userRepository.save(user);
-        }
-        return null;
+        }).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
     public void deleteUser(String id) {

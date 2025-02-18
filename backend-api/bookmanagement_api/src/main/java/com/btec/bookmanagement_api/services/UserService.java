@@ -1,20 +1,25 @@
 package com.btec.bookmanagement_api.services;
 
+import com.btec.bookmanagement_api.entities.Role;
 import com.btec.bookmanagement_api.entities.User;
+import com.btec.bookmanagement_api.repositories.RoleRepository;
 import com.btec.bookmanagement_api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -58,7 +63,7 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setUsername(userDetails.getUsername());
             user.setEmail(userDetails.getEmail());
-            user.setRole(userDetails.getRole());
+            user.setRoles(userDetails.getRoles());
             user.setAvatar(userDetails.getAvatar());
             if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userDetails.getPassword())); // Hash new password

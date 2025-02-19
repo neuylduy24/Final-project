@@ -43,6 +43,7 @@ public class BookService {
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
             book.setChapters(bookDetails.getChapters());
+            book.setCategories(bookDetails.getCategories());
             return bookRepository.save(book);
         }).orElseThrow(() -> new RuntimeException("Book not found with id " + id));
     }

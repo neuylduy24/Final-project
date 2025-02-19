@@ -14,15 +14,17 @@ public class Book {
     private String image;
     private String description;
     private List<Chapter> chapters;
+    private List<Category> categories;
 
     public Book() {}
 
-    public Book(String title, String author, String image, String description, List<Chapter> chapters) {
+    public Book(String title, String author, String image, String description, List<Chapter> chapters, List<Category> categories) {
         this.title = title;
         this.author = author;
         this.image = image;
         this.description = description;
         this.chapters = chapters;
+        this.categories = categories;
     }
 
     public String getId() {
@@ -71,6 +73,14 @@ public class Book {
 
     public void setChapters(List<Chapter> chapters) {
         this.chapters = chapters;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 }
 

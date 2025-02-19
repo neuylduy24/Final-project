@@ -38,6 +38,7 @@ public class ChapterService {
             chapter.setChapterNumber(chapterDetails.getChapterNumber());
             chapter.setTitle(chapterDetails.getTitle());
             chapter.setContent(chapterDetails.getContent());
+            chapter.setCreateAt(chapterDetails.getCreateAt());
             return chapterRepository.save(chapter);
         }).orElseThrow(() -> new RuntimeException("Chapter not found with id " + id));
     }

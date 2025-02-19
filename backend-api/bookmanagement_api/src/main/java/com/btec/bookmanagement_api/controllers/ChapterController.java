@@ -56,4 +56,19 @@ public class ChapterController {
         chapterService.deleteChapter(id);
         return ResponseEntity.noContent().build();
     }
+    public ChapterController(ChapterService chapterService) {
+        this.chapterService = chapterService;
+    }
+
+    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
+    @GetMapping("/sorted")
+    public List<Chapter> getAllChaptersSortedByDate() {
+        return chapterService.getAllChaptersSortedByDate();
+    }
+
+    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo giảm dần
+    @GetMapping("/book/{bookId}")
+    public List<Chapter> getChaptersByBookSortedByDate(@PathVariable String bookId) {
+        return chapterService.getChaptersByBookSortedByDate(bookId);
+    }
 }

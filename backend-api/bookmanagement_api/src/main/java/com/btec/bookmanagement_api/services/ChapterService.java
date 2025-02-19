@@ -45,4 +45,17 @@ public class ChapterService {
     public void deleteChapter(String id) {
         chapterRepository.deleteById(id);
     }
+    public ChapterService(ChapterRepository chapterRepository) {
+        this.chapterRepository = chapterRepository;
+    }
+
+    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
+    public List<Chapter> getAllChaptersSortedByDate() {
+        return chapterRepository.findAllByOrderByCreatedDesc();
+    }
+
+    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo
+    public List<Chapter> getChaptersByBookSortedByDate(String bookId) {
+        return chapterRepository.findByBookIdOrderByCreatedDesc(bookId);
+    }
 }

@@ -51,13 +51,13 @@ public class ChapterService {
         this.chapterRepository = chapterRepository;
     }
 
-    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
-    public List<Chapter> getAllChaptersSortedByDate() {
-        return chapterRepository.findAllByOrderByCreatedDesc();
-    }
-
-    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo
-    public List<Chapter> getChaptersByBookSortedByDate(String bookId) {
-        return chapterRepository.findByBookIdOrderByCreatedDesc(bookId);
-    }
+//    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
+//    public List<Chapter> getAllChaptersSortedByDate() {
+//        return chapterRepository.findAllByOrderByCreatedDesc();
+//    }
+//
+//    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo
+//    public List<Chapter> getChaptersByBookSortedByDate(String bookId) {
+//        return chapterRepository.findByBookIdOrderByCreatedDesc(bookId);
+//    }
 }

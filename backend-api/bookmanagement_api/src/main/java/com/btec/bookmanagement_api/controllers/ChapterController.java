@@ -57,15 +57,15 @@ public class ChapterController {
         return ResponseEntity.noContent().build();
     }
 
-    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
-    @GetMapping("/sorted")
-    public List<Chapter> getAllChaptersSortedByDate() {
-        return chapterService.getAllChaptersSortedByDate();
-    }
-
-    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo giảm dần
-    @GetMapping("/book/{bookId}")
-    public List<Chapter> getChaptersByBookSortedByDate(@PathVariable String bookId) {
-        return chapterService.getChaptersByBookSortedByDate(bookId);
-    }
+//    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
+//    @GetMapping("/sorted")
+//    public List<Chapter> getAllChaptersSortedByDate() {
+//        return chapterService.getAllChaptersSortedByDate();
+//    }
+//
+//    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo giảm dần
+//    @GetMapping("/book/{bookId}")
+//    public List<Chapter> getChaptersByBookSortedByDate(@PathVariable String bookId) {
+//        return chapterService.getChaptersByBookSortedByDate(bookId);
+//    }
 }

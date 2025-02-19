@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDateTime;
 
 @Document(collection = "chapters")
 public class Chapter {
@@ -11,14 +12,18 @@ public class Chapter {
     private int chapterNumber;
     private String title;
     private String content;
+    private LocalDateTime createdAt ;// Đổi tên từ datePosted -> created
 
-    public Chapter() {}
+    public Chapter() {
+        this.createdAt = LocalDateTime.now(); // Tự động lấy thời gian khi tạo chương mới
+    }
 
     public Chapter(String bookId, int chapterNumber, String title, String content) {
         this.bookId = bookId;
         this.chapterNumber = chapterNumber;
         this.title = title;
         this.content = content;
+        this.createdAt = LocalDateTime.now(); // Tự động lưu ngày tạo
     }
 
     public String getId() {
@@ -60,5 +65,12 @@ public class Chapter {
     public void setContent(String content) {
         this.content = content;
     }
-}
 
+    public LocalDateTime getCreated() {
+        return createdAt;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.createdAt = createdAt;
+    }
+}

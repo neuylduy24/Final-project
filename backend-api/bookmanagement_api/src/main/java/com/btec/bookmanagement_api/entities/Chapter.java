@@ -1,5 +1,6 @@
 package com.btec.bookmanagement_api.entities;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,16 +14,17 @@ public class Chapter {
     private int chapterNumber;
     private String title;
     private String content;
-    private LocalDateTime createAt;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     public Chapter() {}
 
-    public Chapter(String bookId, int chapterNumber, String title, String content, LocalDateTime createAt) {
+    public Chapter(String bookId, int chapterNumber, String title, String content, LocalDateTime createdAt) {
         this.bookId = bookId;
         this.chapterNumber = chapterNumber;
         this.title = title;
         this.content = content;
-        this.createAt = createAt;
+        this.createdAt = createdAt;
     }
 
     public String getId() {
@@ -65,12 +67,24 @@ public class Chapter {
         this.content = content;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Chapter{" +
+                "id='" + id + '\'' +
+                ", bookId='" + bookId + '\'' +
+                ", chapterNumber=" + chapterNumber +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
 

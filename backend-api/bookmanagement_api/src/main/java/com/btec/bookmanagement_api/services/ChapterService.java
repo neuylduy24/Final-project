@@ -1,6 +1,7 @@
 package com.btec.bookmanagement_api.services;
 
 import com.btec.bookmanagement_api.entities.Chapter;
+import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.repositories.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,35 +13,37 @@ import java.util.Optional;
 public class ChapterService {
     @Autowired
     private ChapterRepository chapterRepository;
+    private BookRepository bookRepository;
 
-    public List<Chapter> getChaptersByBookId(String bookId) {
-        return chapterRepository.findByBookId(bookId);
+    public List<Chapter> getAllChapters() {
+        return chapterRepository.findAll();
     }
 
     public Optional<Chapter> getChapterById(String id) {
         return chapterRepository.findById(id);
     }
 
-    public Optional<Chapter> getChapterByBookIdAndNumber(String bookId, int chapterNumber) {
-        return chapterRepository.findByBookIdAndChapterNumber(bookId, chapterNumber);
+    public List<Chapter> getChaptersByBookId(String bookId) {
+        return chapterRepository.findByBookId(bookId);
     }
 
     public Chapter createChapter(Chapter chapter) {
-        if (chapterRepository.findByBookIdAndChapterNumber(chapter.getBookId(), chapter.getChapterNumber()).isPresent()) {
-            throw new RuntimeException("Chapter number " + chapter.getChapterNumber() + " already exists for this book!");
+        // Check if the book exists before saving the chapter
+        if (!bookRepository.existsById(chapter.getBookId())) {
+            throw new RuntimeException("Book ID not found: " + chapter.getBookId());
         }
         return chapterRepository.save(chapter);
     }
 
-    public Chapter updateChapter(String id, Chapter chapterDetails) {
-        return chapterRepository.findById(id).map(chapter -> {
-            chapter.setBookId(chapterDetails.getBookId());
-            chapter.setChapterNumber(chapterDetails.getChapterNumber());
-            chapter.setTitle(chapterDetails.getTitle());
-            chapter.setContent(chapterDetails.getContent());
-            chapter.setCreateAt(chapterDetails.getCreateAt());
-            return chapterRepository.save(chapter);
-        }).orElseThrow(() -> new RuntimeException("Chapter not found with id " + id));
+    public Chapter updateChapter(String id, Chapter updatedChapter) {
+        return chapterRepository.findById(id)
+                .map(chapter -> {
+                    chapter.setChapterNumber(updatedChapter.getChapterNumber());
+                    chapter.setTitle(updatedChapter.getTitle());
+                    chapter.setContent(updatedChapter.getContent());
+                    return chapterRepository.save(chapter);
+                })
+                .orElseThrow(() -> new RuntimeException("Chapter not found"));
     }
 
     public void deleteChapter(String id) {

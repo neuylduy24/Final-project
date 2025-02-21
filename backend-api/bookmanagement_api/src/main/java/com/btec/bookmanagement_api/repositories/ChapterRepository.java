@@ -11,6 +11,9 @@ import java.util.Optional;
 public interface ChapterRepository extends MongoRepository<Chapter, String> {
     List<Chapter> findByBookId(String bookId);
     Optional<Chapter> findByBookIdAndChapterNumber(String bookId, int chapterNumber);
+
+    List<Chapter> findAllByOrderByCreatedAtDesc();
+    List<Chapter> findTop5ByOrderByCreatedAtDesc(); // Get the latest 5 chapters
 //    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
 //    List<Chapter> findAllByOrderByCreatedDesc();
 //

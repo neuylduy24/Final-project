@@ -38,7 +38,7 @@ public class ChapterService {
             chapter.setChapterNumber(chapterDetails.getChapterNumber());
             chapter.setTitle(chapterDetails.getTitle());
             chapter.setContent(chapterDetails.getContent());
-            chapter.setCreateAt(chapterDetails.getCreateAt());
+            chapter.setCreatedAt(chapterDetails.getCreatedAt()); // Fixed field name
             return chapterRepository.save(chapter);
         }).orElseThrow(() -> new RuntimeException("Chapter not found with id " + id));
     }
@@ -51,13 +51,13 @@ public class ChapterService {
         this.chapterRepository = chapterRepository;
     }
 
-//    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
-//    public List<Chapter> getAllChaptersSortedByDate() {
-//        return chapterRepository.findAllByOrderByCreatedDesc();
-//    }
-//
-//    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo
-//    public List<Chapter> getChaptersByBookSortedByDate(String bookId) {
-//        return chapterRepository.findByBookIdOrderByCreatedDesc(bookId);
-//    }
+    // Get all chapters sorted by createdAt (latest first)
+    public List<Chapter> getLatestChapters() {
+        return chapterRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    // Get only the latest 5 chapters
+    public List<Chapter> getTop5LatestChapters() {
+        return chapterRepository.findTop5ByOrderByCreatedAtDesc();
+    }
 }

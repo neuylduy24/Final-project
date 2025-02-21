@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import "./style.scss";
-import { FaInstagram, FaUser, FaCartShopping, FaListUl, FaPhone, FaFacebookF, FaCircleChevronUp, FaCircleChevronDown } from "react-icons/fa6";
+import { FaInstagram, FaUser, FaCartShopping, FaListUl, FaPhone, FaCircleChevronUp, FaCircleChevronDown } from "react-icons/fa6";
 import { SiFacebook } from "react-icons/si";
 import { MdEmail } from "react-icons/md";
 import { Link, useLocation } from 'react-router-dom';
@@ -103,7 +103,7 @@ const Header = () => {
         <div className="menu_wrapper_cart">
           <ul>
             <li>
-              <Link to={""}>
+              <Link to={ROUTERS.USER.BOOKCARTSHOPPING}>
                 <FaCartShopping /> <span>1</span>
               </Link>
             </li>
@@ -114,7 +114,7 @@ const Header = () => {
         </div>
         <div className="menu_wrapper_widget">
           <div className="header_top_right_auth">
-            <Link to={""}>
+            <Link to={ROUTERS.ADMIN.LOGIN}>
               <FaUser /> Đăng Nhập
             </Link>
           </div>
@@ -182,11 +182,7 @@ const Header = () => {
                   </Link>
                 </li>
                 <li>
-<<<<<<< Updated upstream
-                  <Link to="/login">
-=======
                   <Link to={ROUTERS.ADMIN.LOGIN}>
->>>>>>> Stashed changes
                     <FaUser />
                   </Link>
                   <span>Đăng Nhập</span>
@@ -238,7 +234,7 @@ const Header = () => {
               </div>
               <ul>
                 <li>
-                  <Link to={"#"}>
+                  <Link to={ROUTERS.USER.BOOKCARTSHOPPING}>
                     <FaCartShopping /> <span>5</span>
                   </Link>
                 </li>

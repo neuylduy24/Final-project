@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="row">
         <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 col-xl-12">
           <div className="footer__about">
-            <Link to={ROUTERS.USER.HOME}>
+          <Link to={ROUTERS.USER.HOME}>
                 <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="footer__about_logo" />
               </Link>
             <ul>

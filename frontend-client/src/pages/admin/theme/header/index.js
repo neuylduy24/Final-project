@@ -1,40 +1,107 @@
-import { memo } from 'react';
-import './style.scss';
-import { ROUTERS } from 'utils/router';
+import { memo, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaCartShopping } from 'react-icons/fa6';
 import { IoLogOut } from "react-icons/io5";
-const HeaderAd = ({ children, ...props }) => {
+import { ROUTERS } from 'utils/router';
+import './style.scss';
+import { FaCircleChevronDown, FaCircleChevronUp, FaListUl } from 'react-icons/fa6';
 
+const HeaderAd = ({ ...props }) => {
     const location = useLocation();
+    const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
-    const navItems = [
+    const sidebarRef = useRef(null);
+
+    const [navItems, setMenu] = useState([
+        { label: 'Tổng quan', path: ROUTERS.ADMIN.STATISTICS },
+
         {
-            path: ROUTERS.ADMIN.ORDERS,
-            onclick: () => navigate(ROUTERS.ADMIN.ORDERS),
-            label: 'Đơn hàng',
-            icon: <FaCartShopping />
-        },
-        {
-            path: ROUTERS.ADMIN.LOGOUT,
-            onclick: () => navigate(ROUTERS.ADMIN.LOGIN),
-            label: 'Đăng xuất',
-            icon: <IoLogOut  />
+            label: 'Quản lý sách',
+            isShowSubmenu: false,
+            child: [
+                { label: 'Thêm sách', path: ROUTERS.ADMIN.USERS },
+                { label: 'Danh sách sách', path: ROUTERS.ADMIN.BOOKS },
+            ],
         },
 
-    ]
+        { label: 'Quản lý người dùng', path: ROUTERS.ADMIN.USERS },
+        { label: 'Đăng xuất', path: ROUTERS.ADMIN.LOGIN, icon: <IoLogOut /> },
+    ]);
+
+    const handleNavClick = (path) => {
+        navigate(path);
+        if (window.innerWidth <= 768) {
+            setIsOpen(false);
+        }
+    };
+
+    const handleMenuClick = (index) => {
+        setMenu((prevMenu) => 
+            prevMenu.map((item, i) =>
+                i === index ? { ...item, isShowSubmenu: !item.isShowSubmenu } : item
+            )
+        );
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
     return (
-        <div className="admin_header container" {...props}>
-            <nav className="admin_header_nav">
-                {navItems.map(({ path, onclick, label, icon }) => (
-                    <div key={path} className={`admin_header_nav-item ${location.pathname.includes(path) ? "admin_header_nav-item--active" : ""}`}
-                    onClick={onclick}
-                    >
-                        <span className="admin_header_nav-icon">{icon}</span>
-                        <span>{label}</span>
-                    </div>))}
-            </nav>
-        </div>
+        <>
+            {!isOpen && (
+                <div className="menu-toggle" onClick={() => setIsOpen(true)}>
+                    <FaListUl />
+                </div>
+            )}
+            <div ref={sidebarRef} className={`admin_sidebar ${isOpen ? 'open' : ''}`} {...props}>
+                <div className="header_logo">
+                    <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
+                </div>
+                <h2 className="admin_sidebar-title">Tên đăng nhập</h2>
+                <div className="menu_wrapper_navbar">
+                    <ul>
+                        {navItems.map((item, index) => (
+                            <li key={index} className={item.isShowSubmenu ? "show_submenu" : ""}>
+                                {item.child ? (
+                                    <>
+                                        <div className="admin_sidebar-row" onClick={() => handleMenuClick(index)}>
+                                            <span className="admin_sidebar-label">{item.label}</span>
+                                            {item.isShowSubmenu ? <FaCircleChevronUp /> : <FaCircleChevronDown />}
+                                        </div>
+                                        <ul className="header_menu_dropdown">
+                                            {item.child.map((childItem, childIndex) => (
+                                                <li key={childIndex} onClick={() => handleNavClick(childItem.path)}>
+                                                    <Link to={childItem.path}>{childItem.label}</Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                ) : (
+                                    <div className="admin_sidebar-row" onClick={() => handleNavClick(item.path)}>
+                                        <Link to={item.path} className="admin_sidebar-label">
+                                            {item.label}
+                                        </Link>
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </>
     );
-}
+};
+
 export default memo(HeaderAd);

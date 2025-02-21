@@ -13,13 +13,18 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate(ROUTERS.ADMIN.STATISTICS);
+    if (formData.username && formData.password) {
+      navigate(ROUTERS.ADMIN.STATISTICS);
+    } else {
+      alert('Vui lòng nhập đầy đủ thông tin đăng nhập.');
+    }
   };
 
   return (
     <div className="login">
       <div className="login-container">
-
+        
+        {/* Cột trái */}
         <div className="login-left">
           <Link to={ROUTERS.USER.HOME}>
             <img className="footer__about_logo" src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
@@ -27,30 +32,31 @@ const LoginPage = () => {
           <h2 className="login-title">Chào mừng bạn đến với BookStore!!</h2>
         </div>
 
+        {/* Cột phải */}
         <div className="login-right">
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="login-form-group">
               <label htmlFor="username" className="login-label">Tên đăng nhập:</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Nhập tên đăng nhập"
-                required
+              <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                value={formData.username} 
+                onChange={handleChange} 
+                placeholder="Nhập tên đăng nhập" 
+                required 
               />
             </div>
             <div className="login-form-group">
               <label htmlFor="password" className="login-label">Mật khẩu:</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Nhập mật khẩu"
-                required
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                value={formData.password} 
+                onChange={handleChange} 
+                placeholder="Nhập mật khẩu" 
+                required 
               />
             </div>
             <button type="submit" className="login-button">Đăng nhập</button>

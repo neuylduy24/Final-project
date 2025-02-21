@@ -1,5 +1,5 @@
 @use "sass:map";
-@import "./style.css";
+@import "styles/pages/all";
 .container_categories_slider {
     max-width: 1200px !important;
     margin-top: 30px !important;
@@ -76,78 +76,6 @@
             margin-right: 25px;
             position: relative;
             cursor: pointer;
-        }
-    }
-
-    .featured_item {
-        margin-bottom: 50px;
-
-        &:hover {
-            .featured_item_img_hover {
-                bottom: -10% !important;
-            }
-
-        }
-
-        .featured_item_img {
-            overflow: hidden;
-            cursor: pointer;
-            background-position: center;
-            margin: 10px;
-            height: 300px;
-            position: relative;
-            background-repeat: no-repeat;
-            background-size: cover;
-            border-radius: 5px;
-
-            .featured_item_img_hover {
-                position: absolute;
-                left: 0;
-                bottom: -40%;
-                width: 100%;
-                text-align: center;
-                transition: all 0.5s;
-
-                li {
-                    list-style: none;
-                    display: inline-block;
-                    margin-right: 0;
-
-                    &:hover{
-                        svg{
-                            background: #448234;
-                            border-color: #448234;
-                            color: white;
-                            font-size: 25px;
-                            transform: rotate(360deg) !important;
-                        }
-                    }
-                    svg{
-                        padding: 10px;
-                        height: 20px;
-                        width: 20px;
-                        border: 1px solid #ebebeb;
-                        background: #ffffff;
-                        color: #565555;
-                        transition: all, 0.3s;
-                        border-radius: 50%;
-                    }
-                }
-            }
-        }
-        
-        .featured_item_text{
-            text-align: center;
-            h5{
-                margin-top: 10px;
-                font-size: 15px;
-                font-weight: 400;
-
-                a{
-                    color: #1c1c1c;
-                    text-decoration: none;
-                }
-            }
         }
     }
 }

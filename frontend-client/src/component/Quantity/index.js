@@ -1,16 +1,16 @@
 import { memo } from 'react';
 import './style.scss';
-const Quantity = ({ hasAddToCart = true }) => {
+const Quantity = ({ hasAddToCart, hasToComment = true }) => {
     return (
         <div className="quantity-container">
-            <div className="quantity">
-                <span className="qtybtn">-</span>
-                <input type="number" defaultValue={1} />
-                <span className="qtybtn">+</span>
-            </div>
             {
                 hasAddToCart && (
-                    <button type="submit" className="button-submit">Them gio hang</button>
+                    <button type="submit" className="button-follow">Theo dõi</button>
+                )
+            }
+            {
+                hasToComment && (
+                    <button type="submit" className="button-comment">Comment</button>
                 )
             }
         </div>

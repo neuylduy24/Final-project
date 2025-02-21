@@ -11,7 +11,7 @@
     left: -100px;
 
     .login-container {
-        background: #ffffff;
+        background: #763b3b;
         display: flex;
         width: 750px;
         max-width: 100%;
@@ -70,11 +70,10 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
-            color: map.get($theme-colors, "normal-text");
             transition: border-color 0.3s;
 
             &:focus {
-                border-color: map.get($theme-colors, "normal-text");
+                border-color: map.get($theme-colors, "primary");
                 outline: none;
             }
         }

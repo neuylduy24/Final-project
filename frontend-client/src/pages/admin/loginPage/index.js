@@ -24,7 +24,7 @@ const LoginPage = () => {
           <Link to={ROUTERS.USER.HOME}>
             <img className="footer__about_logo" src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
           </Link>
-          <h2 className="login-title">Chào mừng bạn đến với BookStore!!</h2>
+          <h2 className="login-title">Chào mừng bạn đến với BookStore!!!</h2>
         </div>
 
         <div className="login-right">

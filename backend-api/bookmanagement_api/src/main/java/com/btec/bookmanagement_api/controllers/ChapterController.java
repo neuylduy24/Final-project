@@ -55,15 +55,19 @@ public class ChapterController {
         return ResponseEntity.noContent().build();
     }
 
-//    // Lấy tất cả chương, sắp xếp theo ngày tạo giảm dần
-//    @GetMapping("/sorted")
-//    public List<Chapter> getAllChaptersSortedByDate() {
-//        return chapterService.getAllChaptersSortedByDate();
-//    }
-//
-//    // Lấy chương của một quyển sách cụ thể, sắp xếp theo ngày tạo giảm dần
-//    @GetMapping("/book/{bookId}")
-//    public List<Chapter> getChaptersByBookSortedByDate(@PathVariable String bookId) {
-//        return chapterService.getChaptersByBookSortedByDate(bookId);
-//    }
+    public ChapterController(ChapterService chapterService) {
+        this.chapterService = chapterService;
+    }
+
+    // Get all latest chapters
+    @GetMapping("/latest")
+    public List<Chapter> getLatestChapters() {
+        return chapterService.getLatestChapters();
+    }
+
+    // Get only top 5 latest chapters
+    @GetMapping("/latest/top5")
+    public List<Chapter> getTop5LatestChapters() {
+        return chapterService.getTop5LatestChapters();
+    }
 }

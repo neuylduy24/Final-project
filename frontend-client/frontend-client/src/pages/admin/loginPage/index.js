@@ -2,18 +2,29 @@ import { memo, useState } from 'react';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTERS } from 'utils/router';
+import axios from 'axios';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const handleSubmit = (e) => {
+// đăng nhập 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate(ROUTERS.ADMIN.STATISTICS);
+    try {
+      const response = await axios.post('http://localhost:8080/api/auth/sign-in', formData);
+      if (response.data.token) { // Assuming the backend returns a token on success
+        navigate(ROUTERS.ADMIN.STATISTICS);
+      } else {
+        setError('Invalid email or password');
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -30,14 +41,14 @@ const LoginPage = () => {
         <div className="login-right">
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="login-form-group">
-              <label htmlFor="username" className="login-label">Tên đăng nhập:</label>
+              <label htmlFor="email" className="login-label">Email:</label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                placeholder="Nhập tên đăng nhập"
+                placeholder="Nhập email"
                 required
               />
             </div>
@@ -53,6 +64,7 @@ const LoginPage = () => {
                 required
               />
             </div>
+            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="login-button">Đăng nhập</button>
           </form>
         </div>

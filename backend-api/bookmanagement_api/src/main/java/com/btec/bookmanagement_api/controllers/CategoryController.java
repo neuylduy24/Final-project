@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Category;
 import com.btec.bookmanagement_api.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody Category category) {
+    public ResponseEntity<?> createCategory(@RequestBody @Valid Category category) {
         try {
             return ResponseEntity.ok(categoryService.createCategory(category));
         } catch (RuntimeException e) {

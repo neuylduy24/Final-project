@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.services.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBook(@RequestBody Book book) {
+    public ResponseEntity<?> createBook(@RequestBody @Valid Book book) {
         try {
             return ResponseEntity.ok(bookService.createBook(book));
         } catch (RuntimeException e) {

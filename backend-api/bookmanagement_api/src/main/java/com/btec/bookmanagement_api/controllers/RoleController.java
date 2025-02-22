@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Role;
 import com.btec.bookmanagement_api.services.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class RoleController {
     }
 
     @PostMapping
-    public Role createRole(@RequestBody Role role) {
+    public Role createRole(@RequestBody @Valid Role role) {
         return roleService.createRole(role);
     }
 

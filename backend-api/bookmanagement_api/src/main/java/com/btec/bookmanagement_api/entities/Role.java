@@ -1,12 +1,16 @@
 package com.btec.bookmanagement_api.entities;
 
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "roles")
 public class Role {
     @Id
     private String id;
+    @NotBlank(message = "Role name is required")
+    @Pattern(regexp = "ADMIN|AUTHOR|READER", message = "Invalid role name")
     private String name;
 
     public Role() {}

@@ -20,7 +20,7 @@ public class User {
     private String password;
     @NotBlank(message = "Username is required")
     private String username;
-    private Role role;
+    private Role roleId;
     private String avatar;
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -57,11 +57,11 @@ public class User {
     }
 
     public Role getRoles() {
-        return role;
+        return roleId;
     }
 
-    public void setRoles(Role role) {
-        this.role = role;
+    public void setRoles(Role roleId) {
+        this.roleId = roleId;
     }
 
     public String getAvatar() {

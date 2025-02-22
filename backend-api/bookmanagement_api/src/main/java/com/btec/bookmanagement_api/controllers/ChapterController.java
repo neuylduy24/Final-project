@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Chapter;
 import com.btec.bookmanagement_api.services.ChapterService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class ChapterController {
     }
 
     @PostMapping
-    public ResponseEntity<Chapter> createChapter(@RequestBody Chapter chapter) {
+    public ResponseEntity<Chapter> createChapter(@RequestBody @Valid Chapter chapter) {
         try {
             return ResponseEntity.ok(chapterService.createChapter(chapter));
         } catch (RuntimeException e) {

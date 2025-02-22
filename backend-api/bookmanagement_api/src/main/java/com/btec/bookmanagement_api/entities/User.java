@@ -1,6 +1,9 @@
 package com.btec.bookmanagement_api.entities;
 
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -9,8 +12,13 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     private String id;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
+    @NotBlank(message = "Password is required")
+    @Min(value = 6, message = "Password must be at least 6 characters")
     private String password;
+    @NotBlank(message = "Username is required")
     private String username;
     private Role role;
     private String avatar;

@@ -1,5 +1,7 @@
 package com.btec.bookmanagement_api.entities;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,8 +13,11 @@ public class Chapter {
     @Id
     private String id;
     private String bookId;
+    @NotBlank(message = "ChapterNumber is required")
     private int chapterNumber;
     private String title;
+    @NotBlank(message = "Content is required")
+    @Min(value = 300, message = "Content must be at least 300 characters")
     private String content;
     @CreatedDate
     private LocalDateTime createdAt;

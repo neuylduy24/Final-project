@@ -1,5 +1,8 @@
 package com.btec.bookmanagement_api.entities;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,8 +12,13 @@ import java.util.List;
 public class Book {
     @Id
     private String id;
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @NotBlank(message = "Author name is required")
     private String author;
+
+    @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format")
     private String image;
     private String description;
     private List<Chapter> chapters;

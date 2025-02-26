@@ -2,6 +2,9 @@ package com.btec.bookmanagement_api.services;
 
 import com.btec.bookmanagement_api.entities.BookMark;
 import com.btec.bookmanagement_api.repositories.BookMarkRepository;
+import com.btec.bookmanagement_api.repositories.BookRepository;
+import com.btec.bookmanagement_api.repositories.ChapterRepository;
+import com.btec.bookmanagement_api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,12 @@ import java.util.Optional;
 public class BookMarkService {
     @Autowired
     private BookMarkRepository bookmarkRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private ChapterRepository chapterRepository;
 
     public List<BookMark> getBookmarksByUserId(String userId) {
         return bookmarkRepository.findByUserId(userId);

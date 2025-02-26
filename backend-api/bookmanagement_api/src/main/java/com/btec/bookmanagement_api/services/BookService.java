@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.services;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.repositories.BookRepository;
+import com.btec.bookmanagement_api.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,9 @@ import java.util.Optional;
 public class BookService {
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();

@@ -1,0 +1,26 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+.quantity-container {
+    color: map.get($theme-colors, "normal-text");
+    display: flex;
+    gap: 20px;
+    position: relative;
+
+    button {
+        width: 120px;
+        height: 45px;
+        background: map.get($theme-colors, "main");
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.3s;
+
+        &:hover {
+            background: #2d83bc;
+            color: rgb(236, 226, 206);
+        }
+    }
+}

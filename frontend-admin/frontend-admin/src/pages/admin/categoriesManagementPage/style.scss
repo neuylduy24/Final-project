@@ -1,0 +1,332 @@
+@use "sass:map";
+@import "../../../styles/pages/all.scss";
+@import "../../../styles/pages/responsive.scss";
+
+
+
+.categories {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        padding: 20px;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+
+        h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .categories-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            input,
+            select {
+                width: 94.5%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 14px;
+                background: white;
+                color: black;
+                appearance: none; // Ẩn style mặc định của select trên một số trình duyệt
+
+                &:focus {
+                    outline: none;
+                    border-color: rgb(33, 175, 218);
+                    box-shadow: 0 0 5px rgba(33, 175, 218, 0.5);
+                }
+            }
+
+            select {
+                cursor: pointer;
+                background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='gray'><path fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/></svg>") no-repeat;
+                background-position: right 10px center;
+                background-size: 16px;
+                width: 100%;
+                height: 57px;
+
+                option {
+                    padding: 10px;
+                }
+            }
+
+            button {
+                padding: 10px;
+                border: none;
+                border-radius: 5px;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            button[type="submit"] {
+                background: rgb(33, 175, 218);
+                color: white;
+
+                &:hover {
+                    background: darken(rgb(33, 175, 218), 10%);
+                }
+            }
+
+            button[type="button"] {
+                background: rgb(220, 53, 69);
+                height: 40px;
+                color: white;
+
+                &:hover {
+                    background: darken(rgb(220, 53, 69), 10%);
+                }
+            }
+        }
+
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .categories_table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+
+        th,
+        td {
+            text-align: center;
+            padding: 8px;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+
+            button {
+                padding: 6px 10px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 15px;
+                transition: all 0.3s ease;
+            }
+
+            .add-categories-button {
+                background-color: rgb(33, 175, 218);
+                height: 40px;
+                color: white;
+
+                &:hover {
+                    background-color: darken(rgb(33, 175, 218), 20%);
+                }
+            }
+
+            .edit-categories-button {
+                background-color: rgb(255, 193, 7);
+                color: white;
+
+                &:hover {
+                    background-color: darken(rgb(255, 193, 7), 20%);
+                }
+            }
+
+            .delete-categories-button {
+                background-color: rgb(220, 53, 69);
+                color: white;
+
+                &:hover {
+                    background-color: darken(rgb(220, 53, 69), 20%);
+                }
+            }
+        }
+    }
+}
+
+.categories_footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    .categories_pagination {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .categories-page-button {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: #ddd;
+            }
+
+            &.categories-page-button-active {
+                background-color: #007bff;
+                color: white;
+                border-color: #007bff;
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+        }
+    }
+}
+
+/* Responsive Adjustments */
+@include Responsive($DESKTOP) {
+    .container {
+        max-width: 1200px;
+    }
+
+    .categories_table {
+        font-size: 13px;
+
+        th,
+        td {
+            padding: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+
+            button {
+                margin-bottom: 5px;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@include Responsive($MEDIUM_DEVICE) {
+    .container {
+        max-width: 990px;
+    }
+
+    .categories {
+        padding: 15px;
+    }
+
+    .categories_table {
+        font-size: 13px;
+
+        th,
+        td {
+            padding: 6px;
+        }
+
+        .button-group {
+
+            button {
+                margin-bottom: 5px;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@include Responsive($TABLET_DEVICE) {
+    .container {
+        max-width: 750px;
+    }
+
+    .modal-content {
+        width: 80%;
+    }
+
+    .categories_table {
+        font-size: 12px;
+
+        th,
+        td {
+            padding: 5px;
+        }
+    }
+}
+
+@include Responsive($WIDE_MOBILE) {
+    .container {
+        max-width: 540px;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .categories_table {
+        font-size: 12px;
+
+        th,
+        td {
+            padding: 4px;
+        }
+
+        .button-group {
+
+            button {
+                width: 100%;
+            }
+        }
+    }
+}
+
+@include Responsive($SMALL_DEVICE) {
+    .container {
+        min-width: 540px;
+    }
+
+    .modal-content {
+        width: 100%;
+    }
+
+    .categories_table {
+        font-size: 12px;
+
+        th,
+        td {
+            padding: 4px;
+        }
+
+        .button-group {
+
+            button {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,5 +1,7 @@
 package com.btec.bookmanagement_api.entities;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 @Document(collection = "users")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")

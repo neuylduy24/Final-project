@@ -40,6 +40,7 @@ public class ChapterService {
                 .map(chapter -> {
                     chapter.setChapterNumber(updatedChapter.getChapterNumber());
                     chapter.setTitle(updatedChapter.getTitle());
+                    chapter.setImages(updatedChapter.getImages());
                     chapter.setContent(updatedChapter.getContent());
                     chapter.setCreatedAt(updatedChapter.getCreatedAt());
                     return chapterRepository.save(chapter);

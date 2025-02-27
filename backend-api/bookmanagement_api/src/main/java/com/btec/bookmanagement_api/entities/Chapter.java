@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "chapters")
 public class Chapter {
@@ -14,17 +15,16 @@ public class Chapter {
     private String id;
     private String bookId;
     @NotBlank(message = "ChapterNumber is required")
-    private int chapterNumber;
+    private double chapterNumber;
     private String title;
-    @NotBlank(message = "Content is required")
-    @Min(value = 300, message = "Content must be at least 300 characters")
+    private List<String> images;
     private String content;
     @CreatedDate
     private LocalDateTime createdAt;
 
     public Chapter() {}
 
-    public Chapter(String bookId, int chapterNumber, String title, String content, LocalDateTime createdAt) {
+    public Chapter(String bookId, double chapterNumber, String title, String content, LocalDateTime createdAt) {
         this.bookId = bookId;
         this.chapterNumber = chapterNumber;
         this.title = title;
@@ -48,11 +48,11 @@ public class Chapter {
         this.bookId = bookId;
     }
 
-    public int getChapterNumber() {
+    public double getChapterNumber() {
         return chapterNumber;
     }
 
-    public void setChapterNumber(int chapterNumber) {
+    public void setChapterNumber(double chapterNumber) {
         this.chapterNumber = chapterNumber;
     }
 
@@ -62,6 +62,14 @@ public class Chapter {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getContent() {

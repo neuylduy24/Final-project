@@ -23,6 +23,8 @@ public class Book {
     private String description;
     private List<Chapter> chapters;
     private List<Category> categories;
+    private int views = 0 ;
+
 
     public Book() {}
 
@@ -33,8 +35,16 @@ public class Book {
         this.description = description;
         this.chapters = chapters;
         this.categories = categories;
+
+
+    }
+    public int getViews() {
+        return views;
     }
 
+    public void setViews(int views) {
+        this.views = views;
+    }
     public String getId() {
         return id;
     }

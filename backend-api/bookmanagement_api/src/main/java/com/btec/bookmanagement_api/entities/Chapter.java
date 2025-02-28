@@ -19,16 +19,19 @@ public class Chapter {
     private String title;
     private List<String> images;
     private String content;
+    private int views = 0;
     @CreatedDate
     private LocalDateTime createdAt;
 
     public Chapter() {}
+
 
     public Chapter(String bookId, double chapterNumber, String title, String content, LocalDateTime createdAt) {
         this.bookId = bookId;
         this.chapterNumber = chapterNumber;
         this.title = title;
         this.content = content;
+        this.views = 0;
         this.createdAt = createdAt;
     }
 
@@ -78,6 +81,17 @@ public class Chapter {
 
     public void setContent(String content) {
         this.content = content;
+    }
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
+    }
+
+    public void incrementViews() {
+        this.views++;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -65,4 +65,22 @@ public class ChapterService {
     public List<Chapter> getTop5LatestChapters() {
         return chapterRepository.findTop5ByOrderByCreatedAtDesc();
     }
+
+    // Tăng lượt đọc của chương
+    public void incrementChapterViews(String id) {
+        chapterRepository.findById(id).ifPresent(chapter -> {
+            chapter.incrementViews();
+            chapterRepository.save(chapter);
+        });
+    }
+
+
+
+    // Tính tổng lượt xem của sách
+    public int getTotalViewsByBookId(String bookId) {
+        return chapterRepository.findByBookId(bookId)
+                .stream()
+                .mapToInt(Chapter::getViews)
+                .sum();
+    }
 }

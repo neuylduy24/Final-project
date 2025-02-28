@@ -13,4 +13,5 @@ public interface ChapterRepository extends MongoRepository<Chapter, String> {
     Optional<Chapter> findByBookIdAndChapterNumber(String bookId, int chapterNumber);
     List<Chapter> findAllByOrderByCreatedAtDesc();
     List<Chapter> findTop5ByOrderByCreatedAtDesc(); // Get the latest 5 chapters
+
 }

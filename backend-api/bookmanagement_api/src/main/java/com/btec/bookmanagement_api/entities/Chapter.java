@@ -1,7 +1,12 @@
 package com.btec.bookmanagement_api.entities;
 
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "chapters")
+@Getter
+@Setter
 public class Chapter {
     @Id
     private String id;
@@ -21,72 +28,6 @@ public class Chapter {
     private String content;
     @CreatedDate
     private LocalDateTime createdAt;
-
-    public Chapter() {}
-
-    public Chapter(String bookId, double chapterNumber, String title, String content, LocalDateTime createdAt) {
-        this.bookId = bookId;
-        this.chapterNumber = chapterNumber;
-        this.title = title;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
-    }
-
-    public double getChapterNumber() {
-        return chapterNumber;
-    }
-
-    public void setChapterNumber(double chapterNumber) {
-        this.chapterNumber = chapterNumber;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<String> getImages() {
-        return images;
-    }
-
-    public void setImages(List<String> images) {
-        this.images = images;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     @Override
     public String toString() {

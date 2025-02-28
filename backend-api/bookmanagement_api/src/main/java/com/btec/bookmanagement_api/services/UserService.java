@@ -21,7 +21,7 @@ public class UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 //    public Optional<User> getUserByUsername(String username) {
 //        return userRepository.findByUsername(username);

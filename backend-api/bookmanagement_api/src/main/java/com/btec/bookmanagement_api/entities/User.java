@@ -13,6 +13,7 @@ import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -20,6 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 @Entity
 public class User {
     @Id
@@ -35,6 +37,11 @@ public class User {
     private String username;
     Set<String> roles;
     private String avatar;
+    private List<String> favoriteCategories;  // Thể loại yêu thích
+    private List<String> searchHistory;       // Lịch sử tìm kiếm
+    private List<String> bookmarkedBooks;     // Danh sách sách đã lưu
+
+    private List<ReadingHistory> readingHistory; // Lịch sử đọc sách
     private LocalDateTime createdAt = LocalDateTime.now();
 
 //    public String getId() {

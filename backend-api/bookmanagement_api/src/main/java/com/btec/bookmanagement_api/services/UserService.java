@@ -1,7 +1,7 @@
 package com.btec.bookmanagement_api.services;
 
-import com.btec.bookmanagement_api.entities.Role;
 import com.btec.bookmanagement_api.entities.User;
+import com.btec.bookmanagement_api.enums.Role;
 import com.btec.bookmanagement_api.repositories.RoleRepository;
 import com.btec.bookmanagement_api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,12 @@ public class UserService {
             throw new RuntimeException("Username is already taken!");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
+
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.READER.name());
+
+        user.setRoles(roles);
+
         return userRepository.save(user);
     }
 

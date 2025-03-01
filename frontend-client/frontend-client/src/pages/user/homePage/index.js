@@ -42,27 +42,21 @@ const HomePage = () => {
   const sliderItems = [
     {
       bgImg: sach1Img,
-      name: "Xuân Phượng",
     },
     {
       bgImg: sach2Img,
-      name: "Lòng tôi nhẹ",
     },
     {
       bgImg: sach3Img,
-      name: "Trịnh Công Sơn",
     },
     {
       bgImg: sach4Img,
-      name: "Một năm phúc",
     },
     {
       bgImg: sach5Img,
-      name: "Đời có yêu tôi?",
     },
     {
       bgImg: sach4Img,
-      name: "Một năm phúc",
     },
   ]
 
@@ -285,7 +279,7 @@ const HomePage = () => {
         <TabList>{tabList}</TabList>
 
         {
-          tabPanels.map((item, key) => (
+          tabPanels.map((item) => (
             <TabPanel>
               <div className="row">{item}</div>
             </TabPanel>

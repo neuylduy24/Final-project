@@ -1,26 +1,21 @@
-export const ADMIN_PATH = "/admin";
+export const USER_PATH = "/user";
 
 export const ROUTERS = {
     USER: {
-        HOME: "",
-        LOGINPAGE: "login",
-        PROFILE:"thong-tin-ca-nhan",
-        BOOKNEW: "sach-moi",
-        BOOKLIST: "/danh-sach-san-pham",
-        BOOKDETAIL: "/danh-sach-san-pham/chi-tiet-san-pham/:id",
-        BOOKCARTSHOPPING: "/gio-hang",
-        CHECKOUT: "/thanh-toan",
-        BOOKRANK: "sach-ban-chay",
-        BOOKHISTORY: "lich-su-mua-sach",
-        BOOKHOTLINE: "lien-he",
+        HOME: `${USER_PATH}`,
+        LOGINPAGE: `${USER_PATH}/login`,
+        REGISTER: `${USER_PATH}/register`,
+        PROFILE: `${USER_PATH}/thong-tin-ca-nhan`,
+        BOOKNEW: `${USER_PATH}/sach-moi`,
+        BOOKLIST: `${USER_PATH}/danh-sach-san-pham`,
+        BOOKDETAIL: `${USER_PATH}/danh-sach-san-pham/chi-tiet-san-pham/:id`,
+        BOOKCARTSHOPPING: `${USER_PATH}/gio-hang`,
+        CHECKOUT: `${USER_PATH}/thanh-toan`,
+        BOOKRANK: `${USER_PATH}/sach-ban-chay`,
+        BOOKHISTORY: `${USER_PATH}/lich-su-mua-sach`,
+        BOOKHOTLINE: `${USER_PATH}/lien-he`,
     },
     ADMIN: {
-        HOME: `${ADMIN_PATH}`,
-        LOGIN: `${ADMIN_PATH}/dang-nhap`,
-        LOGOUT: `${ADMIN_PATH}/dang-xuat`,
-        BOOKS: `${ADMIN_PATH}/quan-ly-sach`,
-        USERS: `${ADMIN_PATH}/quan-ly-nguoi-dung`,
-        STATISTICS: `${ADMIN_PATH}/thong-ke`,
-        SETTINGS: `${ADMIN_PATH}/cai-dat`,
-    }
+        HOME: "/",
+        }
 };

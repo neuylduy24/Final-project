@@ -67,14 +67,8 @@ $bannerImage: "/assets/user/image/hero/Argosy-Cropped.jpg";
 
         li:last-child {
             cursor: pointer;
-            margin-left: 15px;
             display: flex;
             align-items: center;
-
-            span {
-                font-size: 16px;
-                margin-left: 5px;
-            }
         }
     }
 
@@ -99,12 +93,12 @@ $bannerImage: "/assets/user/image/hero/Argosy-Cropped.jpg";
     }
 }
 
-.header_logo {
-    img {
-        cursor: pointer;
-        max-width: 250px;
-    }
-}
+// .header_logo {
+//     img {
+//         cursor: pointer;
+//         max-width: 150px;
+//     }
+// }
 
 .header_menu {
     padding: 24px 0;
@@ -231,6 +225,7 @@ $bannerImage: "/assets/user/image/hero/Argosy-Cropped.jpg";
         width: 99.3%;
         background: #ffffff;
         transition: all 0.3s;
+        z-index: 9999;
 
         li {
             list-style: none;
@@ -264,10 +259,10 @@ $bannerImage: "/assets/user/image/hero/Argosy-Cropped.jpg";
 
     .hero-search-form {
         width: 600px;
-        height: 50px;
+        height: 5px;
         float: left;
         padding-left: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 60px;
 
         form {
             display: flex;

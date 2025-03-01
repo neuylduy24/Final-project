@@ -1,87 +1,50 @@
 import React from "react";
-import { ADMIN_PATH, ROUTERS } from "./utils/router";
-import HomePage from "./pages/user/homePage";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { ROUTERS, USER_PATH } from "./utils/router";
+
 import MasterLayout from "./pages/user/theme/masterLayout";
+import HomePage from "./pages/user/homePage";
 import BookListProductPage from "./pages/user/bookListProductPage";
 import BookDetailProductPage from "./pages/user/BookDetailProductPage";
-import ShoppingCartPage from "pages/user/shoppingCartPage";
-import CheckoutPage from "pages/user/checkoutPage";
-import LoginPage from "pages/admin/loginPage";
-import MasterLayoutAdmin from "pages/admin/theme/masterLayoutAdmin";
-import BookManagementAdPage from "pages/admin/bookManagementAdPage";
-import UserManagementAdPage from "pages/admin/userManagementAdPage";
-import StatisticManagementPage from "pages/admin/statisticManagementPage";
+import ShoppingCartPage from "./pages/user/shoppingCartPage";
+import CheckoutPage from "./pages/user/checkoutPage";
+import LoginPage from "./pages/user/loginPage";
+import RegisterPage from "./pages/user/registerPage";
 
-const renderUserRouter = () => {
-    const userRouters = [
-        {
-            path: ROUTERS.USER.HOME,
-            component: <HomePage />,
-        },
-        {
-            path: ROUTERS.USER.BOOKLIST,
-            component: <BookListProductPage />,
-        },
-        {
-            path: ROUTERS.USER.BOOKDETAIL,
-            component: <BookDetailProductPage />,
-        },
-        {
-            path: ROUTERS.USER.BOOKCARTSHOPPING,
-            component: <ShoppingCartPage />,
-        },
-        {
-            path: ROUTERS.USER.CHECKOUT,
-            component: <CheckoutPage />,
-        },
-    ];
-
-    return (
-        <MasterLayout>
-        <Routes>
-            {userRouters.map((item, key) => (
-                <Route key={key} path={item.path} element={item.component} />
-            ))}
-        </Routes>
-        </MasterLayout>
-    );
-};
-
-
-const renderAdminRouter = () => {
-    const adminRouters = [
-        {
-            path: ROUTERS.ADMIN.LOGIN,
-            component: <LoginPage />,
-        },
-        {
-            path: ROUTERS.ADMIN.STATISTICS,
-            component: <StatisticManagementPage />,
-        },
-        {
-            path: ROUTERS.ADMIN.BOOKS,
-            component: <BookManagementAdPage />,
-        },
-        {
-            path: ROUTERS.ADMIN.USERS,
-            component: <UserManagementAdPage />,
-        },
-    ];
-    return (
-        <MasterLayoutAdmin>
-        <Routes>
-            {adminRouters.map((item, key) => (
-                <Route key={key} path={item.path} element={item.component} />
-            ))}
-        </Routes>
-        </MasterLayoutAdmin>
-    );
-};
 const RouterCustom = () => {
     const location = useLocation();
-    const isAdminRouters = location.pathname.startsWith(ADMIN_PATH);
+    const isRegisterPage = location.pathname === ROUTERS.USER.REGISTER;
+    const isUserRouters = location.pathname.startsWith(USER_PATH);
 
-    return isAdminRouters ? renderAdminRouter() : renderUserRouter();
+    if (!isUserRouters) {
+        return <Navigate to={ROUTERS.USER.LOGINPAGE} replace />;
+    }
+
+    return (
+        <Routes>
+            {isRegisterPage ? (
+                <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
+            ) : (
+                <Route
+                    path="*"
+                    element={
+                        <MasterLayout>
+                            <Routes>
+                                <Route path="/" element={<Navigate to={ROUTERS.USER.LOGINPAGE} replace />} />
+                                <Route path={ROUTERS.USER.LOGINPAGE} element={<LoginPage />} />
+                                <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
+                                <Route path={ROUTERS.USER.HOME} element={<HomePage />} />
+                                <Route path={ROUTERS.USER.BOOKLIST} element={<BookListProductPage />} />
+                                <Route path={ROUTERS.USER.BOOKDETAIL} element={<BookDetailProductPage />} />
+                                <Route path={ROUTERS.USER.BOOKCARTSHOPPING} element={<ShoppingCartPage />} />
+                                <Route path={ROUTERS.USER.CHECKOUT} element={<CheckoutPage />} />
+                            </Routes>
+                        </MasterLayout>
+                    }
+                />
+            )}
+        </Routes>
+    );
 };
+
 export default RouterCustom;

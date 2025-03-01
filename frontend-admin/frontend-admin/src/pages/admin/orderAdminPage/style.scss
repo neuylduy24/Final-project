@@ -1,0 +1,161 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+
+.orders {
+    background: #fff;
+    border-radius: 8px;
+
+    h2 {
+        margin-bottom: 30px;
+        color: map.get($theme-colors, "normal-text");
+    }
+
+    .orders_table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+
+        th,
+        td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td {
+            height: 100px;
+        }
+
+        .orders_dropdown {
+            position: relative;
+            min-width: 150px;
+            display: flex;
+            justify-content: center;
+
+            .orders_dropdown_menu {
+                position: absolute;
+                top: calc(100% + 1px);
+                right: 20px;
+                background: #ffffff;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                border-radius: 5px;
+                border: 1px solid #e0e0e0;
+                min-width: 60px;
+                z-index: 1;
+            }
+            .orders_dropdown-item {
+                width: 100%;
+                padding: 10px 15px;
+                font-size: 15px;
+                color: map.get($theme-colors, "normal-text");
+                background: none;
+                cursor: pointer;
+                border: none;
+                text-align: left;
+                display: block;
+                &:hover {
+                    background: #f5f5f5;
+                }
+                
+            }
+            .orders_dropdown-item--danger{
+                color: red;
+
+                &:hover {
+                    background: #ffcccc;
+                }
+            }
+
+            .orders_action-button {
+                height: 36px;
+                padding: 0 18px;
+                font-size: 14px;
+                width: 30px;
+                background: #ffffff;
+                color: map.get($theme-colors, "normal-text");
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                min-width: 150px;
+                gap: 10px;
+                justify-content: center;
+
+                &:hover {
+                    background: #f5f5f5;
+                }
+
+                // .orders_dropdown_arrow{
+                //     transform: rotate(180deg);
+                // }
+                .orders_dropdown_arrow {
+                    font-size: 10px;
+                    transition: transform 0.3s ease;
+                }
+            }
+        }
+    }
+}
+
+.orders_footer {
+    display: flex;
+    justify-content: space-between;
+    .orders_pagnigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .orders_page-number {
+        display: flex;
+        gap: 10px;
+    }
+}
+
+.orders-page-button {
+    height: 36px;
+    min-width: 36px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: map.get($theme-colors, "normal-text");
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+
+    &:hover:not(.orders-page-button-active) {
+        background: map.get($theme-colors, "main");
+        color: #ffffff;
+    }
+
+    &.orders-page-button-active {
+        background: map.get($theme-colors, "main");
+        color: #ffffff;
+        border-color: map.get($theme-colors, "main");
+    }
+}
+
+
+@include Responsive($MEDIUM_DEVICE) {
+    .login {
+        width: 990px !important;
+    }
+}
+
+@include Responsive($TABLET_DEVICE) {
+    .login {
+        width: 750px !important;
+    }
+}
+
+@include Responsive($WIDE_MOBILE) {
+    .login {
+        width: 540px !important;
+    }
+}

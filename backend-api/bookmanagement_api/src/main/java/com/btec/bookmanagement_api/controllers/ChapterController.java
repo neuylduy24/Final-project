@@ -71,4 +71,17 @@ public class ChapterController {
     public List<Chapter> getTop5LatestChapters() {
         return chapterService.getTop5LatestChapters();
     }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<Void> incrementChapterViews(@PathVariable String id) {
+        chapterService.incrementChapterViews(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // API lấy tổng lượt xem của một sách
+    @GetMapping("/book/{bookId}/views")
+    public ResponseEntity<Integer> getTotalViewsByBookId(@PathVariable String bookId) {
+        int totalViews = chapterService.getTotalViewsByBookId(bookId);
+        return ResponseEntity.ok(totalViews);
+    }
 }

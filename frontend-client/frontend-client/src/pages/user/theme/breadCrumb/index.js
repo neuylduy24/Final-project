@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import './style.scss';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram } from 'react-icons/fa6';
 import { ROUTERS } from 'utils/router';
 const breadCrumb = (props) => {
   return <div className="breadCrumb">

@@ -1,13 +1,26 @@
 import React from 'react';
+import { useLocation, Navigate } from 'react-router-dom';
 import Header from '../header';
 import Footer from '../footer';
-const MasterLayout = ({children, ...props}) => {
+import { ROUTERS } from 'utils/router';
+
+const MasterLayoutUser = ({ children }) => {
+    const location = useLocation();
+    const isLoginPage = location.pathname.startsWith(ROUTERS.USER.LOGINPAGE);
+
+    const isAuthenticated = localStorage.getItem('token'); 
+
+    if (!isAuthenticated && !isLoginPage) {
+        return <Navigate to={ROUTERS.USER.LOGINPAGE} replace />;
+    }
+
     return (
-        <div {...props}>
-            <Header />
+        <div>
+            {!isLoginPage && <Header />}
             {children}
-            <Footer />
+            {!isLoginPage && <Footer />}
         </div>
     );
 }
-export default MasterLayout;
+
+export default MasterLayoutUser;

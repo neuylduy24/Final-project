@@ -28,6 +28,11 @@ public class Chapter {
     private String content;
     @CreatedDate
     private LocalDateTime createdAt;
+    private int views = 0 ;
+
+    public void incrementViews() {
+        this.views++;
+    }
 
     @Override
     public String toString() {

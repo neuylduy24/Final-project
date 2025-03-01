@@ -3,6 +3,10 @@ package com.btec.bookmanagement_api.configs;
 import com.btec.bookmanagement_api.entities.User;
 import com.btec.bookmanagement_api.enums.Role;
 import com.btec.bookmanagement_api.repositories.UserRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -12,10 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.HashSet;
 
 @Configuration
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ApplicationInitConfig {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    PasswordEncoder passwordEncoder;
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository){
@@ -28,6 +35,8 @@ public class ApplicationInitConfig {
                         .password(passwordEncoder.encode("admin"))
                         .roles(roles)
                         .build();
+                userRepository.save(user);
+                log.warn("admin user has been created with default password: admin, please change it");
             }
         };
     }

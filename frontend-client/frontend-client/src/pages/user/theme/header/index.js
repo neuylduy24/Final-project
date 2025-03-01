@@ -114,7 +114,7 @@ const Header = () => {
         </div>
         <div className="menu_wrapper_widget">
           <div className="header_top_right_auth">
-            <Link to={ROUTERS.ADMIN.LOGIN}>
+            <Link to={ROUTERS.USER.LOGINPAGE}>
               <FaUser /> Đăng Nhập
             </Link>
           </div>
@@ -165,7 +165,9 @@ const Header = () => {
           <div className="row">
             <div className="col-6 header_top_left">
               <ul>
-                <li><MdEmail />trongnnbh00676@gmail.com</li>
+              <Link to={ROUTERS.USER.HOME}>
+                <img width="150px" src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
+              </Link>
                 <li>CHÀO MỪNG BẠN ĐẾN BOOKSTORE</li>
               </ul>
             </div>
@@ -182,10 +184,9 @@ const Header = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to={ROUTERS.ADMIN.LOGIN}>
+                  <Link to={ROUTERS.USER.LOGINPAGE}>
                     <FaUser />
                   </Link>
-                  <span>Đăng Nhập</span>
                 </li>
               </ul>
             </div>
@@ -196,9 +197,9 @@ const Header = () => {
         <div className="row">
           <div className="col-lg-3">
             <div className="header_logo">
-              <Link to={ROUTERS.USER.HOME}>
+              {/* <Link to={ROUTERS.USER.HOME}>
                 <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
-              </Link>
+              </Link> */}
             </div>
           </div>
           <div className="col-lg-6">

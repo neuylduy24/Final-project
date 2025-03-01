@@ -11,7 +11,8 @@ const ProductCard = ({ img, name }) => {
                 <div className="featured_item_img" style={{ backgroundImage: `url(${img})` }}>
                     <ul className="featured_item_img_hover">
                         <li>
-                            <FaRegEye />
+                            <Link to={generatePath(ROUTERS.USER.BOOKDETAIL, { id: 1 })}>
+                            <FaRegEye /></Link>
                         </li>
                     </ul>
                 </div>

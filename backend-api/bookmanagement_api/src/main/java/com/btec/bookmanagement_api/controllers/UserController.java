@@ -3,6 +3,7 @@ package com.btec.bookmanagement_api.controllers;
 import com.btec.bookmanagement_api.entities.ReadingHistory;
 import com.btec.bookmanagement_api.entities.User;
 import com.btec.bookmanagement_api.repositories.UserRepository;
+import com.btec.bookmanagement_api.security.JwtUtil;
 import com.btec.bookmanagement_api.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,5 +106,16 @@ public class UserController {
     public List<String> getBookmarkedBooks(@PathVariable String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return user.getBookmarkedBooks();
+    }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<String> validateToken(@RequestParam String token) {
+        boolean isValid = false;
+        try {
+            isValid = JwtUtil.verifyToken(token);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return isValid ? ResponseEntity.ok("Valid token") : ResponseEntity.status(401).body("Invalid or expired token");
     }
 }

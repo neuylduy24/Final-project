@@ -23,6 +23,7 @@ import java.util.Set;
 @Builder
 @Data
 @Entity
+@Document(collection = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -60,12 +60,19 @@ public class AuthController {
             return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
         }
 
-        // Generate JWT token
-        String token = JwtUtil.generateToken(user.getEmail());
+        // Chuyển Set<String> roles thành chuỗi "USER,ADMIN"
+        String roles = String.join(",", user.getRoles());
 
-        // Return the token
-        Map<String, String> response = new HashMap<>();
+        // Generate JWT token (truyền cả email và roles)
+        String token = JwtUtil.generateToken(user.getEmail(), roles);
+
+        // Return the token và role
+        Map<String, Object> response = new HashMap<>();
         response.put("token", token);
+        response.put("roles", user.getRoles()); // Trả về danh sách roles đầy đủ
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
 }

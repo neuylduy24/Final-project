@@ -4,15 +4,7 @@ import CategoryTable from "../../component/Categories/CategoriesTable";
 import Pagination from "../../component/common/Pagination";
 
 const CategoriesManagementAdPage = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Tình cảm", createdAt: "2024-01-15" },
-    { id: 2, name: "Trinh thám", createdAt: "2024-02-20" },
-    { id: 3, name: "Hài hước", createdAt: "2024-03-10" },
-    { id: 4, name: "Kinh dị", createdAt: "2024-04-05" },
-    { id: 5, name: "Khoa học", createdAt: "2024-05-22" },
-    { id: 6, name: "Lịch sử", createdAt: "2024-06-30" },
-    { id: 7, name: "Viễn tưởng", createdAt: "2024-06-30" },
-  ]);
+  const [categories, setCategories] = useState([]);
   
   const [form, setForm] = useState({ id: "", name: "", createdAt: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -49,7 +41,7 @@ const CategoriesManagementAdPage = () => {
 
   return (
     <div className="container">
-      <div className="categories">
+      <div className="container-management">
         <h2>Quản lý thể loại</h2>
 
         {showForm && (

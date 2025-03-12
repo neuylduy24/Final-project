@@ -44,7 +44,7 @@ const UserManagementAdPage = () => {
 
   return (
     <div className="container">
-      <div className="users">
+      <div className="container-management">
         <h2>Quản lý người dùng</h2>
 
         {showForm && <UserForm form={form} setForm={setForm} handleInputChange={handleInputChange} handleSubmit={handleSubmit} setShowForm={setShowForm} isEditing={isEditing} />}

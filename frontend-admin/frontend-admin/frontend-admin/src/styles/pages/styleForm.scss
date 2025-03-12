@@ -3,7 +3,7 @@
 @import "../../styles/pages/responsive.scss";
 
 
-.container-page {
+.container-management {
     background: #fff;
     border-radius: 8px;
     padding: 20px;
@@ -50,7 +50,7 @@
                 font-size: 14px;
                 background: white;
                 color: black;
-                appearance: none; // Ẩn style mặc định của select trên một số trình duyệt
+                appearance: none; 
 
                 &:focus {
                     outline: none;
@@ -102,12 +102,29 @@
         }
 
     }
+    .search-input{
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 70%;
+        font-size: 14px;
+        background: white;
+        color: black;
+        appearance: none; 
+        &:focus {
+            outline: none;
+            border-color: rgb(33, 175, 218);
+            box-shadow: 0 0 5px rgba(33, 175, 218, 0.5);
+        }
+    }
 
     h2 {
         margin-bottom: 20px;
         font-size: 24px;
         text-align: center;
     }
+
+    
 
     .container-table {
         width: 100%;
@@ -168,9 +185,47 @@
         }
     }
 }
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+
+    .search-input {
+        width: 100%;
+        max-width: 300px; 
+        padding: 10px 10px 10px 35px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        background: white;
+        color: black;
+        appearance: none;
+
+        &:focus {
+            outline: none;
+            border-color: rgb(33, 175, 218);
+            box-shadow: 0 0 5px rgba(33, 175, 218, 0.5);
+        }
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        color: #4d4d4d;
+        font-size: 16px;
+    }
+}
+
+  
+
 @include Responsive($DESKTOP) {
     .container {
         max-width: 1200px;
+    }
+    .search-container {
+        max-width: 400px;
     }
 
     .container-table {
@@ -199,7 +254,7 @@
         max-width: 990px;
     }
 
-    .container-page {
+    .container-management {
         padding: 15px;
     }
 
@@ -245,6 +300,13 @@
         max-width: 540px;
     }
 
+    .search-container {
+        max-width: 60%;
+        justify-content: center; 
+    }
+    .search-input {
+        width: 90%;
+    }
     .modal-content {
         width: 90%;
     }
@@ -272,6 +334,14 @@
     }
 
     .modal-content {
+        width: 100%;
+    }
+    .search-container {
+        max-width: 60%;
+        justify-content: center;
+    }
+
+    .search-input {
         width: 100%;
     }
 

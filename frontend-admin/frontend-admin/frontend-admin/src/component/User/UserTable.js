@@ -1,8 +1,7 @@
 import React from "react";
-import "./styleForm.scss"
 const UserTable = ({ users = [], handleEdit, handleDelete, setShowForm, setForm, setIsEditing }) => {
   return (
-    <table className="users-table">
+    <table className="container-table">
       <thead>
         <tr>
           <th>Id</th>

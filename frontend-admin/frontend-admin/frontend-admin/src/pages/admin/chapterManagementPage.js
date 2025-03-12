@@ -48,7 +48,7 @@ const ChapterManagementPage = () => {
 
   return (
     <div className="container">
-      <div className="container-page">
+      <div className="container-management">
         <h2>Quản lý chương</h2>
 
         {showForm && <ChapterForm form={form} setForm={setForm} handleSubmit={handleSubmit} closeForm={() => setShowForm(false)} isEditing={isEditing} />}

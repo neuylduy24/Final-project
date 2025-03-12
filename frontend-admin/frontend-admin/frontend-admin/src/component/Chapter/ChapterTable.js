@@ -1,5 +1,4 @@
 import React from "react";
-import "./styleForm.scss"
 const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm }) => {
   return (
       <table className="container-table">

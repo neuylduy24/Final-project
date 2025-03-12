@@ -3,58 +3,55 @@ import "./style.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { ROUTERS } from "../../../utils/router";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import CSS cho toast
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess(""); 
     setLoading(true);
 
     try {
-        const response = await axios.post("http://150.95.105.147:8080/api/auth/sign-in", formData);
+      const response = await axios.post("http://150.95.105.147:8080/api/auth/sign-in", formData);
 
-        if (response.status === 200 && response.data.token) {
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("email", formData.email); 
+      if (response.status === 200 && response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("email", formData.email);
 
-            setSuccess("Đăng nhập thành công!");
-            setTimeout(() => {
-                navigate(ROUTERS.ADMIN.STATISTICS); 
-            }, 500);
-        } else {
-            setError("Email hoặc mật khẩu không chính xác.");
-        }
+        toast.success("✅ Đăng nhập thành công!", { autoClose: 1000 });
+
+        setTimeout(() => {
+          navigate(ROUTERS.ADMIN.STATISTICS);
+        }, 2000);
+      } else {
+        toast.error("❌ Email hoặc mật khẩu không chính xác!");
+      }
     } catch (err) {
-        if (!err.response) {
-            setError("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại server.");
-        } else if (err.response.status === 401) {
-            setError("Email hoặc mật khẩu không đúng.");
-        } else {
-            setError(err.response?.data?.message || "Đã xảy ra lỗi, vui lòng thử lại.");
-        }
+      if (!err.response) {
+        toast.error("❌ Không thể kết nối đến máy chủ!");
+      } else if (err.response.status === 401) {
+        toast.error("❌ Email hoặc mật khẩu không đúng!");
+      } else {
+        toast.error(err.response?.data?.message || "❌ Đã xảy ra lỗi, vui lòng thử lại!");
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
-
-
-
+  };
 
   return (
     <div className="login">
+      {/* ToastContainer để hiển thị thông báo */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="login-container">
         <div className="login-left">
           <Link to={ROUTERS.USER.HOME}>
@@ -97,8 +94,6 @@ const LoginPage = () => {
                 required
               />
             </div>
-            {success && <p className="success-message">{success}</p>}
-            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>

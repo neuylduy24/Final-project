@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import "../../styles/pages/styleForm.scss"
+import "../../styles/pages/styleForm.scss";
 
-const CategoriesForm = ({ category ={}, onSave, setShowForm, isEditing }) => {
-  const [formData, setFormData] = useState({ id: "", name: "" });
+const CategoriesForm = ({ category = {}, onSave, setShowForm, isEditing }) => {
+  const [formData, setFormData] = useState({
+    id: Date.now().toString(),
+    name: "",
+    createdAt: new Date().toISOString().split("T")[0],
+  });
 
   useEffect(() => {
     if (category && isEditing) {
       setFormData(category);
     } else {
-      setFormData({ id: "", name: "" });
+      setFormData({
+        id: Date.now().toString(),
+        name: "",
+        createdAt: new Date().toISOString().split("T")[0],
+      });
     }
   }, [category, isEditing]);
 
@@ -39,10 +47,8 @@ const CategoriesForm = ({ category ={}, onSave, setShowForm, isEditing }) => {
             onChange={handleChange}
             required
           />
-          <div className="button-group">
             <button type="submit">{isEditing ? "Cập nhật" : "Thêm mới"}</button>
             <button type="button" onClick={() => setShowForm(false)}>Hủy</button>
-          </div>
         </form>
       </div>
     </div>

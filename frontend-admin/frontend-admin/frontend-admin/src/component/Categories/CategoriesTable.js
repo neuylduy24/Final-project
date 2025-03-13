@@ -1,23 +1,28 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import CategoriesForm from "./CategoriesForm";
+import { FaSearch } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
 
 const API_URL = "http://150.95.105.147:8080/api/categories";
 
-const CategoriesTable = () => {
+const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState([]);
 
   // Lấy danh sách thể loại từ API
   const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(API_URL);
       setCategories(response.data);
+      setFilteredCategories(response.data);
     } catch (error) {
-      toast.error("Lỗi khi lấy danh sách thể loại!");
+      toast.error("🚨 Lỗi khi lấy danh sách thể loại!");
     }
   }, []);
 
@@ -25,11 +30,18 @@ const CategoriesTable = () => {
     fetchCategories();
   }, [fetchCategories]);
 
+  // Xử lý tìm kiếm
+  useEffect(() => {
+    const filtered = categories.filter((category) =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCategories(filtered);
+  }, [searchTerm, categories]);
+
   // Xử lý thêm & cập nhật thể loại
   const handleSave = async (category) => {
     try {
       if (!isEditing) {
-        // Tạo ID mới nếu backend không trả về ID
         const newCategory = {
           ...category,
           id:
@@ -39,26 +51,19 @@ const CategoriesTable = () => {
           createdAt: new Date().toISOString(),
         };
 
-        // Gửi yêu cầu POST lên backend
         const response = await axios.post(API_URL, newCategory);
-
-        // Nếu backend trả về ID, cập nhật lại
         const savedCategory = response.data || newCategory;
-
-        // Cập nhật danh sách categories mà không ghi đè dữ liệu cũ
         setCategories((prevCategories) => [...prevCategories, savedCategory]);
 
-        toast.success("📂 Thêm thể loại thành công!");
+        toast.success(
+          `📂 Đã thêm thể loại "${savedCategory.name}" thành công!`
+        );
       } else {
-        // Gửi yêu cầu cập nhật
         await axios.put(`${API_URL}/${category.id}`, category);
-
-        // Cập nhật danh sách categories
         setCategories((prevCategories) =>
           prevCategories.map((c) => (c.id === category.id ? category : c))
         );
-
-        toast.info("✏️ Cập nhật thể loại thành công!");
+        toast.info(`✏️ Đã cập nhật thể loại "${category.name}"!`);
       }
 
       setShowForm(false);
@@ -68,30 +73,78 @@ const CategoriesTable = () => {
     }
   };
 
+  // Xử lý xóa thể loại
   const handleDelete = async (id) => {
+    // Kiểm tra nếu ID không hợp lệ (null, undefined, rỗng)
+    if (!id || id === "" || id === null || id === undefined) {
+      toast.error("❌ Không thể xóa thể loại vì thiếu ID hợp lệ!");
+      return;
+    }
+  
+    const categoryToDelete = categories.find((c) => c.id === id);
+    if (!categoryToDelete) {
+      toast.error("❌ Không tìm thấy thể loại để xóa!");
+      return;
+    }
+  
     try {
-      // Gửi yêu cầu xóa lên API
-      await axios.delete(`http://150.95.105.147:8080/api/categories/${id}`);
-  
-      // Cập nhật lại danh sách categories sau khi xóa
-      setCategories((prevCategories) => prevCategories.filter((c) => c.id !== id));
-  
-      toast.warning("🗑️ Xóa thể loại thành công!");
+      await axios.delete(`${API_URL}/${id}`);
+      setCategories((prevCategories) =>
+        prevCategories.filter((c) => c.id !== id)
+      );
+      toast.warning(`🗑️ Đã xóa thể loại "${categoryToDelete.name}"!`);
     } catch (error) {
       toast.error("❌ Lỗi khi xóa thể loại!");
       console.error("Lỗi khi xóa thể loại:", error);
     }
   };
+  // const deleteEmptyCategories = async () => {
+  //   try {
+  //     // Lọc các thể loại có ID rỗng hoặc không hợp lệ
+  //     const emptyCategories = categories.filter((c) => !c.id || c.id === "");
+  
+  //     if (emptyCategories.length === 0) {
+  //       toast.info("✅ Không có thể loại nào có ID rỗng để xóa!");
+  //       return;
+  //     }
+  
+  //     // Chỉ gửi yêu cầu DELETE nếu ID hợp lệ
+  //     await Promise.all(
+  //       emptyCategories
+  //         .filter((c) => c.id) // Chặn gửi ID rỗng
+  //         .map(async (category) => {
+  //           await axios.delete(`${API_URL}/${category.id}`);
+  //         })
+  //     );
+  
+  //     // Cập nhật danh sách thể loại sau khi xóa
+  //     setCategories((prevCategories) =>
+  //       prevCategories.filter((c) => c.id) // Xóa thể loại có ID rỗng khỏi UI
+  //     );
+  
+  //     toast.success("🗑️ Đã xóa tất cả thể loại có ID rỗng!");
+  //   } catch (error) {
+  //     toast.error("❌ Lỗi khi xóa các thể loại có ID rỗng!");
+  //     console.error("Lỗi khi xóa thể loại:", error);
+  //   }
+  // };
   
   
+  
+
+  // Mở form thêm thể loại
   const handleAddCategory = () => {
     setSelectedCategory(null);
     setShowForm(true);
     setIsEditing(false);
   };
+  const indexOfLastBook = currentPage * categoriesPerPage;
+  const indexOfFirstBook = indexOfLastBook - categoriesPerPage;
+  const currentCategories = filteredCategories.slice(indexOfFirstBook, indexOfLastBook);
 
   return (
     <div>
+      <ToastContainer position="top-right" autoClose={2000} />
       {showForm && (
         <CategoriesForm
           category={selectedCategory}
@@ -100,49 +153,61 @@ const CategoriesTable = () => {
           isEditing={isEditing}
         />
       )}
+
+      {/* Thanh tìm kiếm */}
+      <div className="search-container">
+        <FaSearch className="search-icon" />
+        <input
+          className="search-input"
+          type="text"
+          placeholder="Tìm kiếm thể loại..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button className="add-button" onClick={handleAddCategory}>
+          ➕ Thêm
+        </button>
+      </div>
+
+      {/* Bảng danh sách thể loại */}
       <table className="container-table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Tên thể loại</th>
-            <th>Ngày tạo</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {categories.length > 0 ? (
-            categories.map((category) => (
-              <tr key={category.id}>
-                <td>{category.id}</td>
-                <td>{category.name}</td>
-                <td>{category.createdAt}</td>
-                <td className="button-group">
-                  <button className="add-button" onClick={handleAddCategory}>
-                  ➕ Thêm
-                  </button>
-
-                  <button
-                    className="edit-button"
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setShowForm(true);
-                      setIsEditing(true);
-                    }}
-                  >
-                    ✏️ Sửa
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(category.id)}
-                  >
-                    🗑️ Xóa
-                  </button>
-                </td>
-              </tr>
-            ))
+          {currentCategories.length > 0 ? (
+            currentCategories
+              .map((category) => (
+                <tr key={category.id}>
+                  <td>{category.id}</td>
+                  <td>{category.name}</td>
+                  <td className="button-group">
+                    <button
+                      className="edit-button"
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setShowForm(true);
+                        setIsEditing(true);
+                      }}
+                    >
+                      ✏️ Sửa
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(category.id)}
+                    >
+                      🗑️ Xóa
+                    </button>
+                  </td>
+                </tr>
+              ))
           ) : (
             <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
+              <td colSpan="3" style={{ textAlign: "center" }}>
                 Không có thể loại nào
               </td>
             </tr>

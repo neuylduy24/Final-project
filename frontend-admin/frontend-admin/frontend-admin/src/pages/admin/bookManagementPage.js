@@ -34,23 +34,22 @@ const BookManagementPage = () => {
     e.preventDefault();
     try {
       if (isEditing) {
-        await axios.put(
-          `http://150.95.105.147:8080/api/books/${form.id}`,
-          form
-        );
+        await axios.put(`http://150.95.105.147:8080/api/books/${form.id}`, form);
       } else {
-        await axios.post("http://150.95.105.147:8080/api/books", {
-          ...form
-        });
+        const response = await axios.post("http://150.95.105.147:8080/api/books", form);
+        setBooks((prevBooks) => [...prevBooks, response.data]); 
       }
-      await fetchBooks();
+  
       setShowForm(false);
       setIsEditing(false);
-      setForm({ id: "", title: "", author: ""});
+      setForm({ id: "", title: "", author: "" });
+  
+      setCurrentPage(Math.ceil((books.length + 1) / booksPerPage));
     } catch (error) {
       console.error("Lỗi khi lưu sách:", error);
     }
   };
+  
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);

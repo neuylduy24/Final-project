@@ -31,7 +31,6 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
       setBooks(response.data);
     } catch (error) {
       toast.error("❌ Lỗi khi lấy dữ liệu sách!");
-      console.error("Lỗi khi lấy dữ liệu sách:", error);
     }
   }
 
@@ -46,20 +45,21 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
       if (!isEditing) {
         const newBook = {
           ...book,
-          id: books.length > 0 ? Math.max(...books.map((b) => b.id)) + 1 : 1,
           createdAt: new Date().toISOString(),
         };
         await axios.post("http://150.95.105.147:8080/api/books", newBook);
         toast.success("📖 Thêm sách thành công!");
       } else {
-        await axios.put(`http://150.95.105.147:8080/api/books/${book.id}`, book);
+        await axios.put(
+          `http://150.95.105.147:8080/api/books/${book.id}`,
+          book
+        );
         toast.info("✏️ Cập nhật sách thành công!");
       }
       fetchBooks();
       setShowForm(false);
     } catch (error) {
       toast.error("❌ Lỗi khi lưu sách!");
-      console.error("Lỗi khi lưu sách:", error);
     }
   };
 
@@ -70,7 +70,6 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
       toast.warning("🗑️ Xóa sách thành công!");
     } catch (error) {
       toast.error("❌ Lỗi khi xóa sách!");
-      console.error("Lỗi khi xóa sách:", error);
     }
   };
 
@@ -100,6 +99,16 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <button
+          className="add-button"
+          onClick={() => {
+            setSelectedBook(null);
+            setShowForm(true);
+            setIsEditing(false);
+          }}
+        >
+          Thêm
+        </button>
       </div>
 
       <table className="container-table">
@@ -119,22 +128,23 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                 <td>{book.id}</td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
-                <td>{book.category}</td>
+                <td>
+                  {Array.isArray(book.category)
+                    ? book.category.map((cat) => cat.name).join(", ")
+                    : book.category}
+                </td>
+
                 <td className="button-group">
                   <button
-                    className="add-button"
-                    onClick={() => {
-                      setSelectedBook(null);
-                      setShowForm(true);
-                      setIsEditing(false);
-                    }}
+                    className="edit-button"
+                    onClick={() => handleEdit(book)}
                   >
-                    Thêm
-                  </button>
-                  <button className="edit-button" onClick={() => handleEdit(book)}>
                     Sửa
                   </button>
-                  <button className="delete-button" onClick={() => handleDelete(book.id)}>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(book.id)}
+                  >
                     Xóa
                   </button>
                 </td>

@@ -155,16 +155,6 @@
                 transition: all 0.3s ease;
             }
 
-            .add-button {
-                background-color: rgb(33, 175, 218);
-                height: 40px;
-                color: white;
-
-                &:hover {
-                    background-color: darken(rgb(33, 175, 218), 20%);
-                }
-            }
-
             .edit-button {
                 background-color: rgb(255, 193, 7);
                 color: white;
@@ -191,10 +181,30 @@
     align-items: center;
     width: 100%;
     margin-bottom: 5px;
+    
+    button {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .add-button {
+        background-color: rgb(33, 175, 218);
+        height: 55px;
+        width: 40%;
+        color: white;
+
+        &:hover {
+            background-color: darken(rgb(33, 175, 218), 20%);
+        }
+    }
 
     .search-input {
         width: 100%;
-        max-width: 300px; 
+        max-width: 100%; 
         padding: 10px 10px 10px 35px;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -225,7 +235,10 @@
         max-width: 1200px;
     }
     .search-container {
-        max-width: 400px;
+        max-width: 100%;
+    }
+    .add-button{
+        max-width: 10%;
     }
 
     .container-table {
@@ -243,7 +256,7 @@
 
             button {
                 margin-bottom: 5px;
-                width: 30%;
+                width: 60%;
             }
         }
     }
@@ -281,6 +294,9 @@
         max-width: 750px;
     }
 
+    .search-container {
+        max-width: 100%;
+    }
     .modal-content {
         width: 80%;
     }
@@ -301,11 +317,10 @@
     }
 
     .search-container {
-        max-width: 60%;
-        justify-content: center; 
+        max-width: 100%;
     }
     .search-input {
-        width: 90%;
+        width: 100% !important;
     }
     .modal-content {
         width: 90%;
@@ -338,7 +353,6 @@
     }
     .search-container {
         max-width: 60%;
-        justify-content: center;
     }
 
     .search-input {

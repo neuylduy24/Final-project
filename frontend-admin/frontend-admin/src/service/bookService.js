@@ -1,35 +1,27 @@
 import axios from 'axios';
 
-// Tạo instance axios với cấu hình mặc định
-const apiClient = axios.create({
-  baseURL: 'https://api.it-ebook.io.vn',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
+const API_URL = 'https://api.it-ebook.io.vn/api/books';
 
-const getAllBooks = async () => {
-  try {
-    const response = await apiClient.get('/api/books');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching books:', error);
-    throw error;
-  }
+const bookService = {
+    // Lấy tất cả sách
+    getAllBooks: async () => {
+        try {
+            const response = await axios.get(API_URL);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Lấy sách theo ID
+    getBookById: async (id) => {
+        try {
+            const response = await axios.get(`${API_URL}/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 };
 
-const getBookById = async (id) => {
-  try {
-    const response = await apiClient.get(`/api/books/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching book ${id}:`, error);
-    throw error;
-  }
-};
-
-export {
-  getAllBooks,
-  getBookById
-};
+export default bookService; 

@@ -3,7 +3,7 @@
 @import "../../styles/pages/responsive.scss";
 
 
-.container-page {
+.container-management {
     background: #fff;
     border-radius: 8px;
     padding: 20px;
@@ -50,7 +50,7 @@
                 font-size: 14px;
                 background: white;
                 color: black;
-                appearance: none; // Ẩn style mặc định của select trên một số trình duyệt
+                appearance: none; 
 
                 &:focus {
                     outline: none;
@@ -102,12 +102,29 @@
         }
 
     }
+    .search-input{
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 70%;
+        font-size: 14px;
+        background: white;
+        color: black;
+        appearance: none; 
+        &:focus {
+            outline: none;
+            border-color: rgb(33, 175, 218);
+            box-shadow: 0 0 5px rgba(33, 175, 218, 0.5);
+        }
+    }
 
     h2 {
         margin-bottom: 20px;
         font-size: 24px;
         text-align: center;
     }
+
+    
 
     .container-table {
         width: 100%;
@@ -138,16 +155,6 @@
                 transition: all 0.3s ease;
             }
 
-            .add-button {
-                background-color: rgb(33, 175, 218);
-                height: 40px;
-                color: white;
-
-                &:hover {
-                    background-color: darken(rgb(33, 175, 218), 20%);
-                }
-            }
-
             .edit-button {
                 background-color: rgb(255, 193, 7);
                 color: white;
@@ -168,9 +175,70 @@
         }
     }
 }
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+    
+    button {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .add-button {
+        background-color: rgb(33, 175, 218);
+        height: 55px;
+        width: 40%;
+        color: white;
+
+        &:hover {
+            background-color: darken(rgb(33, 175, 218), 20%);
+        }
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 100%; 
+        padding: 10px 10px 10px 35px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        background: white;
+        color: black;
+        appearance: none;
+
+        &:focus {
+            outline: none;
+            border-color: rgb(33, 175, 218);
+            box-shadow: 0 0 5px rgba(33, 175, 218, 0.5);
+        }
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        color: #4d4d4d;
+        font-size: 16px;
+    }
+}
+
+  
+
 @include Responsive($DESKTOP) {
     .container {
         max-width: 1200px;
+    }
+    .search-container {
+        max-width: 100%;
+    }
+    .add-button{
+        max-width: 10%;
     }
 
     .container-table {
@@ -188,7 +256,7 @@
 
             button {
                 margin-bottom: 5px;
-                width: 30%;
+                width: 60%;
             }
         }
     }
@@ -199,7 +267,7 @@
         max-width: 990px;
     }
 
-    .container-page {
+    .container-management {
         padding: 15px;
     }
 
@@ -226,6 +294,9 @@
         max-width: 750px;
     }
 
+    .search-container {
+        max-width: 100%;
+    }
     .modal-content {
         width: 80%;
     }
@@ -245,6 +316,12 @@
         max-width: 540px;
     }
 
+    .search-container {
+        max-width: 100%;
+    }
+    .search-input {
+        width: 100% !important;
+    }
     .modal-content {
         width: 90%;
     }
@@ -272,6 +349,13 @@
     }
 
     .modal-content {
+        width: 100%;
+    }
+    .search-container {
+        max-width: 60%;
+    }
+
+    .search-input {
         width: 100%;
     }
 

@@ -1,0 +1,40 @@
+.user-list-container {
+  padding: 20px;
+
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+  }
+
+  .mat-column-actions {
+    width: 120px;
+    text-align: center;
+  }
+
+  .mat-column-username {
+    width: 200px;
+  }
+
+  .mat-column-email {
+    width: 250px;
+  }
+
+  .mat-column-roles {
+    width: 300px;
+  }
+
+  mat-chip-list {
+    display: inline-block;
+  }
+
+  mat-chip {
+    margin: 2px;
+  }
+} 

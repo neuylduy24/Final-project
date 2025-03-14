@@ -1,223 +1,270 @@
-import React, { useState, useEffect } from "react";
-import { getAllBooks } from "../../service/bookService";
-import { createChapter, updateChapter } from "../../service/chapterService";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import bookService from '../../service/bookService';
 
-const ChapterForm = ({ chapter, setChapter, onSuccess, closeForm, isEditing }) => {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [images, setImages] = useState([]);
+const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [uploadType, setUploadType] = useState('url'); // 'url' hoặc 'file'
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [previewUrls, setPreviewUrls] = useState([]);
 
-  useEffect(() => {
+    useEffect(() => {
+        fetchBooks();
+    }, []);
+
+    useEffect(() => {
+        // Xóa preview URLs khi component unmount
+        return () => {
+            previewUrls.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [previewUrls]);
+
     const fetchBooks = async () => {
-      try {
-        const data = await getAllBooks();
-        setBooks(data);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách sách:", error);
-        toast.error("Không thể lấy danh sách sách");
-      }
+        try {
+            setLoading(true);
+            const data = await bookService.getAllBooks();
+            setBooks(data);
+            setError(null);
+        } catch (err) {
+            setError("Không thể tải danh sách sách");
+            console.error("Error fetching books:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    fetchBooks();
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-    // Nếu đang chỉnh sửa, thiết lập danh sách hình ảnh
-    if (isEditing && chapter.images) {
-      setImages(chapter.images || []);
-    }
-  }, [isEditing, chapter.images]);
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        
+        if (files.length === 0) return;
+        
+        // Tạo preview URLs cho các files đã chọn
+        const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+        
+        setSelectedFiles(files);
+        setPreviewUrls(prevUrls => {
+            // Xóa các URL cũ để tránh memory leak
+            prevUrls.forEach(url => URL.revokeObjectURL(url));
+            return newPreviewUrls;
+        });
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Kiểm tra chapterNumber là số hợp lệ
-      const chapterNumberValue = parseFloat(chapter.chapterNumber);
-      if (isNaN(chapterNumberValue)) {
-        toast.error("Số chương phải là số hợp lệ");
-        setLoading(false);
-        return;
-      }
-
-      // Kiểm tra các trường bắt buộc
-      if (!chapter.bookId) {
-        toast.error("Vui lòng chọn sách");
-        setLoading(false);
-        return;
-      }
-
-      if (!chapter.title) {
-        toast.error("Vui lòng nhập tiêu đề chương");
-        setLoading(false);
-        return;
-      }
-      
-      // Tạo đối tượng dữ liệu đúng định dạng
-      const chapterData = {
-        bookId: chapter.bookId,
-        chapterNumber: chapterNumberValue, // Gửi dưới dạng số
-        title: chapter.title || "",
-        content: chapter.content || "",
-        images: Array.isArray(images) ? images : []
-      };
-      
-      console.log("Gửi dữ liệu chương:", chapterData);
-
-      if (isEditing) {
-        chapterData.id = chapter.id;
-        await updateChapter(chapter.id, chapterData);
-        toast.success("Cập nhật chương thành công");
-      } else {
-        await createChapter(chapterData);
-        toast.success("Thêm chương mới thành công");
-      }
-      
-      onSuccess();
-      closeForm();
-    } catch (error) {
-      console.error("Lỗi khi lưu chương:", error);
-      console.error("Chi tiết lỗi:", error.response?.data || error.message);
-      
-      // Hiển thị thông báo lỗi cụ thể nếu có
-      if (error.response?.data?.message) {
-        toast.error(`Lỗi: ${error.response.data.message}`);
-      } else {
-        toast.error(isEditing ? "Không thể cập nhật chương" : "Không thể thêm chương mới");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    
-    if (file) {
-      // Ở đây chúng ta giả định rằng bạn sẽ upload ảnh và nhận về URL
-      // Trong thực tế, bạn sẽ cần một API để upload ảnh và nhận về URL
-      
-      // Tạm thời sử dụng URL tạm để demo
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      
-      // Trong thực tế, bạn sẽ upload ảnh lên server và nhận về URL thực
-      // const uploadedImageUrl = await uploadImageToServer(file);
-      // setImages([...images, uploadedImageUrl]);
-    }
-  };
-
-  const addImageToList = () => {
-    if (selectedImage) {
-      setImages([...images, selectedImage]);
-      setSelectedImage(null);
-    }
-  };
-
-  const removeImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
-  };
-
-  return (
-    <div className="modal-overlay" onClick={closeForm}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <form onSubmit={handleSubmit} className="container-form">
-          <h3>{isEditing ? "Cập nhật chương" : "Thêm mới chương"}</h3>
-          
-          <div className="form-group">
-            <label>Chọn sách</label>
-            <select
-              name="bookId"
-              value={chapter.bookId || ""}
-              onChange={(e) => setChapter(prev => ({ ...prev, bookId: e.target.value }))}
-              required
-              disabled={isEditing} // Không cho phép thay đổi sách khi đang chỉnh sửa
-            >
-              <option value="">-- Chọn sách --</option>
-              {books.map(book => (
-                <option key={book.id} value={book.id}>{book.title}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label>Số chương</label>
-            <input
-              type="number"
-              name="chapterNumber"
-              step="0.1"
-              placeholder="Số chương (vd: 1, 1.5)"
-              value={chapter.chapterNumber || ""}
-              onChange={(e) => setChapter(prev => ({ 
-                ...prev, 
-                chapterNumber: e.target.value 
-              }))}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Tiêu đề</label>
-            <input
-              name="title"
-              placeholder="Tiêu đề chương"
-              value={chapter.title || ""}
-              onChange={(e) => setChapter(prev => ({ ...prev, title: e.target.value }))}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Nội dung</label>
-            <textarea
-              name="content"
-              placeholder="Nội dung chương"
-              value={chapter.content || ""}
-              onChange={(e) => setChapter(prev => ({ ...prev, content: e.target.value }))}
-              rows={10}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Hình ảnh</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
-            {selectedImage && (
-              <div className="selected-image">
-                <img src={selectedImage} alt="Selected" height="100" />
-                <button type="button" onClick={addImageToList}>Thêm ảnh này</button>
-              </div>
-            )}
-            
-            <div className="image-preview">
-              {images.map((img, index) => (
-                <div key={index} className="image-item">
-                  <img src={img} alt={`Ảnh ${index + 1}`} height="50" />
-                  <button type="button" onClick={() => removeImage(index)}>Xóa</button>
+    const renderImageInput = () => {
+        if (uploadType === 'url') {
+            return (
+                <div className="form-group">
+                    <label htmlFor="images">Hình ảnh (URL, phân tách bằng dấu phẩy):</label>
+                    <input
+                        type="text"
+                        id="images"
+                        name="images"
+                        value={form.images ? form.images.join(', ') : ''}
+                        onChange={(e) => {
+                            const imageUrls = e.target.value.split(',').map(url => url.trim());
+                            setForm(prev => ({
+                                ...prev,
+                                images: imageUrls.filter(url => url !== '')
+                            }));
+                        }}
+                        placeholder="Nhập URL hình ảnh, phân tách bằng dấu phẩy"
+                    />
                 </div>
-              ))}
+            );
+        } else {
+            return (
+                <div className="form-group">
+                    <label htmlFor="fileImages">Tải lên hình ảnh:</label>
+                    <input
+                        type="file"
+                        id="fileImages"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileChange}
+                        className="file-input"
+                    />
+                    {previewUrls.length > 0 && (
+                        <div className="image-previews">
+                            {previewUrls.map((url, index) => (
+                                <div key={index} className="image-preview">
+                                    <img src={url} alt={`Preview ${index}`} />
+                                    <button 
+                                        type="button" 
+                                        className="remove-image"
+                                        onClick={() => {
+                                            setPreviewUrls(prevUrls => {
+                                                const newUrls = [...prevUrls];
+                                                URL.revokeObjectURL(newUrls[index]);
+                                                newUrls.splice(index, 1);
+                                                return newUrls;
+                                            });
+                                            setSelectedFiles(prevFiles => {
+                                                const newFiles = [...prevFiles];
+                                                newFiles.splice(index, 1);
+                                                return newFiles;
+                                            });
+                                        }}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+    };
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Nếu upload là kiểu file, cần xử lý tải file lên trước
+        if (uploadType === 'file' && selectedFiles.length > 0) {
+            try {
+                // Giả định chúng ta đang sử dụng hàm upload ảnh giả lập (cần thay bằng hàm thực tế)
+                const uploadedUrls = await Promise.all(
+                    selectedFiles.map(async (file) => {
+                        // Giả lập việc tải ảnh lên - trong thực tế, cần thay thế bằng API upload thật
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        // Giả định chúng ta đang gọi một API upload ảnh
+                        // const response = await axios.post('your-upload-api-endpoint', formData);
+                        // return response.data.url;
+                        
+                        // Trong ví dụ này, chúng ta chỉ trả về URL giả
+                        return URL.createObjectURL(file); // Trong thực tế, sẽ trả về URL từ server
+                    })
+                );
+                
+                // Cập nhật form với URLs của ảnh đã tải lên
+                setForm(prev => ({
+                    ...prev,
+                    images: uploadedUrls
+                }));
+                
+                // Tiếp tục với form submit
+                handleSubmit(e, { ...form, images: uploadedUrls });
+            } catch (error) {
+                console.error("Error uploading images:", error);
+                alert("Không thể tải ảnh lên. Vui lòng thử lại sau.");
+            }
+        } else {
+            // Nếu không có file nào được chọn hoặc upload là kiểu URL, tiếp tục với submit bình thường
+            handleSubmit(e);
+        }
+    };
+
+    return (
+        <div className="form-overlay">
+            <div className="form-container">
+                <h3>{isEditing ? 'Chỉnh sửa chương' : 'Thêm chương mới'}</h3>
+                <form onSubmit={handleFormSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="bookId">Chọn sách:</label>
+                        <select
+                            id="bookId"
+                            name="bookId"
+                            value={form.bookId || ''}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        >
+                            <option value="">-- Chọn sách --</option>
+                            {books.map(book => (
+                                <option key={book.id} value={book.id}>
+                                    {book.title}
+                                </option>
+                            ))}
+                        </select>
+                        {loading && <span className="loading-text">Đang tải danh sách sách...</span>}
+                        {error && <span className="error-text">{error}</span>}
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="chapterNumber">Số chương:</label>
+                        <input
+                            type="number"
+                            id="chapterNumber"
+                            name="chapterNumber"
+                            value={form.chapterNumber || ''}
+                            onChange={handleChange}
+                            required
+                            min="0"
+                            step="0.1"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="title">Tiêu đề:</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={form.title || ''}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="content">Nội dung:</label>
+                        <textarea
+                            id="content"
+                            name="content"
+                            value={form.content || ''}
+                            onChange={handleChange}
+                            required
+                            rows="10"
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>Phương thức tải ảnh:</label>
+                        <div className="upload-type-options">
+                            <label className="radio-label">
+                                <input
+                                    type="radio"
+                                    name="uploadType"
+                                    value="url"
+                                    checked={uploadType === 'url'}
+                                    onChange={() => setUploadType('url')}
+                                />
+                                Từ URL
+                            </label>
+                            <label className="radio-label">
+                                <input
+                                    type="radio"
+                                    name="uploadType"
+                                    value="file"
+                                    checked={uploadType === 'file'}
+                                    onChange={() => setUploadType('file')}
+                                />
+                                Từ máy tính
+                            </label>
+                        </div>
+                    </div>
+                    
+                    {renderImageInput()}
+                    
+                    <div className="form-buttons">
+                        <button type="submit" className="btn-submit">
+                            {isEditing ? 'Cập nhật' : 'Thêm mới'}
+                        </button>
+                        <button type="button" className="btn-cancel" onClick={closeForm}>
+                            Hủy
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
-          
-          <div className="form-actions">
-            <button type="submit" disabled={loading}>
-              {loading ? "Đang xử lý..." : (isEditing ? "Cập nhật" : "Thêm mới")}
-            </button>
-            <button type="button" onClick={closeForm}>
-              Hủy
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default ChapterForm;

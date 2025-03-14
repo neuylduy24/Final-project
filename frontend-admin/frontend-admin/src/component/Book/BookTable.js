@@ -143,9 +143,11 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>
-                  {Array.isArray(book.category)
-                    ? book.category.map((cat) => cat.name).join(", ")
-                    : book.category}
+                  {book.categories && Array.isArray(book.categories) 
+                    ? book.categories.map((cat) => cat.name).join(", ")
+                    : Array.isArray(book.category)
+                      ? book.category.map((cat) => cat.name).join(", ")
+                      : book.category || ""}
                 </td>
 
                 <td className="button-group">

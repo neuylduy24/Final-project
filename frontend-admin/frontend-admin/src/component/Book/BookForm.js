@@ -12,6 +12,8 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   });
 
   const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [imageInputType, setImageInputType] = useState("url"); // "url" hoặc "upload"
@@ -19,10 +21,20 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   useEffect(() => {
     if (book && isEditing) {
       setFormData(book);
+      // Nếu sách có categories đã là mảng, giữ nguyên, nếu không, cần chuyển đổi
       if (book.image) {
         setImagePreview(book.image);
-        // Nếu đang chỉnh sửa và đã có URL ảnh, mặc định chọn kiểu URL
         setImageInputType("url");
+      }
+      
+      // Thiết lập thể loại đã chọn
+      if (book.categories && Array.isArray(book.categories)) {
+        setSelectedCategories(book.categories);
+      } else if (Array.isArray(book.category)) {
+        setSelectedCategories(book.category);
+      } else if (book.category) {
+        // Nếu chỉ là chuỗi, tạo đối tượng thể loại
+        setSelectedCategories([{ id: 'temp', name: book.category }]);
       }
     }
   }, [book, isEditing]);
@@ -33,7 +45,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("https://api.it-ebook.io.vn/api/books");
+      const response = await axios.get("https://api.it-ebook.io.vn/api/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách thể loại:", error);
@@ -47,6 +59,33 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
     if (e.target.name === "image") {
       setImagePreview(e.target.value);
     }
+  };
+
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories(prevSelected => {
+      // Kiểm tra xem thể loại này đã được chọn chưa
+      const isSelected = prevSelected.some(cat => cat.id === category.id || cat.name === category.name);
+      
+      if (isSelected) {
+        // Nếu đã chọn, loại bỏ khỏi danh sách đã chọn
+        return prevSelected.filter(cat => cat.id !== category.id && cat.name !== category.name);
+      } else {
+        // Nếu chưa chọn, thêm vào danh sách đã chọn
+        return [...prevSelected, category];
+      }
+    });
+  };
+
+  const handleCategoriesSave = () => {
+    // Cập nhật formData với danh sách thể loại đã chọn
+    setFormData(prev => ({
+      ...prev,
+      categories: selectedCategories,
+      // Để tương thích với API, vẫn giữ trường category là chuỗi các tên thể loại được ngăn cách bởi dấu phẩy
+      category: selectedCategories.map(cat => cat.name).join(', ')
+    }));
+    
+    setShowCategoryModal(false);
   };
 
   const handleImageInputTypeChange = (e) => {
@@ -77,6 +116,12 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let updatedFormData = { ...formData };
+    
+    // Đảm bảo có trường categories
+    if (selectedCategories.length > 0) {
+      updatedFormData.categories = selectedCategories;
+      updatedFormData.category = selectedCategories.map(cat => cat.name).join(', ');
+    }
     
     // Nếu chọn kiểu upload và có file ảnh, upload ảnh trước
     if (imageInputType === "upload" && imageFile) {
@@ -119,14 +164,78 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             required
           />
 
-          <select name="category" value={formData.category} onChange={handleChange} required>
-            <option value="">Chọn thể loại</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          <div className="category-selector">
+            <div className="selected-categories">
+              <label>Thể loại đã chọn:</label>
+              <div className="category-tags">
+                {selectedCategories.length > 0 ? (
+                  selectedCategories.map((cat, index) => (
+                    <span key={cat.id || `category-${index}`} className="category-tag">
+                      {cat.name}
+                      <button 
+                        type="button" 
+                        className="remove-category" 
+                        onClick={() => handleCategoryToggle(cat)}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))
+                ) : (
+                  <span className="no-categories">Chưa chọn thể loại</span>
+                )}
+              </div>
+            </div>
+            <button 
+              type="button" 
+              className="select-categories-button"
+              onClick={() => setShowCategoryModal(true)}
+            >
+              Chọn thể loại
+            </button>
+          </div>
+
+          {showCategoryModal && (
+            <div className="category-modal" onClick={(e) => {
+              if (e.target.className === 'category-modal') setShowCategoryModal(false);
+            }}>
+              <div className="category-modal-content">
+                <h4>Chọn thể loại</h4>
+                <div className="category-list">
+                  {categories.map(category => (
+                    <div key={category.id} className="category-checkbox-item">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.some(
+                            cat => cat.id === category.id || cat.name === category.name
+                          )}
+                          onChange={() => handleCategoryToggle(category)}
+                        />
+                        <span>{category.name}</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <div className="modal-actions">
+                  <button 
+                    type="button" 
+                    className="save-categories" 
+                    onClick={handleCategoriesSave}
+                  >
+                    Xác nhận
+                  </button>
+                  <button 
+                    type="button" 
+                    className="cancel" 
+                    onClick={() => setShowCategoryModal(false)}
+                  >
+                    Hủy
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="image-input-type-selector">
             <label className={imageInputType === "url" ? "active" : ""}>

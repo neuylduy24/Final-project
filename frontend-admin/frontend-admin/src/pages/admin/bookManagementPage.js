@@ -33,10 +33,20 @@ const BookManagementPage = () => {
 
   const handleSubmit = async (bookData) => {
     try {
+      // Đảm bảo dữ liệu đầy đủ trước khi gửi đi
+      const dataToSend = { ...bookData };
+      
+      // Đảm bảo có trường categories nếu chưa có
+      if (!dataToSend.categories && dataToSend.category) {
+        if (typeof dataToSend.category === 'string') {
+          dataToSend.categories = [{ name: dataToSend.category }];
+        }
+      }
+      
       if (isEditing) {
-        await axios.put(`http://150.95.105.147:8080/api/books/${bookData.id}`, bookData);
+        await axios.put(`https://api.it-ebook.io.vn/api/books/${dataToSend.id}`, dataToSend);
       } else {
-        const response = await axios.post("http://150.95.105.147:8080/api/books", bookData);
+        const response = await axios.post("https://api.it-ebook.io.vn/api/books", dataToSend);
         setBooks((prevBooks) => [...prevBooks, response.data]); 
       }
   

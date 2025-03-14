@@ -3,22 +3,19 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import "./pagination.scss";
 
 const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
-  if (totalPages <= 1) return null;
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
   return (
     <div className="footer">
     <div className="pagination">
-      <button className="page-button"  onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-        <FaArrowLeftLong/>
+      <button className="page-button" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
+        <FaArrowLeftLong />
       </button>
-      <span>Trang {currentPage} / {totalPages}</span>
-      <button className="page-button" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-        <FaArrowRightLong/>
+      {Array.from({ length: totalPages }, (_, index) => (
+        <button key={index + 1} className={`page-button ${currentPage === index + 1 ? "page-button-active" : ""}`} onClick={() => setCurrentPage(index + 1)}>
+          {index + 1}
+        </button>
+      ))}
+      <button className="page-button" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+        <FaArrowRightLong />
       </button>
     </div>
     </div>

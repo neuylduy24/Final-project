@@ -1,20 +1,27 @@
+<<<<<<< Updated upstream
+=======
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const [formData, setFormData] = useState({
-    id: Date.now().toString(),
+    id: "",
     title: "",
     author: "",
-    category: "",
-    createdAt: new Date().toISOString().split("T")[0],
+    image: "",
+    description: "",
+    chapters: [],
+    categories: []
   });
 
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     if (book && isEditing) {
-      setFormData(book);
+      setFormData({
+        ...book,
+        categories: book.categories || []
+      });
     }
   }, [book, isEditing]);
 
@@ -33,6 +40,14 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCategoryChange = (e) => {
+    const selectedOptions = Array.from(
+      e.target.selectedOptions, 
+      option => parseInt(option.value, 10)
+    );
+    setFormData({ ...formData, categories: selectedOptions });
   };
 
   const handleSubmit = (e) => {
@@ -64,14 +79,35 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             required
           />
 
-          <select name="category" value={formData.category} onChange={handleChange} required>
-            <option value="">Chọn thể loại</option>
+          <input
+            type="text"
+            name="image"
+            placeholder="URL hình ảnh"
+            value={formData.image}
+            onChange={handleChange}
+          />
+
+          <textarea
+            name="description"
+            placeholder="Mô tả"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+          />
+
+          <select 
+            name="categories" 
+            multiple 
+            value={formData.categories} 
+            onChange={handleCategoryChange}
+          >
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>
+              <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>
             ))}
           </select>
+          <small>Giữ Ctrl để chọn nhiều thể loại</small>
 
           <button type="submit">{isEditing ? "Cập nhật" : "Thêm mới"}</button>
           <button type="button" onClick={() => setShowForm(false)}>Hủy</button>
@@ -82,3 +118,4 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 };
 
 export default BookForm;
+>>>>>>> Stashed changes

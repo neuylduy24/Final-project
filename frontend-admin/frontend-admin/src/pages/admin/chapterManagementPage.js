@@ -1,46 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getAllChapters, getChaptersByBookId, deleteChapter } from "../../service/chapterService";
+import { getAllBooks } from "../../service/bookService";
 import ChapterForm from "../../component/Chapter/ChapterForm";
 import ChapterTable from "../../component/Chapter/ChapterTable";
 import Pagination from "../../component/common/Pagination";
+import { toast } from "react-toastify";
 
 const ChapterManagementPage = () => {
-  const [chapters, setChapters] = useState([
-    { id: 1, name: "Chương 1", title: "Tiêu đề 1", createdAt: "2024-01-15" },
-    { id: 2, name: "Chương 2", title: "Tiêu đề 2", createdAt: "2024-01-16" },
-    { id: 3, name: "Chương 3", title: "Tiêu đề 3", createdAt: "2024-01-17" },
-    { id: 4, name: "Chương 4", title: "Tiêu đề 4", createdAt: "2024-01-18" },
-    { id: 5, name: "Chương 5", title: "Tiêu đề 5", createdAt: "2024-01-19" },
-    { id: 6, name: "Chương 6", title: "Tiêu đề 6", createdAt: "2024-01-20" },
-  ]);
-
-  const [form, setForm] = useState({ id: "", name: "", title: "", createdAt: "" });
+  const [chapters, setChapters] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [bookTitles, setBookTitles] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState('');
+  
+  const [chapter, setChapter] = useState({
+    id: "",
+    bookId: "",
+    chapterNumber: "",
+    title: "",
+    content: "",
+    images: []
+  });
+  
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      setChapters(chapters.map((ch) => (ch.id === form.id ? { ...form } : ch)));
-    } else {
-      setChapters([...chapters, { ...form, id: Date.now(), createdAt: new Date().toISOString().split("T")[0] }]);
+  // Lấy danh sách chương
+  useEffect(() => {
+    fetchData();
+  }, [selectedBookId]);
+
+  // Lấy danh sách sách
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      let data;
+      
+      if (selectedBookId) {
+        data = await getChaptersByBookId(selectedBookId);
+      } else {
+        data = await getAllChapters();
+      }
+      
+      // Cập nhật danh sách chương với tên sách
+      const chaptersWithBookInfo = data.map(chapter => ({
+        ...chapter, 
+        bookTitle: bookTitles[chapter.bookId] || "Chưa xác định"
+      }));
+      
+      setChapters(chaptersWithBookInfo);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách chương:", error);
+      toast.error("Không thể lấy danh sách chương");
+    } finally {
+      setIsLoading(false);
     }
-    setForm({ id: "", name: "", title: "", createdAt: "" });
-    setIsEditing(false);
-    setShowForm(false);
   };
 
-  const handleEdit = (chapter) => {
-    setForm(chapter);
+  const fetchBooks = async () => {
+    try {
+      const data = await getAllBooks();
+      setBooks(data);
+      
+      // Tạo map từ bookId đến title
+      const bookTitlesMap = {};
+      data.forEach(book => {
+        bookTitlesMap[book.id] = book.title;
+      });
+      setBookTitles(bookTitlesMap);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sách:", error);
+      toast.error("Không thể lấy danh sách sách");
+    }
+  };
+
+  const handleAddNew = () => {
+    setChapter({
+      id: "",
+      bookId: selectedBookId || "",
+      chapterNumber: "",
+      title: "",
+      content: "",
+      images: []
+    });
+    setIsEditing(false);
+    setShowForm(true);
+  };
+
+  const handleEdit = (chapterData) => {
+    setChapter(chapterData);
     setIsEditing(true);
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    setChapters(chapters.filter((ch) => ch.id !== id));
+  const handleDelete = async (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa chương này không?")) {
+      try {
+        await deleteChapter(id);
+        toast.success("Xóa chương thành công");
+        fetchData(); // Tải lại dữ liệu sau khi xóa
+      } catch (error) {
+        console.error("Lỗi khi xóa chương:", error);
+        toast.error("Không thể xóa chương");
+      }
+    }
   };
 
+  const handleFilterByBook = (e) => {
+    setSelectedBookId(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Phân trang
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = chapters.slice(indexOfFirstItem, indexOfLastItem);
@@ -48,14 +125,52 @@ const ChapterManagementPage = () => {
 
   return (
     <div className="container">
-      <div className="container-management">
+      <div className="container-page">
         <h2>Quản lý chương</h2>
+        
+        <div className="filter-container">
+          <label htmlFor="bookFilter">Lọc theo sách:</label>
+          <select 
+            id="bookFilter" 
+            value={selectedBookId} 
+            onChange={handleFilterByBook}
+          >
+            <option value="">Tất cả sách</option>
+            {books.map(book => (
+              <option key={book.id} value={book.id}>{book.title}</option>
+            ))}
+          </select>
+          
+          <button onClick={fetchData} className="refresh-button">
+            Làm mới
+          </button>
+        </div>
 
-        {showForm && <ChapterForm form={form} setForm={setForm} handleSubmit={handleSubmit} closeForm={() => setShowForm(false)} isEditing={isEditing} />}
+        {showForm && (
+          <ChapterForm 
+            chapter={chapter} 
+            setChapter={setChapter} 
+            onSuccess={fetchData} 
+            closeForm={() => setShowForm(false)} 
+            isEditing={isEditing} 
+          />
+        )}
         
-        <ChapterTable chapters={currentItems} handleEdit={handleEdit} handleDelete={handleDelete} setShowForm={setShowForm} />
+        <ChapterTable 
+          chapters={currentItems} 
+          handleEdit={handleEdit} 
+          handleDelete={handleDelete} 
+          onAddNew={handleAddNew}
+          isLoading={isLoading}
+        />
         
-        <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+        {!isLoading && totalPages > 1 && (
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            setCurrentPage={setCurrentPage} 
+          />
+        )}
       </div>
     </div>
   );

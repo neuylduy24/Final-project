@@ -7,7 +7,6 @@ import CategoriesManagementAdPage from "./pages/admin/categoriesManagementPage";
 import ChapterManagementPage from "./pages/admin/chapterManagementPage";
 import UserManagementAdPage from "./pages/admin/userManagementPage";
 import StatisticManagementPage from "./pages/admin/statisticManagementPage";
-import BookManagementPage from "./pages/admin/bookManagementPage";
 
 const renderAdminRouter = () => {
     const adminRouters = [
@@ -30,10 +29,6 @@ const renderAdminRouter = () => {
         {
             path: ROUTERS.ADMIN.USERS,
             component: <UserManagementAdPage />,
-        },
-        {
-            path: ROUTERS.ADMIN.BOOKS,
-            component: <BookManagementPage />,
         },
     ];
 

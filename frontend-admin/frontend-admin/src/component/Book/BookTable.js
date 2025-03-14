@@ -1,9 +1,12 @@
+<<<<<<< Updated upstream
+=======
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import BookForm from "./BookForm";
 import { FaSearch } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getAllBooks, createBook, updateBook, deleteBook } from "../../service/bookService";
+import axios from "axios";
 
 const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
   const [books, setBooks] = useState([]);
@@ -12,9 +15,19 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState({
+    id: "",
+    title: "",
+    author: "",
+    image: "",
+    description: "",
+    categories: []
+  });
 
   useEffect(() => {
     fetchBooks();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -25,12 +38,24 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
     setFilteredBooks(filtered);
   }, [searchTerm, books, setCurrentPage]);
 
+  async function fetchCategories() {
+    try {
+      const response = await axios.get("http://150.95.105.147:8080/api/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách thể loại:", error);
+    }
+  }
+
   async function fetchBooks() {
     try {
-      const response = await axios.get("http://150.95.105.147:8080/api/books");
-      setBooks(response.data);
+      const data = await getAllBooks();
+      console.log("Dữ liệu sách từ API:", data);
+      setBooks(data);
+      setFilteredBooks(data);
     } catch (error) {
       toast.error("❌ Lỗi khi lấy dữ liệu sách!");
+      console.error("Lỗi khi lấy dữ liệu sách:", error);
     }
   }
 
@@ -42,40 +67,62 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 
   const handleSave = async (book) => {
     try {
+      // Đảm bảo categories là mảng số nguyên
+      const bookToSave = {
+        ...book,
+        categories: Array.isArray(book.categories) 
+          ? book.categories.map(cat => typeof cat === 'string' ? parseInt(cat, 10) : cat)
+          : []
+      };
+      
       if (!isEditing) {
-        const newBook = {
-          ...book,
-          createdAt: new Date().toISOString(),
-        };
-        await axios.post("http://150.95.105.147:8080/api/books", newBook);
+        await createBook(bookToSave);
         toast.success("📖 Thêm sách thành công!");
       } else {
-        await axios.put(
-          `http://150.95.105.147:8080/api/books/${book.id}`,
-          book
-        );
+        await updateBook(bookToSave.id, bookToSave);
         toast.info("✏️ Cập nhật sách thành công!");
       }
       fetchBooks();
       setShowForm(false);
     } catch (error) {
-      toast.error("❌ Lỗi khi lưu sách!");
+      toast.error(`❌ ${error.message}`);
+      console.error("Lỗi khi lưu sách:", error);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://150.95.105.147:8080/api/books/${id}`);
+      await deleteBook(id);
       fetchBooks();
       toast.warning("🗑️ Xóa sách thành công!");
     } catch (error) {
-      toast.error("❌ Lỗi khi xóa sách!");
+      toast.error(`❌ ${error.message}`);
+      console.error("Lỗi khi xóa sách:", error);
     }
   };
 
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+
+  // Hàm lấy tên thể loại
+  const getCategoryNames = (categories) => {
+    if (!categories || categories.length === 0) return "Chưa có thể loại";
+    
+    return categories.map(cat => {
+      const category = typeof cat === 'object' ? cat : categories.find(c => c.id === cat);
+      return category ? category.name : "";
+    }).filter(Boolean).join(", ");
+  };
+
+  const handleCategoryChange = (e) => {
+    // Chuyển đổi giá trị từ chuỗi sang số nguyên
+    const selectedOptions = Array.from(
+      e.target.selectedOptions, 
+      option => parseInt(option.value, 10)
+    );
+    setFormData({ ...formData, categories: selectedOptions });
+  };
 
   return (
     <div>
@@ -99,17 +146,18 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button
-          className="add-button"
-          onClick={() => {
-            setSelectedBook(null);
-            setShowForm(true);
-            setIsEditing(false);
-          }}
-        >
-          Thêm
-        </button>
       </div>
+
+      <button
+        className="add-button"
+        onClick={() => {
+          setSelectedBook(null);
+          setShowForm(true);
+          setIsEditing(false);
+        }}
+      >
+        Thêm sách mới
+      </button>
 
       <table className="container-table">
         <thead>
@@ -117,6 +165,8 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             <th>ID</th>
             <th>Tiêu đề</th>
             <th>Tác giả</th>
+            <th>Hình ảnh</th>
+            <th>Mô tả</th>
             <th>Thể loại</th>
             <th>Hành động</th>
           </tr>
@@ -129,22 +179,33 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>
-                  {Array.isArray(book.category)
-                    ? book.category.map((cat) => cat.name).join(", ")
-                    : book.category}
+                  {book.image ? (
+                    <img 
+                      src={book.image} 
+                      alt={book.title} 
+                      style={{ width: '50px', height: '70px', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    "Không có ảnh"
+                  )}
                 </td>
-
+                <td>
+                  {book.description ? (
+                    book.description.length > 50 
+                      ? `${book.description.substring(0, 50)}...` 
+                      : book.description
+                  ) : (
+                    "Không có mô tả"
+                  )}
+                </td>
+                <td>
+                  {getCategoryNames(book.categories)}
+                </td>
                 <td className="button-group">
-                  <button
-                    className="edit-button"
-                    onClick={() => handleEdit(book)}
-                  >
+                  <button className="edit-button" onClick={() => handleEdit(book)}>
                     Sửa
                   </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(book.id)}
-                  >
+                  <button className="delete-button" onClick={() => handleDelete(book.id)}>
                     Xóa
                   </button>
                 </td>
@@ -152,7 +213,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
                 Không có sách nào
               </td>
             </tr>
@@ -164,3 +225,4 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 };
 
 export default BookTable;
+>>>>>>> Stashed changes

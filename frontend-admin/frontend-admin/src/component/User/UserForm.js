@@ -4,7 +4,7 @@ const UserForm = ({ form, setForm, handleInputChange, handleSubmit, setShowForm,
   return (
     <div className="modal-overlay" onClick={() => setShowForm(false)}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <form onSubmit={handleSubmit} className="container-form">
+        <form onSubmit={handleSubmit} className="users-form">
           <h3>{isEditing ? "Cập nhật người dùng" : "Thêm mới người dùng"}</h3>
           <input name="name" placeholder="Tên người dùng" value={form.name} onChange={handleInputChange} required />
           <input name="email" placeholder="Email" value={form.email} onChange={handleInputChange} required />

@@ -18,7 +18,7 @@ public class EmailService {
 
     public boolean sendVerificationEmail(String email, String token) {
         try {
-            String url = "http://150.95.105.147:8080/api/auth/verify?token=" + token;
+            String url = "https://api.it-ebook.io.vn/api/auth/verify?token=" + token;
             String subject = "Xác minh tài khoản của bạn";
             String message = "Vui lòng nhấp vào link dưới đây để xác minh tài khoản của bạn:\n" + url;
 

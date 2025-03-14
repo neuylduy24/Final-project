@@ -46,4 +46,8 @@ public class CategoryService {
     public void deleteCategory(String id) {
         categoryRepository.deleteById(id);
     }
+
+//    public void deleteCategory(String name) {
+//        categoryRepository.deleteByName(name);
+//    }
 }

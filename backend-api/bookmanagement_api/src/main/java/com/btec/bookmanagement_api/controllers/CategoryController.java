@@ -50,4 +50,10 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+//    @DeleteMapping("/{name}")
+//    public ResponseEntity<Void> deleteCategory(@PathVariable String name) {
+//        categoryService.deleteCategory(name);
+//        return ResponseEntity.noContent().build();
+//    }
 }

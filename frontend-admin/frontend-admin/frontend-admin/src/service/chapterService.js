@@ -2,14 +2,33 @@ import axios from 'axios';
 
 // Tạo instance axios với cấu hình mặc định
 const apiClient = axios.create({
-  baseURL: 'http://150.95.105.147:8080',
+  baseURL: 'https://api.it-ebook.io.vn',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*'
   },
-  timeout: 10000, // 10 seconds
+  timeout: 15000, // Tăng thời gian timeout lên 15 giây
   withCredentials: false // không gửi cookie cross-origin
 });
+
+// Thêm interceptor để log mọi request
+apiClient.interceptors.request.use(request => {
+  console.log('Bắt đầu request:', request);
+  return request;
+});
+
+// Thêm interceptor để log mọi response
+apiClient.interceptors.response.use(
+  response => {
+    console.log('Nhận phản hồi thành công:', response);
+    return response;
+  },
+  error => {
+    console.log('Lỗi phản hồi:', error);
+    return Promise.reject(error);
+  }
+);
 
 const getAllChapters = async () => {
   try {
@@ -27,7 +46,7 @@ const getChapterById = async (id) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching chapter ${id}:`, error);
-    throw error;
+    throw error;  
   }
 };
 
@@ -43,13 +62,28 @@ const getChaptersByBookId = async (bookId) => {
 
 const createChapter = async (chapterData) => {
   try {
-    console.log('Sending chapter data:', JSON.stringify(chapterData)); // Debugging line
-    const response = await apiClient.post('/api/chapters', chapterData);
+    // Đảm bảo chapterNumber là số
+    const formattedData = {
+      ...chapterData,
+      chapterNumber: Number(chapterData.chapterNumber)
+    };
+    
+    console.log('Dữ liệu gửi đi:', JSON.stringify(formattedData, null, 2));
+    const response = await apiClient.post('/api/chapters', formattedData);
+    console.log('Phản hồi thành công:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating chapter:', error);
-    console.error('Request data:', chapterData);
-    console.error('Response:', error.response?.data);
+    console.error('Lỗi khi tạo chương:', error);
+    console.error('Dữ liệu request:', JSON.stringify(chapterData, null, 2));
+    if (error.response) {
+      console.error('Mã lỗi:', error.response.status);
+      console.error('Dữ liệu phản hồi:', error.response.data);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('Không nhận được phản hồi:', error.request);
+    } else {
+      console.error('Lỗi cấu hình request:', error.message);
+    }
     throw error;
   }
 };

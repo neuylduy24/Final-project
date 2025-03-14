@@ -33,9 +33,8 @@ const ChapterForm = ({ chapter, setChapter, onSuccess, closeForm, isEditing }) =
     setLoading(true);
 
     try {
-      // Đảm bảo chapterNumber là số (double)
+      // Kiểm tra chapterNumber là số hợp lệ
       const chapterNumberValue = parseFloat(chapter.chapterNumber);
-      
       if (isNaN(chapterNumberValue)) {
         toast.error("Số chương phải là số hợp lệ");
         setLoading(false);
@@ -55,25 +54,22 @@ const ChapterForm = ({ chapter, setChapter, onSuccess, closeForm, isEditing }) =
         return;
       }
       
-      // Tạo đối tượng dữ liệu đúng định dạng (chính xác với Entity trong backend)
+      // Tạo đối tượng dữ liệu đúng định dạng
       const chapterData = {
         bookId: chapter.bookId,
-        chapterNumber: chapterNumberValue,
+        chapterNumber: chapterNumberValue, // Gửi dưới dạng số
         title: chapter.title || "",
         content: chapter.content || "",
-        images: images || []
-        // Không truyền views và createdAt, để server quản lý
+        images: Array.isArray(images) ? images : []
       };
       
-      console.log("Sending chapter data:", chapterData); // Debugging line
+      console.log("Gửi dữ liệu chương:", chapterData);
 
       if (isEditing) {
         chapterData.id = chapter.id;
-        console.log("Cập nhật chương:", chapterData);
         await updateChapter(chapter.id, chapterData);
         toast.success("Cập nhật chương thành công");
       } else {
-        console.log("Tạo chương mới:", chapterData);
         await createChapter(chapterData);
         toast.success("Thêm chương mới thành công");
       }
@@ -157,7 +153,7 @@ const ChapterForm = ({ chapter, setChapter, onSuccess, closeForm, isEditing }) =
               value={chapter.chapterNumber || ""}
               onChange={(e) => setChapter(prev => ({ 
                 ...prev, 
-                chapterNumber: parseFloat(e.target.value) 
+                chapterNumber: e.target.value 
               }))}
               required
             />

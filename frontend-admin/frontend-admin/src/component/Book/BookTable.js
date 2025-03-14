@@ -27,7 +27,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 
   async function fetchBooks() {
     try {
-      const response = await axios.get("http://150.95.105.147:8080/api/books");
+      const response = await axios.get("https://api.it-ebook.io.vn/api/books");
       setBooks(response.data);
     } catch (error) {
       toast.error("❌ Lỗi khi lấy dữ liệu sách!");
@@ -115,6 +115,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
         <thead>
           <tr>
             <th>ID</th>
+            <th>Ảnh bìa</th>
             <th>Tiêu đề</th>
             <th>Tác giả</th>
             <th>Thể loại</th>
@@ -126,6 +127,19 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             currentBooks.map((book) => (
               <tr key={book.id}>
                 <td>{book.id}</td>
+                <td className="book-image-cell">
+                  {book.image ? (
+                    <img 
+                      src={book.image} 
+                      alt={book.title} 
+                      style={{ width: "50px", height: "75px", objectFit: "cover" }} 
+                    />
+                  ) : (
+                    <div className="no-image-placeholder">
+                      Không có ảnh
+                    </div>
+                  )}
+                </td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>

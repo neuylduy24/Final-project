@@ -1,0 +1,123 @@
+/* Book management styles */
+
+.image-input-type-selector {
+  display: flex;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  label {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-right: none;
+    }
+    
+    &:last-child {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border-left: none;
+    }
+    
+    input[type="radio"] {
+      display: none;
+    }
+    
+    &.active {
+      background-color: #14b8a6;
+      color: white;
+      border-color: #14b8a6;
+    }
+  }
+}
+
+.image-upload-container {
+  margin-bottom: 15px;
+  
+  .image-upload-label {
+    display: inline-block;
+    width: 100%;
+    background-color: #14b8a6;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    box-sizing: border-box;
+    
+    &:hover {
+      background-color: #0e9f8d;
+    }
+  }
+}
+
+.image-preview {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  padding: 5px;
+  border-radius: 4px;
+  display: inline-block;
+  
+  img {
+    display: block;
+    max-width: 100px;
+    max-height: 150px;
+    object-fit: cover;
+  }
+}
+
+/* Styles cho bảng sách */
+.container-table {
+  th, td {
+    vertical-align: middle;
+  }
+  
+  .book-image-cell {
+    padding: 5px;
+    
+    img {
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .no-image-placeholder {
+      width: 50px;
+      height: 75px;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #999;
+      border-radius: 4px;
+    }
+  }
+}
+
+/* Styles cho form thêm/sửa sách */
+.container-form {
+  input[name="image"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    
+    &:focus {
+      border-color: #14b8a6;
+      outline: none;
+    }
+  }
+} 

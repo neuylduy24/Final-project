@@ -10,6 +10,7 @@ const BookManagementPage = () => {
     id: "",
     title: "",
     author: "",
+    image: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -30,21 +31,20 @@ const BookManagementPage = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (bookData) => {
     try {
       if (isEditing) {
-        await axios.put(`http://150.95.105.147:8080/api/books/${form.id}`, form);
+        await axios.put(`http://150.95.105.147:8080/api/books/${bookData.id}`, bookData);
       } else {
-        const response = await axios.post("http://150.95.105.147:8080/api/books", form);
+        const response = await axios.post("http://150.95.105.147:8080/api/books", bookData);
         setBooks((prevBooks) => [...prevBooks, response.data]); 
       }
   
       setShowForm(false);
       setIsEditing(false);
-      setForm({ id: "", title: "", author: "" });
+      setForm({ id: "", title: "", author: "", image: "" });
   
-      setCurrentPage(Math.ceil((books.length + 1) / booksPerPage));
+      fetchBooks();
     } catch (error) {
       console.error("Lỗi khi lưu sách:", error);
     }
@@ -63,11 +63,8 @@ const BookManagementPage = () => {
 
         {showForm && (
           <BookForm
-            form={form}
-            handleInputChange={(e) =>
-              setForm({ ...form, [e.target.name]: e.target.value })
-            }
-            handleSubmit={handleSubmit}
+            book={form}
+            onSave={handleSubmit}
             setShowForm={setShowForm}
             isEditing={isEditing}
           />

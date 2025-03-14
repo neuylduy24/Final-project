@@ -7,14 +7,23 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
     title: "",
     author: "",
     category: "",
+    image: "",
     createdAt: new Date().toISOString().split("T")[0],
   });
 
   const [categories, setCategories] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageInputType, setImageInputType] = useState("url"); // "url" hoặc "upload"
 
   useEffect(() => {
     if (book && isEditing) {
       setFormData(book);
+      if (book.image) {
+        setImagePreview(book.image);
+        // Nếu đang chỉnh sửa và đã có URL ảnh, mặc định chọn kiểu URL
+        setImageInputType("url");
+      }
     }
   }, [book, isEditing]);
 
@@ -24,7 +33,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://150.95.105.147:8080/api/categories");
+      const response = await axios.get("https://api.it-ebook.io.vn/api/books");
       setCategories(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách thể loại:", error);
@@ -33,11 +42,57 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    
+    // Cập nhật preview khi URL ảnh thay đổi
+    if (e.target.name === "image") {
+      setImagePreview(e.target.value);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleImageInputTypeChange = (e) => {
+    setImageInputType(e.target.value);
+    // Xóa dữ liệu ảnh khi chuyển kiểu nhập
+    if (e.target.value === "url") {
+      setImageFile(null);
+      setImagePreview(formData.image);
+    } else {
+      setFormData({ ...formData, image: "" });
+      setImagePreview("");
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Tạo URL xem trước cho ảnh
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
+    let updatedFormData = { ...formData };
+    
+    // Nếu chọn kiểu upload và có file ảnh, upload ảnh trước
+    if (imageInputType === "upload" && imageFile) {
+      try {
+        const formDataUpload = new FormData();
+        formDataUpload.append("image", imageFile);
+        
+        // Thay thế API upload ảnh thực tế của bạn tại đây
+        const uploadResponse = await axios.post("http://150.95.105.147:8080/api/upload", formDataUpload);
+        updatedFormData.image = uploadResponse.data.imageUrl;
+      } catch (error) {
+        console.error("Lỗi khi upload ảnh:", error);
+      }
+    }
+    
+    onSave(updatedFormData);
   };
 
   return (
@@ -72,6 +127,64 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
               </option>
             ))}
           </select>
+
+          <div className="image-input-type-selector">
+            <label className={imageInputType === "url" ? "active" : ""}>
+              <input
+                type="radio"
+                name="imageInputType"
+                value="url"
+                checked={imageInputType === "url"}
+                onChange={handleImageInputTypeChange}
+              />
+              Nhập URL ảnh
+            </label>
+            <label className={imageInputType === "upload" ? "active" : ""}>
+              <input
+                type="radio"
+                name="imageInputType"
+                value="upload"
+                checked={imageInputType === "upload"}
+                onChange={handleImageInputTypeChange}
+              />
+              Upload ảnh
+            </label>
+          </div>
+
+          {imageInputType === "url" && (
+            <input
+              type="text"
+              name="image"
+              placeholder="URL ảnh bìa sách"
+              value={formData.image}
+              onChange={handleChange}
+            />
+          )}
+
+          {imageInputType === "upload" && (
+            <div className="image-upload-container">
+              <label htmlFor="image-upload" className="image-upload-label">
+                Upload ảnh bìa sách
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                />
+              </label>
+            </div>
+          )}
+
+          {imagePreview && (
+            <div className="image-preview">
+              <img 
+                src={imagePreview} 
+                alt="Xem trước ảnh bìa sách" 
+                style={{ maxWidth: "100px", maxHeight: "150px", marginTop: "10px" }} 
+              />
+            </div>
+          )}
 
           <button type="submit">{isEditing ? "Cập nhật" : "Thêm mới"}</button>
           <button type="button" onClick={() => setShowForm(false)}>Hủy</button>

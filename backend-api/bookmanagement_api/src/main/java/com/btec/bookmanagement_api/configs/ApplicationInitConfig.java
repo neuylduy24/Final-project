@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
+import java.time.LocalDateTime;
 
 @Configuration
 @RequiredArgsConstructor
@@ -25,17 +26,40 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByEmail("admin@gmail.com").isEmpty()) { // Kiểm tra theo email
-                var roles = new HashSet<String>();
-                roles.add(Role.ADMIN.name());
-                User user = User.builder()
-                        .email("admin@gmail.com")
-                        .password(passwordEncoder.encode("admin"))
-                        .roles(roles)
-                        .build();
-                userRepository.save(user);
-                log.warn("Admin user has been created with default password: admin, please change it.");
-            }
+            userRepository.findByEmail("admin@gmail.com").ifPresentOrElse(
+                    admin -> {
+                        // Nếu admin đã tồn tại nhưng chưa được xác thực, cập nhật lại
+                        if (!admin.isVerified()) {
+                            admin.setVerified(true);
+                            admin.setEnabled(true);
+                            admin.setVerificationToken(null); // Xóa token
+                            admin.setTokenExpiry(null); // Xóa thời gian hết hạn token
+                            userRepository.save(admin);
+                            log.info("Admin email has been verified.");
+                        }
+                    },
+                    () -> {
+                        // Nếu chưa có admin, tạo mới với email đã xác thực
+                        var roles = new HashSet<String>();
+                        roles.add(Role.ADMIN.name());
+
+                        User user = User.builder()
+                                .email("admin@gmail.com")
+                                .password(passwordEncoder.encode("admin"))
+                                .username("Admin")
+                                .roles(roles)
+                                .avatar("default_avatar.png")
+                                .enabled(true) // Kích hoạt tài khoản
+                                .isVerified(true) // Xác thực email
+                                .verificationToken(null) // Không cần token
+                                .tokenExpiry(null)
+                                .createdAt(LocalDateTime.now())
+                                .build();
+
+                        userRepository.save(user);
+                        log.warn("Admin user has been created with default password: admin, please change it.");
+                    }
+            );
         };
     }
 }

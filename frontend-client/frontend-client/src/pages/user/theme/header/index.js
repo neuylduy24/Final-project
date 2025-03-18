@@ -1,73 +1,106 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from "react";
 import "./style.scss";
-import { FaInstagram, FaUser, FaCartShopping, FaListUl, FaPhone, FaCircleChevronUp, FaCircleChevronDown } from "react-icons/fa6";
+import {
+  FaInstagram,
+  FaUser,
+  FaListUl,
+  FaPhone,
+  FaCircleChevronUp,
+  FaCircleChevronDown,
+  FaCommentDots,
+  FaBookmark,
+} from "react-icons/fa6";
 import { SiFacebook } from "react-icons/si";
 import { MdEmail } from "react-icons/md";
-import { Link, useLocation } from 'react-router-dom';
-import { formater } from 'utils/fomater';
-import { ROUTERS } from 'utils/router';
-
+import { Link, useLocation } from "react-router-dom";
+import { ROUTERS } from "utils/router";
+import { FaHistory, FaSignOutAlt } from "react-icons/fa";
 
 export const categories = [
-  "Truyện Tranh",
-  "Sách Khoa Học",
-  "Sách Tình Cảm",
-  "Sách Chính Trị",
-  "Sách Công Nghệ",
-]
+  "Comic",
+  "Science Books",
+  "Romance Books",
+  "Political Books",
+  "Technology Books",
+];
 
 const Header = () => {
   const location = useLocation();
   const [isShowMenuWrapper, setShowMenuWrapper] = useState(false);
   const [isHome, setIsHome] = useState(location.pathname.length <= 1);
   const [isShowCategories, setShowCategories] = useState(isHome);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [showMenu, setShowMenu] = useState(false);
   const [menu, setMenu] = useState([
     {
-      name: "Trang Chủ",
+      name: "Home",
       path: ROUTERS.USER.HOME,
     },
     {
-      name: "Sách Mới",
+      name: "BookNew",
       path: ROUTERS.USER.BOOKNEW,
     },
     {
-      name: "Thể Loại",
+      name: "Categories",
+      path: "",
+      isShowSubmenu: false,
+      child: [
+        "Action",
+        "Adventure",
+        "Anime",
+        "Cổ Đại",
+        "Comedy",
+        "Comic",
+        "Detective",
+        "Doujinshi",
+        "Drama",
+        "Fantasy",
+        "Gender Bender",
+        "Historical",
+        "Horror",
+        "Isekai",
+        "Josei",
+        "Magic",
+        "Manga",
+        "Manhua",
+        "Manhwa",
+        "Martial Arts",
+        "Mystery",
+        "Ngôn Tình",
+        "One shot",
+        "Psychological",
+      ].map((name) => ({ name, path: "" })),
+    },
+    {
+      name: "Ranking",
       path: "",
       isShowSubmenu: false,
       child: [
         {
-          name: "Lịch Sử - Chính Trị",
-          path: ROUTERS.USER.BOOKNEW,
-        },
-        {
-          name: "Triết Học - Tâm Linh",
+          name: "Top day",
           path: "",
         },
         {
-          name: "Văn Học - Nghệ Thuật",
+          name: "Top week",
           path: "",
         },
         {
-          name: "Kinh Tế - Kinh Doanh",
+          name: "Top month",
           path: "",
         },
         {
-          name: "Khoa Học - Công Nghệ",
+          name: "Update new",
           path: "",
         },
       ],
     },
     {
-      name: "Sách Bán Chạy",
-      path: ROUTERS.USER.BOOKRANK,
-    },
-    {
-      name: "Lịch Sử",
+      name: "Follow",
       path: ROUTERS.USER.BOOKHISTORY,
     },
     {
-      name: "Liên Hệ",
-      path: ROUTERS.USER.BOOKHOTLINE,
+      name: "History",
+      path: ROUTERS.USER.BOOKHISTORY,
     },
   ]);
   const handleMenuClick = (menuKey) => {
@@ -79,55 +112,79 @@ const Header = () => {
       return newMenu;
     });
   };
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
 
-  useEffect(() =>{
+    window.addEventListener("storage", checkLoginStatus); // Lắng nghe thay đổi từ localStorage
+
+    return () => {
+      window.removeEventListener("storage", checkLoginStatus);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
+
+  useEffect(() => {
     const isHome = location.pathname.length <= 1;
     setIsHome(isHome);
     setShowCategories(isHome);
-
-  }, [location])
+  }, [location]);
   return (
     <>
-
-      <div className={`menu_wrapper_overlay ${isShowMenuWrapper ? "active" : ""}`}
-
+      <div
+        className={`menu_wrapper_overlay ${isShowMenuWrapper ? "active" : ""}`}
         onClick={() => setShowMenuWrapper(false)}
       />
+      <button className="chatbox-button">
+        <FaCommentDots />
+      </button>
 
       <div className={`menu_wrapper ${isShowMenuWrapper ? "show" : ""}`}>
         <div className="header_logo">
-        <Link to={ROUTERS.USER.HOME}>
-                <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
-              </Link>
-        </div>
-        <div className="menu_wrapper_cart">
-          <ul>
-            <li>
-              <Link to={ROUTERS.USER.BOOKCARTSHOPPING}>
-                <FaCartShopping /> <span>1</span>
-              </Link>
-            </li>
-          </ul>
-          <div className="header_cart_price">
-            Giỏ hàng:  <span>{formater(1900000)}</span>
-          </div>
+          <Link to={ROUTERS.USER.HOME}>
+            <img
+              width="250px"
+              src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
+              alt="Logo"
+            />
+          </Link>
         </div>
         <div className="menu_wrapper_widget">
           <div className="header_top_right_auth">
             <Link to={ROUTERS.USER.LOGINPAGE}>
-              <FaUser /> Đăng Nhập
+              <FaUser /> Login
             </Link>
           </div>
         </div>
         <div className="menu_wrapper_navbar">
           <ul>
             {menu.map((menu, menuKey) => (
-              <li key={menu.name || menuKey} >
-                <Link to={menu.path} onClick={() => { handleMenuClick(menuKey) }}>
-                  {menu.name} {menu.child && (menu.isShowSubmenu ? <FaCircleChevronDown /> : <FaCircleChevronUp />)}
+              <li key={menu.name || menuKey}>
+                <Link
+                  to={menu.path}
+                  onClick={() => {
+                    handleMenuClick(menuKey);
+                  }}
+                >
+                  {menu.name}{" "}
+                  {menu.child &&
+                    (menu.isShowSubmenu ? (
+                      <FaCircleChevronDown />
+                    ) : (
+                      <FaCircleChevronUp />
+                    ))}
                 </Link>
                 {menu.child && menu.isShowSubmenu && (
-                  <ul className={`header_menu_doppdown ${menu.isShowSubmenu ? "show_submenu" : ""}`}>
+                  <ul
+                    className={`header_menu_doppdown ${
+                      menu.isShowSubmenu ? "show_submenu" : ""
+                    }`}
+                  >
                     {menu.child.map((childItem, childKey) => (
                       <li key={childItem.name || `&{menu}-${childKey}`}>
                         <Link to={childItem.path}>{childItem.name}</Link>
@@ -150,44 +207,76 @@ const Header = () => {
         <div className="menu_wrapper_contact">
           <ul>
             <li>
-              <MdEmail />trongnnbh00676@gmail.com
+              <MdEmail />
+              trongnnbh00676@gmail.com
             </li>
-            <li>
-              Miễn phí đọc sách và truyện thả ga
-            </li>
+            <li>Free reading book!!</li>
           </ul>
         </div>
       </div>
-
 
       <div className="header_top">
         <div className="container">
           <div className="row">
             <div className="col-6 header_top_left">
               <ul>
-              <Link to={ROUTERS.USER.HOME}>
-                <img width="150px" src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
-              </Link>
-                <li>CHÀO MỪNG BẠN ĐẾN BOOKSTORE</li>
+                <Link to={ROUTERS.USER.HOME}>
+                  <img
+                    width="100px"
+                    src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
+                    alt="Logo"
+                  />
+                </Link>
+                <li>Hello welcome to BOOKSTORE</li>
               </ul>
             </div>
             <div className="col-6 header_top_right">
-              <ul>
-                <li>
-                  <Link to={""}>
-                    <SiFacebook />
-                  </Link>
-                </li>
-                <li>
-                  <Link to={""}>
-                    <FaInstagram />
-                  </Link>
-                </li>
-                <li>
-                  <Link to={ROUTERS.USER.LOGINPAGE}>
-                    <FaUser />
-                  </Link>
-                </li>
+              <ul className="auth-links">
+                {isLoggedIn ? (
+                  <>
+                    <li>
+                      <Link to={""}>
+                        <SiFacebook />
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={""}>
+                        <FaInstagram />
+                      </Link>
+                    </li>
+                    <li className="user-menu">
+                      <button onClick={() => setShowMenu(!showMenu)}>
+                        <FaUser />
+                      </button>
+                      {showMenu && (
+                        <ul className="dropdown-menu">
+                          <li>
+                            <FaUser />{" "}
+                            <Link to={"/profile"}>Trang cá nhân</Link>
+                          </li>
+                          <li>
+                            <FaBookmark />{" "}
+                            <Link to={"/follow"}>Danh sách theo dõi</Link>
+                          </li>
+                          <li>
+                            <FaHistory />{" "}
+                            <Link to={"/history"}>Lịch sử đọc truyện</Link>
+                          </li>
+                          <li>
+                            <FaSignOutAlt /> onClick={handleLogout}{" "}
+                            <Link to={"/logout"}>Đăng xuất</Link>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+                  </>
+                ) : (
+                  <li className="user-auth">
+                    <Link to={ROUTERS.USER.REGISTER}>Đăng Ký</Link>
+                    <span>|</span>
+                    <Link to={ROUTERS.USER.LOGINPAGE}>Đăng Nhập</Link>
+                  </li>
+                )}
               </ul>
             </div>
           </div>
@@ -196,51 +285,29 @@ const Header = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-3">
-            <div className="header_logo">
-              {/* <Link to={ROUTERS.USER.HOME}>
-                <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="Logo" />
-              </Link> */}
-            </div>
+            <div className="header_logo"></div>
           </div>
           <div className="col-lg-6">
             <nav className="header_menu">
               <ul>
-                {
-                  menu?.map((menu, menuKey) => (
-                    <li key={menuKey} className={menuKey === 0 ? "active" : ""}>
-                      <Link to={menu?.path}>{menu?.name}</Link>
-                      {
-                        menu.child && (
-                          <ul className="header_menu_dropdown">
-                            {
-                              menu.child.map((childItem, childKey) => (
-                                <li key={`${menuKey} - ${childKey}`}>
-                                  <Link to={childItem.path}>{childItem.name}</Link>
-                                </li>
-                              ))
-                            }
-                          </ul>
-                        )
-                      }
-                    </li>
-                  ))
-                }
+                {menu?.map((menu, menuKey) => (
+                  <li key={menuKey} className={menuKey === 0 ? "active" : ""}>
+                    <Link to={menu?.path}>{menu?.name}</Link>
+                    {menu.child && (
+                      <ul className="header_menu_dropdown">
+                        {menu.child.map((childItem, childKey) => (
+                          <li key={`${menuKey} - ${childKey}`}>
+                            <Link to={childItem.path}>{childItem.name}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>
           <div className="col-lg-3">
-            <div className="header_cart">
-              <div className="header_cart_price">
-                <span>{formater(10000)}</span>
-              </div>
-              <ul>
-                <li>
-                  <Link to={ROUTERS.USER.BOOKCARTSHOPPING}>
-                    <FaCartShopping /> <span>5</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
             <div className="menu_open">
               <FaListUl onClick={() => setShowMenuWrapper(true)} />
             </div>
@@ -250,22 +317,35 @@ const Header = () => {
       <div className="container">
         <div className="row hero_categories_container">
           <div className="col-lg-3 col-md-12 col-sm-12 col-xs-12 hero_categories">
-            <div className="hero_categories_all" onClick={() => setShowCategories(!isShowCategories)}>
-              <FaListUl />Danh sách sản phẩm</div>
-            <ul className={isShowCategories ? "" : "hidden"}>
-              {categories.map((category, key) => (
-                <li key={key}>
-                  <Link to={ROUTERS.USER.BOOKLIST}>{category}</Link>
-                </li>
-              ))}
-            </ul>
+            <div
+              className="hero_categories_all"
+              onClick={() => setShowCategories(!isShowCategories)}
+            >
+              <FaListUl />
+              List Books
+            </div>
+            {isShowCategories && (
+              <ul>
+                {categories.map((category, key) => (
+                  <li key={key}>
+                    <Link to={ROUTERS.USER.BOOKLIST}>{category}</Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
+
           <div className="col-lg-9 col-sm-12 col-xs-12 col-md-12 hero-search-container">
             <div className="hero-search">
               <div className="hero-search-form">
                 <form>
-                  <input type="text" placeholder="Bạn đang tìm gì ???" />
-                  <button type="submit" className="site-btn">Tìm Kiếm</button>
+                  <input
+                    type="text"
+                    placeholder="What are you looking for????"
+                  />
+                  <button type="submit" className="site-btn">
+                    Search
+                  </button>
                 </form>
               </div>
               <div className="hero-search-phone">
@@ -278,19 +358,10 @@ const Header = () => {
                 </div>
               </div>
             </div>
-            {isHome && (
-              <div className="hero-item">
-                <div className="hero-text">
-                  <h2>Thư viện<br />đa dạng sách</h2>
-                  <p>Miễn phí mọi loại sách</p>
-                  <Link to="#" className="primary-btn">Mua Ngay</Link>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
     </>
   );
-}
+};
 export default memo(Header);

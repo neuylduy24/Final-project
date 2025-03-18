@@ -20,7 +20,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://150.95.105.147:8080/api/auth/sign-in", formData);
+      const response = await axios.post("https://api.it-ebook.io.vn/api/auth/sign-in", formData);
 
       if (response.status === 200 && response.data.token) {
         localStorage.setItem("token", response.data.token);

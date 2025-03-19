@@ -19,17 +19,34 @@ const ChapterManagementPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedBookId, setSelectedBookId] = useState('');
+  const [selectedBookId, setSelectedBookId] = useState("all"); // Giá trị mặc định "all" để hiển thị tất cả
+  const [allChapters, setAllChapters] = useState([]);
   const itemsPerPage = 10;
 
   useEffect(() => {
     fetchBooks();
   }, []);
 
-  // Reset trang về 1 khi thay đổi bộ lọc
+  // Lấy tất cả chương từ tất cả sách
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedBookId]);
+    if (books && books.length > 0) {
+      const chaptersFromBooks = [];
+      books.forEach(book => {
+        if (book.chapters && book.chapters.length > 0) {
+          // Thêm bookId và bookTitle vào mỗi chương để dễ truy xuất
+          const chaptersWithBookInfo = book.chapters.map(chapter => ({
+            ...chapter,
+            bookId: book.id,
+            bookTitle: book.title
+          }));
+          chaptersFromBooks.push(...chaptersWithBookInfo);
+        }
+      });
+      setAllChapters(chaptersFromBooks);
+    } else {
+      setAllChapters([]);
+    }
+  }, [books]);
 
   const fetchBooks = async () => {
     try {
@@ -82,40 +99,12 @@ const ChapterManagementPage = () => {
     }
   };
 
-  // Xử lý thay đổi bộ lọc sách
-  const handleBookFilterChange = (bookId) => {
-    setSelectedBookId(bookId);
+  const handleFilterChange = (e) => {
+    setSelectedBookId(e.target.value);
+    setCurrentPage(1); // Reset về trang đầu tiên khi đổi bộ lọc
   };
 
-  // Tạo một mảng chứa tất cả các chương từ tất cả các sách
-  const getAllChapters = () => {
-    const allChapters = [];
-    books.forEach(book => {
-      // Nếu có bộ lọc sách, chỉ lấy chương của sách đó
-      if (selectedBookId && book.id !== selectedBookId) {
-        return;
-      }
-      
-      if (book.chapters && book.chapters.length > 0) {
-        // Thêm bookId và bookTitle vào mỗi chương để dễ truy xuất
-        const chaptersWithBookInfo = book.chapters.map(chapter => ({
-          ...chapter,
-          bookId: book.id,
-          bookTitle: book.title
-        }));
-        allChapters.push(...chaptersWithBookInfo);
-      }
-    });
-    return allChapters;
-  };
-
-  const allChapters = getAllChapters();
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = allChapters.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(allChapters.length / itemsPerPage);
-
-  if (loading) {
+  if (loading && books.length === 0) {
     return <div className="loading">Đang tải...</div>;
   }
 
@@ -125,6 +114,26 @@ const ChapterManagementPage = () => {
         <h2>Quản lý chương</h2>
 
         {error && <div className="error-message">{error}</div>}
+
+        <div className="filter-container">
+          <label htmlFor="bookFilter">Lọc theo sách:</label>
+          <select
+            id="bookFilter"
+            value={selectedBookId}
+            onChange={handleFilterChange}
+            className="book-filter"
+          >
+            <option value="all">Tất cả sách</option>
+            {books.map(book => (
+              <option key={book.id} value={book.id}>
+                {book.title}
+              </option>
+            ))}
+          </select>
+          <button className="btn-add" onClick={() => setShowForm(true)}>
+            Thêm chương mới
+          </button>
+        </div>
 
         {showForm && (
           <ChapterForm
@@ -137,22 +146,12 @@ const ChapterManagementPage = () => {
         )}
 
         <ChapterTable
-          chapters={currentItems}
+          chapters={allChapters}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           setShowForm={setShowForm}
           selectedBookId={selectedBookId}
-          handleBookFilterChange={handleBookFilterChange}
-          books={books}
         />
-
-        {allChapters.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            setCurrentPage={setCurrentPage}
-          />
-        )}
       </div>
     </div>
   );

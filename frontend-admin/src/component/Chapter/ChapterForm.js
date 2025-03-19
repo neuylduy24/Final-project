@@ -129,12 +129,6 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
         e.preventDefault();
         
         try {
-            // Tạo thời gian hiện tại theo múi giờ Việt Nam (UTC+7)
-            const now = new Date();
-            // Tạo múi giờ Việt Nam (+7 giờ so với UTC)
-            const vnTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
-            const currentTime = vnTime.toISOString();
-            
             // Đảm bảo chapterNumber là số nguyên
             const chapterData = {
                 chapterNumber: parseInt(form.chapterNumber),
@@ -142,8 +136,21 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                 content: form.content,
                 views: 0,
                 bookId: null,  // Giá trị mặc định là null theo ảnh Postman
-                createdAt: isEditing ? form.createdAt : currentTime  // Sử dụng thời gian thực khi thêm mới
+                createdAt: isEditing ? form.createdAt : null  // Giá trị mặc định là null theo ảnh Postman
             };
+            
+            // Thêm createdAt là thời gian hiện tại theo múi giờ Việt Nam
+            const now = new Date();
+            // Điều chỉnh về múi giờ Việt Nam (UTC+7)
+            const vietnamTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+            
+            if (isEditing) {
+                // Nếu đang chỉnh sửa, giữ nguyên createdAt cũ
+                chapterData.createdAt = form.createdAt;
+            } else {
+                // Nếu thêm mới, đặt thời gian hiện tại theo múi giờ Việt Nam
+                chapterData.createdAt = vietnamTime.toISOString();
+            }
             
             // Xử lý hình ảnh
             if (uploadType === 'file' && selectedFiles.length > 0) {
@@ -279,12 +286,6 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             placeholder="Nhập nội dung chương vào đây..."
                         />
                     </div>
-
-                    {!isEditing && (
-                        <div className="form-info">
-                            <p><i>Lưu ý: Ngày tải lên sẽ tự động được gán là thời gian hiện tại theo múi giờ Việt Nam (UTC+7) khi bạn thêm chương mới.</i></p>
-                        </div>
-                    )}
                     
                     <div className="form-group">
                         <label>Phương thức tải ảnh:</label>

@@ -8,6 +8,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const [uploadType, setUploadType] = useState('url'); // 'url' hoặc 'file'
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
         fetchBooks();
@@ -127,40 +128,95 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         
-        // Nếu upload là kiểu file, cần xử lý tải file lên trước
-        if (uploadType === 'file' && selectedFiles.length > 0) {
-            try {
-                // Giả định chúng ta đang sử dụng hàm upload ảnh giả lập (cần thay bằng hàm thực tế)
-                const uploadedUrls = await Promise.all(
-                    selectedFiles.map(async (file) => {
-                        // Giả lập việc tải ảnh lên - trong thực tế, cần thay thế bằng API upload thật
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        
-                        // Giả định chúng ta đang gọi một API upload ảnh
-                        // const response = await axios.post('your-upload-api-endpoint', formData);
-                        // return response.data.url;
-                        
-                        // Trong ví dụ này, chúng ta chỉ trả về URL giả
-                        return URL.createObjectURL(file); // Trong thực tế, sẽ trả về URL từ server
-                    })
-                );
-                
-                // Cập nhật form với URLs của ảnh đã tải lên
-                setForm(prev => ({
-                    ...prev,
-                    images: uploadedUrls
-                }));
-                
-                // Tiếp tục với form submit
-                handleSubmit(e, { ...form, images: uploadedUrls });
-            } catch (error) {
-                console.error("Error uploading images:", error);
-                alert("Không thể tải ảnh lên. Vui lòng thử lại sau.");
+        try {
+            // Đảm bảo chapterNumber là số nguyên
+            const chapterData = {
+                chapterNumber: parseInt(form.chapterNumber),
+                title: form.title,
+                content: form.content,
+                views: 0,
+                bookId: null,  // Giá trị mặc định là null theo ảnh Postman
+                createdAt: isEditing ? form.createdAt : null  // Giá trị mặc định là null theo ảnh Postman
+            };
+            
+            // Thêm createdAt là thời gian hiện tại theo múi giờ Việt Nam
+            const now = new Date();
+            // Điều chỉnh về múi giờ Việt Nam (UTC+7)
+            const vietnamTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+            
+            if (isEditing) {
+                // Nếu đang chỉnh sửa, giữ nguyên createdAt cũ
+                chapterData.createdAt = form.createdAt;
+            } else {
+                // Nếu thêm mới, đặt thời gian hiện tại theo múi giờ Việt Nam
+                chapterData.createdAt = vietnamTime.toISOString();
             }
-        } else {
-            // Nếu không có file nào được chọn hoặc upload là kiểu URL, tiếp tục với submit bình thường
-            handleSubmit(e);
+            
+            // Xử lý hình ảnh
+            if (uploadType === 'file' && selectedFiles.length > 0) {
+                try {
+                    // Giả định chúng ta đang sử dụng hàm upload ảnh giả lập (cần thay bằng hàm thực tế)
+                    const uploadedUrls = await Promise.all(
+                        selectedFiles.map(async (file) => {
+                            // Giả lập việc tải ảnh lên - trong thực tế, cần thay thế bằng API upload thật
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            // Giả định chúng ta đang gọi một API upload ảnh
+                            // const response = await axios.post('your-upload-api-endpoint', formData);
+                            // return response.data.url;
+                            
+                            // Trong ví dụ này, chúng ta chỉ trả về URL giả
+                            return URL.createObjectURL(file); // Trong thực tế, sẽ trả về URL từ server
+                        })
+                    );
+                    
+                    // Thêm URLs hình ảnh vào chapterData
+                    chapterData.images = uploadedUrls;
+                    
+                } catch (error) {
+                    console.error("Error uploading images:", error);
+                    setError("Không thể tải ảnh lên. Vui lòng thử lại sau.");
+                    return;
+                }
+            } else if (form.images && form.images.length > 0) {
+                chapterData.images = form.images;
+            } else {
+                chapterData.images = null; // Giá trị mặc định là null theo ảnh Postman
+            }
+            
+            if (isEditing) {
+                // Cập nhật chương
+                await bookService.updateChapterInBook(form.bookId, form.id, chapterData);
+            } else {
+                // Thêm chương mới vào sách
+                await bookService.addChapterToBook(form.bookId, chapterData);
+            }
+            
+            // Reset form
+            setForm({
+                bookId: "",
+                chapterNumber: "",
+                title: "",
+                content: "",
+                images: []
+            });
+            
+            // Hiển thị thông báo thành công
+            setSuccessMessage(isEditing ? 'Đã cập nhật chương thành công!' : 'Đã thêm chương mới thành công!');
+            
+            // Đóng form sau khi thành công
+            setTimeout(() => {
+                setSuccessMessage('');
+                closeForm();
+            }, 2000);
+            
+            // Gọi hàm handleSubmit để thông báo cho component cha
+            handleSubmit(e, true);
+            
+        } catch (error) {
+            console.error("Error submitting chapter:", error);
+            setError(isEditing ? 'Không thể cập nhật chương: ' + error.message : 'Không thể thêm chương mới: ' + error.message);
         }
     };
 
@@ -168,6 +224,9 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
         <div className="form-overlay">
             <div className="form-container">
                 <h3>{isEditing ? 'Chỉnh sửa chương' : 'Thêm chương mới'}</h3>
+                {successMessage && <div className="success-message">{successMessage}</div>}
+                {error && <div className="error-message">{error}</div>}
+                
                 <form onSubmit={handleFormSubmit}>
                     <div className="form-group">
                         <label htmlFor="bookId">Chọn sách:</label>
@@ -177,7 +236,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             value={form.bookId || ''}
                             onChange={handleChange}
                             required
-                            disabled={loading}
+                            disabled={loading || isEditing}
                         >
                             <option value="">-- Chọn sách --</option>
                             {books.map(book => (
@@ -187,7 +246,6 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             ))}
                         </select>
                         {loading && <span className="loading-text">Đang tải danh sách sách...</span>}
-                        {error && <span className="error-text">{error}</span>}
                     </div>
                     <div className="form-group">
                         <label htmlFor="chapterNumber">Số chương:</label>
@@ -198,9 +256,11 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             value={form.chapterNumber || ''}
                             onChange={handleChange}
                             required
-                            min="0"
-                            step="0.1"
+                            min="1"
+                            step="1"
+                            placeholder="Ví dụ: 1, 2, 3"
                         />
+                        <small className="form-text text-muted">Số chương phải là số nguyên dương (ví dụ: 1, 2, 3)</small>
                     </div>
                     <div className="form-group">
                         <label htmlFor="title">Tiêu đề:</label>
@@ -211,6 +271,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             value={form.title || ''}
                             onChange={handleChange}
                             required
+                            placeholder="Ví dụ: Chương 1: Gặp gỡ"
                         />
                     </div>
                     <div className="form-group">
@@ -222,6 +283,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             onChange={handleChange}
                             required
                             rows="10"
+                            placeholder="Nhập nội dung chương vào đây..."
                         />
                     </div>
                     

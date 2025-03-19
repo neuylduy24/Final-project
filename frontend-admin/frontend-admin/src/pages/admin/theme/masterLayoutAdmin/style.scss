@@ -1,9 +1,31 @@
+@use "sass:map";
+@import "../../../../styles/pages/all.scss";
+
 .admin_layout {
     display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
 }
 
 .admin_content {
     flex: 1;
-    margin-left: 200px; // Căn lề với sidebar
-    padding: 20px;
+    margin-left: 230px; // Phù hợp với chiều rộng sidebar
+    padding: 25px;
+    transition: margin-left 0.3s ease-in-out;
+    
+    @include Responsive($WIDE_MOBILE) {
+        margin-left: 210px; // Cập nhật để luôn có margin với sidebar
+    }
+    
+    @include Responsive($TABLET_DEVICE) {
+        margin-left: 210px;
+    }
+    
+    @include Responsive($MEDIUM_DEVICE) {
+        margin-left: 210px;
+    }
+    
+    @include Responsive($DESKTOP) {
+        margin-left: 210px;
+    }
 }

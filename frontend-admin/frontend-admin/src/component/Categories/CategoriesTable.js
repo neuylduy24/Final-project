@@ -5,7 +5,7 @@ import CategoriesForm from "./CategoriesForm";
 import { FaSearch } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "http://150.95.105.147:8080/api/categories";
+const API_URL = "https://api.it-ebook.io.vn/api/categories";
 
 const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
   const [categories, setCategories] = useState([]);

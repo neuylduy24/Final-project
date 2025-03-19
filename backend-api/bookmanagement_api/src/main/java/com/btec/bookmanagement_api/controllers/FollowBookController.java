@@ -27,9 +27,9 @@ public class FollowBookController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createFollowBook(@RequestBody FollowBook FollowBook) {
+    public ResponseEntity<?> createFollowBook(@RequestBody FollowBook followBook) {
         try {
-            return ResponseEntity.ok(followBookRepository.createFollowBook(FollowBook));
+            return ResponseEntity.ok(followBookRepository.createFollowBook(followBook));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -8,17 +8,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "bookmarks")
+@Document(collection = "followbooks")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class BookMark {
+public class FollowBook {
     @Id
     private String id;
     private String userId;
     private String bookId;
-    private String chapterId;
 }
 

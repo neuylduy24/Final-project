@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import ChapterForm from "../../component/Chapter/ChapterForm";
 import ChapterTable from "../../component/Chapter/ChapterTable";
 import Pagination from "../../component/common/Pagination";
-import chapterService from "../../service/chapterService";
+import bookService from "../../service/bookService";
 import "../../styles/chapterManagement.css";
 
 const ChapterManagementPage = () => {
-  const [chapters, setChapters] = useState([]);
+  const [books, setBooks] = useState([]);
   const [form, setForm] = useState({
     bookId: "",
     chapterNumber: "",
@@ -19,70 +19,37 @@ const ChapterManagementPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedBookId, setSelectedBookId] = useState('');
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchChapters();
+    fetchBooks();
   }, []);
 
-  const fetchChapters = async () => {
+  // Reset trang về 1 khi thay đổi bộ lọc
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBookId]);
+
+  const fetchBooks = async () => {
     try {
       setLoading(true);
-      const data = await chapterService.getAllChapters();
-      setChapters(data);
+      const data = await bookService.getAllBooks();
+      setBooks(data);
       setError(null);
     } catch (err) {
-      setError("Không thể tải danh sách chương. Vui lòng thử lại sau.");
-      console.error("Error fetching chapters:", err);
+      setError("Không thể tải danh sách sách. Vui lòng thử lại sau.");
+      console.error("Error fetching books:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Xử lý việc tải ảnh lên từ files
-  const uploadImages = async (files) => {
-    try {
-      // Giả lập việc upload - trong thực tế, thay thế bằng API thật
-      return await chapterService.uploadImages(files);
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      throw new Error("Không thể tải ảnh lên. Vui lòng thử lại.");
-    }
-  };
-
-  const handleSubmit = async (e, formDataWithImages) => {
-    e.preventDefault();
-    
-    try {
-      let dataToSubmit;
-      
-      // Nếu form đã có dữ liệu ảnh từ tùy chọn tải lên (formDataWithImages được truyền)
-      if (formDataWithImages) {
-        dataToSubmit = {
-          ...formDataWithImages,
-          createdAt: isEditing ? form.createdAt : new Date().toISOString()
-        };
-      } else {
-        // Trường hợp thông thường (sử dụng URL)
-        dataToSubmit = {
-          ...form,
-          createdAt: isEditing ? form.createdAt : new Date().toISOString()
-        };
-      }
-      
-      if (isEditing) {
-        await chapterService.updateChapter(dataToSubmit.id, dataToSubmit);
-        setChapters(chapters.map((ch) => (ch.id === dataToSubmit.id ? dataToSubmit : ch)));
-      } else {
-        const newChapter = await chapterService.createChapter(dataToSubmit);
-        
-        const chapterWithDate = newChapter.createdAt 
-          ? newChapter 
-          : { ...newChapter, createdAt: new Date().toISOString() };
-        
-        setChapters([...chapters, chapterWithDate]);
-      }
-      
+  const handleSubmit = async (e, success) => {
+    // Nếu đã được xử lý thành công trong ChapterForm
+    if (success) {
+      // Refresh lại danh sách sách
+      fetchBooks();
       setForm({
         bookId: "",
         chapterNumber: "",
@@ -92,10 +59,6 @@ const ChapterManagementPage = () => {
       });
       setIsEditing(false);
       setShowForm(false);
-      setError(null);
-    } catch (err) {
-      setError(isEditing ? "Không thể cập nhật chương" : "Không thể thêm chương mới");
-      console.error("Error submitting chapter:", err);
     }
   };
 
@@ -105,23 +68,52 @@ const ChapterManagementPage = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (bookId, chapterId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa chương này?")) {
       try {
-        await chapterService.deleteChapter(id);
-        setChapters(chapters.filter((ch) => ch.id !== id));
+        await bookService.deleteChapterFromBook(bookId, chapterId);
+        // Refresh lại danh sách sách
+        fetchBooks();
         setError(null);
       } catch (err) {
-        setError("Không thể xóa chương");
+        setError("Không thể xóa chương: " + err.message);
         console.error("Error deleting chapter:", err);
       }
     }
   };
 
+  // Xử lý thay đổi bộ lọc sách
+  const handleBookFilterChange = (bookId) => {
+    setSelectedBookId(bookId);
+  };
+
+  // Tạo một mảng chứa tất cả các chương từ tất cả các sách
+  const getAllChapters = () => {
+    const allChapters = [];
+    books.forEach(book => {
+      // Nếu có bộ lọc sách, chỉ lấy chương của sách đó
+      if (selectedBookId && book.id !== selectedBookId) {
+        return;
+      }
+      
+      if (book.chapters && book.chapters.length > 0) {
+        // Thêm bookId và bookTitle vào mỗi chương để dễ truy xuất
+        const chaptersWithBookInfo = book.chapters.map(chapter => ({
+          ...chapter,
+          bookId: book.id,
+          bookTitle: book.title
+        }));
+        allChapters.push(...chaptersWithBookInfo);
+      }
+    });
+    return allChapters;
+  };
+
+  const allChapters = getAllChapters();
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = chapters.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(chapters.length / itemsPerPage);
+  const currentItems = allChapters.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(allChapters.length / itemsPerPage);
 
   if (loading) {
     return <div className="loading">Đang tải...</div>;
@@ -149,13 +141,18 @@ const ChapterManagementPage = () => {
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           setShowForm={setShowForm}
+          selectedBookId={selectedBookId}
+          handleBookFilterChange={handleBookFilterChange}
+          books={books}
         />
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-        />
+        {allChapters.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import { ROUTERS } from 'utils/router';
 const breadCrumb = (props) => {
   return <div className="breadCrumb">
     <div className="breadCrumb_text">
-      <h2>BOOKSTORE</h2>
       <div className="breadCrumb_option">
         <ul>
           <li className="link">

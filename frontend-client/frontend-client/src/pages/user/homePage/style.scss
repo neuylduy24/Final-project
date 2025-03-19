@@ -1,98 +1,92 @@
 @use "sass:map";
 @import "styles/pages/all";
-.container_categories_slider {
-    max-width: 1200px !important;
-    margin-top: 30px !important;
 
-    .categories_slider {
-        .categories_slider_item {
-            height: 300px;
-            position: relative;
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: top center;
-            border-radius: 5px;
 
-            p {
-                position: absolute;
-                left: 6%;
-                bottom: -5px;
-                text-align: center;
-                font-size: 17px;
-                font-weight: 600;
-                text-transform: uppercase;
-                color: black;
-                padding: 10px 0 10px;
-                width: 267px;
-                background: #ffffff;
-                cursor: pointer;
-                border-radius: 2px;
-            }
-        }
+// Định nghĩa màu sắc
+$primary-color: #007bff;
+$secondary-color: #064e9a;
+$hot-badge-color: red;
+$rating-color: #f39c12;
+$text-color: #333;
+$white: #ffffff;
+$box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-        .react-multi-carousel-item {
+// Mixin button
+@mixin button-style($bg-color, $text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
 
-            margin-left: 15px;
-        }
-    }
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
 }
 
-.featured {
-    margin-top: 50px;
-
-    .section-title {
-        margin-bottom: 50px;
-        text-align: center;
-
-        h2 {
-            position: relative;
-        }
-
-        h2:after {
-            position: absolute;
-            left: 0;
-            bottom: -15px;
-            right: 0;
-            height: 4px;
-            width: 80px;
-            background: rgb(18, 183, 233);
-            content: "";
-            margin: 0 auto;
-        }
-    }
-
-    .react-tabs {
-        ul {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 50px;
-        }
-
-        li {
-            list-style: none;
-            font-size: 20px;
-            color: black;
-            display: inline-block;
-            margin-right: 25px;
-            position: relative;
-            cursor: pointer;
-        }
-    }
+// Pulse effect
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+  }
 }
 
-@include Responsive($MEDIUM_DEVICE){
-    .container{
-        width: 990px !important;
-    }
-}
-@include Responsive($TABLET_DEVICE){
-    .container{
-        width: 750px !important;
-    }
-}
-@include Responsive($WIDE_MOBILE){
-    .container{
-        width: 540px !important;
-    }
+
+// Nút xem thêm
+.see-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
 
+.see-more-button {
+  @include button-style($primary-color, #fff);
+}
+
+// Responsive
+@include Responsive($MEDIUM_DEVICE) {
+  .container {
+    width: 100% !important;
+    padding: 0 20px;
+  }
+}
+
+@include Responsive($TABLET_DEVICE) {
+  .container {
+    width: 100% !important;
+    padding: 0 15px;
+  }
+
+  .featured-list {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@include Responsive($WIDE_MOBILE) {
+  .container {
+    width: 100% !important;
+    padding: 0 10px;
+  }
+
+  .featured-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .product-card {
+    max-width: 150px;
+  }
+
+  .see-more-button {
+    width: 30%;
+  }
+}

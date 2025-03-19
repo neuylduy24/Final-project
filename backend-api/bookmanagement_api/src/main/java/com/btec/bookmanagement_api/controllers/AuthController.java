@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,53 +23,69 @@ public class AuthController {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
-     * Sign-up: Create a new user.
-     *
-     * @param user The user object containing sign-up details.
-     * @return ResponseEntity with the created user.
+     * Đăng ký tài khoản mới
      */
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody User user) {
-        // Check if the email already exists
-        if (userService.getUserByEmail(user.getEmail()) != null) {
-            return new ResponseEntity<>("Email is already taken", HttpStatus.BAD_REQUEST);
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Email is already taken"));
+        }
+        if (userService.existsByUsername(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Username is already taken"));
         }
 
-        // Save the user with a hashed password
         User createdUser = userService.createUser(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Verification email sent. Please verify your account."));
     }
 
     /**
-     * Sign-in: Authenticate a user and return a JWT token.
-     *
-     * @param loginRequest A map containing email and password.
-     * @return ResponseEntity with the JWT token or error message.
+     * Xác minh tài khoản bằng token
+     */
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestParam String token) {
+        try {
+            boolean isVerified = userService.verifyUser(token);
+            if (isVerified) {
+                return ResponseEntity.ok(Map.of("message", "Account successfully verified!"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Invalid or expired verification token."));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    /**
+     * Đăng nhập vào hệ thống
      */
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
-        // Find the user by email
         User user = userService.getUserByEmail(email);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid email or password"));
         }
 
-        // Chuyển Set<String> roles thành chuỗi "USER,ADMIN"
-        String roles = String.join(",", user.getRoles());
+        if (!user.isVerified()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Account not verified. Please check your email."));
+        }
 
-        // Generate JWT token (truyền cả email và roles)
+        String roles = String.join(",", user.getRoles());
         String token = JwtUtil.generateToken(user.getEmail(), roles);
 
-        // Return the token và role
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
-        response.put("roles", user.getRoles()); // Trả về danh sách roles đầy đủ
+        response.put("roles", user.getRoles());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
-
-
 }

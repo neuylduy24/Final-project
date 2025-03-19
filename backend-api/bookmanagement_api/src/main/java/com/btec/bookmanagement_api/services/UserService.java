@@ -9,23 +9,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private EmailService emailService;
 
-//    public Optional<User> getUserByUsername(String username) {
-//        return userRepository.findByUsername(username);
-//    }
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -36,21 +35,44 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        // Hash the password before saving
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
+            throw new RuntimeException("Email already in use!");
         }
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+            throw new RuntimeException("Username already exists!");
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
+        user.setRoles(Set.of("READER")); // Default role
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.READER.name());
+        // Generate verification token
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plusHours(24)); // Token expires in 24 hours
+        user.setVerified(false);
 
-        user.setRoles(roles);
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        // Send verification email
+        emailService.sendVerificationEmail(user.getEmail(), token);
+
+        return user;
+    }
+
+    public boolean verifyUser(String token) {
+        Optional<User> userOptional = userRepository.findByVerificationToken(token);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Verification token has expired.");
+            }
+            user.setVerified(true);
+            user.setVerificationToken(null);
+            user.setTokenExpiry(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     public User getUserByEmail(String email) {

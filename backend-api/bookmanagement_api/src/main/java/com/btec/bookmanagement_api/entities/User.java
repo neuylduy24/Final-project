@@ -19,7 +19,7 @@ import java.util.Set;
 @Document(collection = "users") // Định nghĩa collection MongoDB
 public class User {
     @Id
-    private String id;  // MongoDB tự động sinh ObjectId, không cần @GeneratedValue
+    private String id;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
@@ -32,19 +32,24 @@ public class User {
     @NotBlank(message = "Username is required")
     private String username;
 
-    private Set<String> roles;  // Danh sách các vai trò (User, Admin, Moderator, ...)
+    private Set<String> roles;
 
-    private String avatar;  // Ảnh đại diện
+    private String avatar;
 
-    private List<String> favoriteCategories;  // Thể loại yêu thích
+    private List<String> favoriteCategories;
 
-    private List<String> searchHistory;  // Lịch sử tìm kiếm
+    private List<String> searchHistory;
 
-    private List<String> bookmarkedBooks;  // Danh sách sách đã lưu
+    private List<String> bookmarkedBooks;
 
-    private List<ReadingHistory> readingHistory; // Lịch sử đọc sách
+    private List<ReadingHistory> readingHistory;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private boolean enabled = false;
+    private boolean isVerified = false;// Mặc định tài khoản chưa kích hoạt
 
+    private String verificationToken;  // Token xác minh email
+
+    private LocalDateTime tokenExpiry; // Thời gian hết hạn token
 }

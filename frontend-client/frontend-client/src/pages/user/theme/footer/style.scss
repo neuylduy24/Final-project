@@ -1,4 +1,5 @@
 @use "sass:map";
+@import "styles/pages/responsive";
 @import "styles/pages/theme";
 
 .footer {
@@ -27,14 +28,6 @@
     .footer__widget {
         margin-bottom: 30px;
         overflow: hidden;
-
-        h6 {
-            font-size: 18px;
-            color: map.get($theme-colors, "normal-text");
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
         ul {
             float: left;
             width: 50%;
@@ -54,11 +47,6 @@
             }
         }
         
-    }
-    p {
-        font-size: 14px;
-        color: map.get($theme-colors, "normal-text");
-        margin-bottom: 20px;
     }
     .footer_widget_social{
         display: flex;
@@ -93,8 +81,8 @@
 
             input {
                 width: 100%;
-                font-size: 16px;
-                padding-left: 20px;
+                font-size: 14px;
+                padding-left: 10px;
                 color: map.get($theme-colors, "normal-text");
                 height: 46px;
                 border: 1px solid #E5E5E5;

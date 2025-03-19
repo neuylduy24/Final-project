@@ -2,40 +2,39 @@
 @import "styles/pages/theme";
 
 .breadCrumb {
-    display: flex;
-    align-items: center;
-    padding: 45px 0px 40px;
-    justify-content: center;
-    line-height: 30px;
-    margin-top: 100px;
-    text-align: center;
-    background: map.get($theme-colors, "main");
+    padding: 10px 0;
+    font-size: 14px;
 
     .breadCrumb_text {
-        color: #ffffff;
+        
+        .breadCrumb_option {
+            ul {
+                display: flex;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                gap: 5px; 
 
-        h2 {
-            margin-bottom: 10px;
-        }
+                li {
+                    color: #333;
+                    font-weight: 400;
 
-        ul {
-            display: flex;
-            list-style: none;
-            column-gap: 10px;
+                    a {
+                        text-decoration: none;
+                        color: #333;
 
-            li {
-                text-decoration: underline;
-                color: map.get($theme-colors, "description");
+                        &:hover {
+                            color: #007bff; 
+                        }
+                    }
 
-                a {
-                    text-decoration: none;
-                    color: #ffffff;
-                }
+                    &::after {
+                        content: " / ";
+                        color: #666; 
+                    }
 
-                &.link {
-                    text-decoration: none;
-                    :hover {
-                        color: map.get($theme-colors, "description");
+                    &:last-child::after {
+                        content: ""; 
                     }
                 }
             }

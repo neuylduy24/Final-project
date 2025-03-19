@@ -19,7 +19,7 @@ const CategoriesManagementAdPage = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        "http://150.95.105.147:8080/api/categories"
+        "https://api.it-ebook.io.vn/api/categories"
       );
       setCategories(response.data);
       setCurrentPage(1); // Reset về trang đầu tiên khi dữ liệu thay đổi

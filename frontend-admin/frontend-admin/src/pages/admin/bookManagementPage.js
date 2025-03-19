@@ -10,6 +10,7 @@ const BookManagementPage = () => {
     id: "",
     title: "",
     author: "",
+    image: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -22,7 +23,7 @@ const BookManagementPage = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get("http://150.95.105.147:8080/api/books");
+      const response = await axios.get("https://api.it-ebook.io.vn/api/books");
       setBooks(response.data);
       setCurrentPage(1);
     } catch (error) {
@@ -30,21 +31,30 @@ const BookManagementPage = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (bookData) => {
     try {
+      // Đảm bảo dữ liệu đầy đủ trước khi gửi đi
+      const dataToSend = { ...bookData };
+      
+      // Đảm bảo có trường categories nếu chưa có
+      if (!dataToSend.categories && dataToSend.category) {
+        if (typeof dataToSend.category === 'string') {
+          dataToSend.categories = [{ name: dataToSend.category }];
+        }
+      }
+      
       if (isEditing) {
-        await axios.put(`http://150.95.105.147:8080/api/books/${form.id}`, form);
+        await axios.put(`https://api.it-ebook.io.vn/api/books/${dataToSend.id}`, dataToSend);
       } else {
-        const response = await axios.post("http://150.95.105.147:8080/api/books", form);
+        const response = await axios.post("https://api.it-ebook.io.vn/api/books", dataToSend);
         setBooks((prevBooks) => [...prevBooks, response.data]); 
       }
   
       setShowForm(false);
       setIsEditing(false);
-      setForm({ id: "", title: "", author: "" });
+      setForm({ id: "", title: "", author: "", image: "" });
   
-      setCurrentPage(Math.ceil((books.length + 1) / booksPerPage));
+      fetchBooks();
     } catch (error) {
       console.error("Lỗi khi lưu sách:", error);
     }
@@ -63,11 +73,8 @@ const BookManagementPage = () => {
 
         {showForm && (
           <BookForm
-            form={form}
-            handleInputChange={(e) =>
-              setForm({ ...form, [e.target.name]: e.target.value })
-            }
-            handleSubmit={handleSubmit}
+            book={form}
+            onSave={handleSubmit}
             setShowForm={setShowForm}
             isEditing={isEditing}
           />

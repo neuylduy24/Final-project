@@ -1,273 +1,306 @@
-@use "sass:map";
 @import "styles/pages/theme";
 @import "styles/pages/all";
 
+
 .book-detail-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-    background-color: #f9f9f9;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.row-detail {
+  display: flex;
+  gap: 20px;
+}
+
+.book-image {
+  flex: 1;
+  max-width: 30%;
+
+  .book-cover {
+    width: 100%;
     border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
 }
 
-.product-detail {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+.book-info {
+  flex: 2;
+  max-width: 65%;
 
-.product-detail-pic {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  .book-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 
-    .img1 {
-        width: 100%;
-        max-width: 400px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+  .book-description {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
+  }
 
-    .main {
-        display: flex;
-        gap: 10px;
 
-        img {
-            width: 60px;
-            height: 60px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.2s;
-
-            &:hover {
-                transform: scale(1.1);
-            }
-        }
-    }
-}
-
-.product-detail-text {
-    h2 {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 10px;
-    }
-
-    .seen-icon {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: #555;
-    }
-
+  .book-meta {
     p {
-        font-size: 1rem;
-        color: #666;
-        line-height: 1.5;
+      font-size: 14px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      b {
+        color: #222;
+        font-weight: bold;
+      }
+
+      span {
+        font-weight: 500;
+        color: #007bff;
+      }
+
+      svg {
+        font-size: 16px;
+        color: #007bff;
+      }
     }
-
-    ul {
-        list-style: none;
-        padding: 0;
-
-        li {
-            margin: 8px 0;
-            font-size: 1rem;
-
-            b {
-                color: #007bff;
-            }
-
-            span {
-                color: #333;
-            }
-        }
-    }
+  }
 }
+
+
+.book-tags {
+  margin-top: 15px;
+
+  span {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin-right: 5px;
+    transition: background 0.3s;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+}
+
+
+.book-rating {
+  margin-top: 15px;
+
+  svg {
+    color: #f8b400;
+  }
+
+  .star {
+    font-size: 18px;
+    color: #ccc;
+  }
+}
+
+
+.book-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+
+  .btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+
+    &-read {
+      background: #40c057;
+      color: white;
+
+      &:hover {
+        background: #2e8b3d;
+      }
+    }
+
+    &-follow {
+      background: #a933f7;
+      color: white;
+
+      &:hover {
+        background: #9029c6;
+      }
+    }
+  }
+}
+
 
 .chapter-list {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-height: 500px;
+  margin-top: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2196f3;
+    border-bottom: 2px solid #2196f3;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+  }
+
+  .chapter-items {
+    list-style: none;
+    padding: 0;
+    max-height: 350px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f5f5f5;
 
-    h2 {
-        font-size: 1.5rem;
-        color: #007bff;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    &::-webkit-scrollbar {
+      width: 6px;
     }
 
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    &::-webkit-scrollbar-track {
+      background: #f5f5f5;
     }
 
-    .chapter-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 15px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-        transition: background 0.3s;
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 5px;
+    }
 
-        &:hover {
-            background-color: #e3f2fd;
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background: #f5f5f5;
+      }
+
+        a{
+          color: #333;
+          text-decoration: none;
+          list-style: none;
+          font-weight: 600;
+          &:hover{
+            color: #007bff;
+          }
         }
-    }
 
-    .chapter-title {
-        font-weight: bold;
-        color: #333;
+      .chapter-date {
+        color: #9e9e9e;
+        font-size: 14px;
+        font-style: italic;
+      }
     }
+  }
 }
 
-.comments-section {
-    background-color: #222;
-    padding: 20px;
-    border-radius: 8px;
-    color: #fff;
+.comment-section {
+  margin-top: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-    h2 {
-        margin-bottom: 15px;
+  h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2196f3;
+    border-bottom: 2px solid #2196f3;
+    padding-bottom: 5px;
+  }
+
+  .btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+
+    &-comment {
+      background: #40c057;
+      color: white;
+
+      &:hover {
+        background: #2e8b3d;
+      }
     }
-  
-    .comment-box {
-        display: flex;
-        width: 100%;
-        max-width: 500px;
-        margin-bottom: 15px;
-  
-        input {
-            width: 100%;
-            padding: 12px 50px 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            font-size: 1rem;
-            outline: none;
-            background: #333;
-            color: #fff;
-  
-            &:focus {
-                border-color: #00bfff;
-            }
-        }
-  
-        button {
-            background-color: #00bfff;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-  
-            &:hover {
-                background-color: #008cba;
-            }
-        }
-    }
-  
-    .comment-list {
-        .comment-item {
-            display: flex;
-            align-items: flex-start;
-            background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-  
-            .comment-avatar {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                margin-right: 10px;
-            }
-  
-            .comment-content {
-                flex: 1;
-  
-                .comment-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-bottom: 5px;
-  
-                    .comment-user {
-                        font-weight: bold;
-                    }
-  
-                    .comment-level {
-                        background-color: #444;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                    }
-  
-                    .comment-chapter {
-                        font-size: 12px;
-                        color: #bbb;
-                    }
-                }
-  
-                .comment-text {
-                    margin-bottom: 8px;
-                }
-  
-                .comment-footer {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-  
-                    .comment-actions {
-                        display: flex;
-                        gap: 10px;
-                        font-size: 14px;
-                        cursor: pointer;
-  
-                        .icon {
-                            color: #ccc;
-                            transition: color 0.2s;
-  
-                            &:hover {
-                                color: #fff;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+  }
+
+  input {
+    width: 99%;
+    height: 80px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
 }
+
+
 
 @include Responsive($TABLET_DEVICE) {
-    .comment-box {
-        max-width: 100%;
+  .book-detail-container {
+    padding: 15px;
+  }
+
+  .book-image {
+    max-width: 100%;
+    margin-top: 40px;
+  }
+
+  .book-info {
+    max-width: 100%;
+  }
+
+  .book-actions {
+    flex-direction: column;
+
+    .btn {
+      width: 88%;
     }
+  }
 }
 
+
 @include Responsive($WIDE_MOBILE) {
-    .comment-box {
-        flex-direction: column;
-        input {
-            border-radius: 15px;
-        }
-        button {
-            margin-top: 10px;
-            width: 100%;
-        }
+  .book-image {
+    max-width: 100%;
+  }
+  .book-cover{
+    width: 100%;
+  }
+
+  .book-info {
+    max-width: 100%;
+  }
+
+  .book-actions {
+    flex-direction: column;
+    .btn {
+      width: 88%;
     }
+  }
 }

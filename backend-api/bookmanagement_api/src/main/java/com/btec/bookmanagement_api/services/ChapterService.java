@@ -52,8 +52,9 @@ public class ChapterService {
         chapterRepository.deleteById(id);
     }
 
-    public ChapterService(ChapterRepository chapterRepository) {
+    public ChapterService(ChapterRepository chapterRepository, BookRepository bookRepository) {
         this.chapterRepository = chapterRepository;
+        this.bookRepository = bookRepository;
     }
 
   // Get all chapters sorted by createdAt (latest first)

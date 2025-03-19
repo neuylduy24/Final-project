@@ -6,8 +6,9 @@ import LoginPage from "./pages/admin/loginPage";
 import MasterLayoutAdmin from "./pages/admin/theme/masterLayoutAdmin";
 import CategoriesManagementAdPage from "./pages/admin/categoriesManagementPage";
 import ChapterManagementPage from "./pages/admin/chapterManagementPage";
-import UserManagementAdPage from "./pages/admin/userManagementPage";
+import UserManagementPage from "./pages/admin/userManagementPage";
 import StatisticManagementPage from "./pages/admin/statisticManagementPage";
+
 
 // ✅ Kiểm tra trạng thái đăng nhập
 const isAuthenticated = () => !!localStorage.getItem("token");
@@ -25,6 +26,37 @@ const AdminRouter = () => {
     if (!isAuthenticated()) {
         return <Navigate to={ROUTERS.ADMIN.LOGIN} replace />;
     }
+=======
+import BookManagementPage from "./pages/admin/bookManagementPage";
+
+const renderAdminRouter = () => {
+    const adminRouters = [
+        {
+            path: ROUTERS.ADMIN.LOGIN,
+            component: <LoginPage />,
+        },
+        {
+            path: ROUTERS.ADMIN.STATISTICS,
+            component: <StatisticManagementPage />,
+        },
+        {
+            path: ROUTERS.ADMIN.BOOKSCATEGORIES,
+            component: <CategoriesManagementAdPage />,
+        },
+        {
+            path: ROUTERS.ADMIN.CHAPTERBOOKS,
+            component: <ChapterManagementPage />,
+        },
+        {
+            path: ROUTERS.ADMIN.USERS,
+            component: <UserManagementPage />,
+        },
+        {
+            path: ROUTERS.ADMIN.BOOKS,
+            component: <BookManagementPage />,
+        },
+    ];
+
 
     return (
         <MasterLayoutAdmin>

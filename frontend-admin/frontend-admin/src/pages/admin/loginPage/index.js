@@ -25,10 +25,14 @@ const LoginPage = () => {
     
 
     try {
+
         const response = await axios.post("https://api.it-ebook.io.vn/api/auth/sign-in", formData);
 
         if (response.status === 200 && response.data.token) {
             const { token, roles } = response.data; // Lấy roles từ API
+
+      const response = await axios.post("https://api.it-ebook.io.vn/api/auth/sign-in", formData);
+
 
             if (!roles.includes("ADMIN")) {  
                 setError("Bạn không có quyền truy cập!");

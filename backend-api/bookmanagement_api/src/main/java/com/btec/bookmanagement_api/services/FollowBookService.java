@@ -13,16 +13,21 @@ import java.util.Optional;
 
 @Service
 public class FollowBookService {
-    @Autowired
-    private FollowBookRepository followBookRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private ChapterRepository chapterRepository;
+    private final FollowBookRepository followBookRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
+    private final ChapterRepository chapterRepository;
 
-    public List<FollowBook> getFollowBookByUserId(String userId) {
+    @Autowired
+    public FollowBookService(FollowBookRepository followBookRepository, UserRepository userRepository,
+                             BookRepository bookRepository, ChapterRepository chapterRepository) {
+        this.followBookRepository = followBookRepository;
+        this.userRepository = userRepository;
+        this.bookRepository = bookRepository;
+        this.chapterRepository = chapterRepository;
+    }
+
+    public List<FollowBook> getFollowBooksByUserId(String userId) {
         return followBookRepository.findByUserId(userId);
     }
 
@@ -30,13 +35,13 @@ public class FollowBookService {
         return followBookRepository.findByUserIdAndBookId(userId, bookId);
     }
 
-    public FollowBook createFollowBook(FollowBook bookmark) {
-        // Check if a bookmark for this book already exists for the user
-        Optional<FollowBook> existingBookmark = followBookRepository.findByUserIdAndBookId(bookmark.getUserId(), bookmark.getBookId());
-        if (existingBookmark.isPresent()) {
-            throw new RuntimeException("Bookmark for this book already exists!");
+    public FollowBook createFollowBook(FollowBook followBook) {
+        // Check if a FollowBook record already exists for the user and book
+        Optional<FollowBook> existingFollowBook = followBookRepository.findByUserIdAndBookId(followBook.getUserId(), followBook.getBookId());
+        if (existingFollowBook.isPresent()) {
+            throw new RuntimeException("FollowBook record for this book already exists!");
         }
-        return followBookRepository.save(bookmark);
+        return followBookRepository.save(followBook);
     }
 
     public void deleteFollowBook(String id) {

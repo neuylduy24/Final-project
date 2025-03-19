@@ -1,7 +1,9 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.User;
+import com.btec.bookmanagement_api.repositories.UserRepository;
 import com.btec.bookmanagement_api.security.JwtUtil;
+import com.btec.bookmanagement_api.services.EmailService;
 import com.btec.bookmanagement_api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,8 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,6 +23,10 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository ;
+    @Autowired
+    private EmailService emailService;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -88,4 +96,55 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email,
+                                                @RequestParam String otp,
+                                                @RequestParam String newPassword) {
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Email không tồn tại!");
+        }
+
+        // 🛠 Kiểm tra mã OTP có hợp lệ không
+        if (user.getResetPasswordCode().equals(otp) && LocalDateTime.now().isBefore(user.getResetCodeExpiry())) {
+            user.setPassword(passwordEncoder.encode(newPassword)); // Cập nhật mật khẩu mới
+            user.setResetPasswordCode(null); // Xóa mã OTP sau khi đặt lại
+            user.setResetCodeExpiry(null);
+            userRepository.save(user);
+            return ResponseEntity.ok("✅ Mật khẩu đã được đặt lại thành công!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("❌ Mã OTP không đúng hoặc đã hết hạn.");
+        }
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestParam("email") String email) {
+        Map<String, String> response = new HashMap<>();
+
+        // 🔍 Kiểm tra user có tồn tại không
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            response.put("message", "❌ Email không tồn tại!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // 🛠 Tạo mã OTP gồm 6 chữ số (đảm bảo luôn đủ 6 số)
+        String otp = String.format("%06d", new Random().nextInt(1000000));
+        user.setResetPasswordCode(otp);
+        user.setResetCodeExpiry(LocalDateTime.now().plusMinutes(5)); // Hết hạn sau 5 phút
+        userService.saveUser(user); // 🔄 Cập nhật thông tin user vào DB
+
+        // ✉ Gửi email OTP (kiểm tra phương thức sendResetPasswordCode)
+        try {
+            emailService.sendResetPasswordCode(user.getEmail(), otp);
+            response.put("message", "✅ Mã OTP đã được gửi vào email của bạn!");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "❌ Gửi email thất bại: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
+
+
 }

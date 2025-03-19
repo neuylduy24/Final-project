@@ -1,7 +1,5 @@
 package com.btec.bookmanagement_api.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -18,7 +16,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class Book {
     @Id
     private String id;

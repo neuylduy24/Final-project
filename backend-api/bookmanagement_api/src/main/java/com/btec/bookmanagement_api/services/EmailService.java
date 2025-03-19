@@ -36,4 +36,24 @@ public class EmailService {
             return false;
         }
     }
+
+    public void sendResetPasswordCode(String email, String otp) {
+        try {
+            String subject = "🔐 Mã OTP Đặt Lại Mật Khẩu";
+            String message = "Mã OTP của bạn là: " + otp + ". OTP có hiệu lực trong 5 phút.";
+
+            SimpleMailMessage emailMessage = new SimpleMailMessage();
+            emailMessage.setTo(email);
+            emailMessage.setSubject(subject);
+            emailMessage.setText(message);
+            emailMessage.setFrom("dieptvbh00666@fpt.edu.vn");  // Đảm bảo đây là email của bạn
+
+            mailSender.send(emailMessage);
+            System.out.println("✅ Email OTP đã được gửi thành công!");
+        } catch (MailException e) {
+            System.err.println("❌ Lỗi gửi email: " + e.getMessage());
+            throw new RuntimeException("Lỗi khi gửi email OTP.");
+        }
+    }
+
 }

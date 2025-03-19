@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/followbooks")
+@RequestMapping("/api/follow-books")
 public class FollowBookController {
     @Autowired
-    private FollowBookService followBookRepository;
+    private FollowBookService followBookService;
 
     @GetMapping("/user/{userId}")
     public List<FollowBook> getFollowBooksByUserId(@PathVariable String userId) {
-        return followBookRepository.getFollowBookByUserId(userId);
+        return followBookService.getFollowBooksByUserId(userId);
     }
 
     @GetMapping("/user/{userId}/book/{bookId}")
     public ResponseEntity<FollowBook> getFollowBookByUserAndBook(@PathVariable String userId, @PathVariable String bookId) {
-        return followBookRepository.getFollowBookByUserAndBook(userId, bookId)
+        return followBookService.getFollowBookByUserAndBook(userId, bookId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -29,7 +29,7 @@ public class FollowBookController {
     @PostMapping
     public ResponseEntity<?> createFollowBook(@RequestBody FollowBook followBook) {
         try {
-            return ResponseEntity.ok(followBookRepository.createFollowBook(followBook));
+            return ResponseEntity.ok(followBookService.createFollowBook(followBook));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -37,13 +37,13 @@ public class FollowBookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFollowBook(@PathVariable String id) {
-        followBookRepository.deleteFollowBook(id);
+        followBookService.deleteFollowBook(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/user/{userId}/book/{bookId}")
     public ResponseEntity<Void> deleteFollowBookByUserAndBook(@PathVariable String userId, @PathVariable String bookId) {
-        followBookRepository.deleteFollowBookByUserAndBook(userId, bookId);
+        followBookService.deleteFollowBookByUserAndBook(userId, bookId);
         return ResponseEntity.noContent().build();
     }
 }

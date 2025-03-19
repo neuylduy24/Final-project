@@ -52,4 +52,8 @@ public class User {
     private String verificationToken;  // Token xác minh email
 
     private LocalDateTime tokenExpiry; // Thời gian hết hạn token
+
+    // 🔥 Thêm thuộc tính để xử lý quên mật khẩu
+    private String resetPasswordCode;  // Mã OTP gửi đến email
+    private LocalDateTime resetCodeExpiry;  // Thời gian hết hạn OTP
 }

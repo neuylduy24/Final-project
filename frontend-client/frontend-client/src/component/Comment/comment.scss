@@ -1,0 +1,45 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+.comment-section {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #2196f3;
+        border-bottom: 2px solid #2196f3;
+        padding-bottom: 5px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+
+        &-comment {
+            background: #40c057;
+            color: white;
+
+            &:hover {
+                background: #2e8b3d;
+            }
+        }
+    }
+
+    input {
+        width: 99%;
+        height: 80px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+}

@@ -1,14 +1,13 @@
 import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { ROUTERS, USER_PATH } from "./utils/router";
+import { ROUTERS, USER_PATH } from "./utils/path";
 
-import MasterLayout from "./pages/user/theme/masterLayout";
-import HomePage from "./pages/user/homePage";
-import BookDetailProductPage from "./pages/user/BookDetailProductPage";
-import ShoppingCartPage from "./pages/user/shoppingCartPage";
-import CheckoutPage from "./pages/user/checkoutPage";
-import LoginPage from "./pages/user/loginPage";
-import RegisterPage from "./pages/user/registerPage";
+import MasterLayout from "./pages/user/theme/masterLayout/masterLayout";
+import HomePage from "./pages/user/homePage/homepage";
+import BookDetailProductPage from "./pages/user/BookDetailProductPage/bookDetail";
+import LoginPage from "./pages/user/loginForm/login";
+import RegisterPage from "./pages/user/loginForm/register";
+import ChapterDetailPage from "component/ChapterDetail/ChapterDetailPage";
 
 const RouterCustom = () => {
     const location = useLocation();
@@ -34,8 +33,7 @@ const RouterCustom = () => {
                                 <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
                                 <Route path={ROUTERS.USER.HOME} element={<HomePage />} />
                                 <Route path={ROUTERS.USER.BOOKDETAIL} element={<BookDetailProductPage />} />
-                                <Route path={ROUTERS.USER.BOOKCARTSHOPPING} element={<ShoppingCartPage />} />
-                                <Route path={ROUTERS.USER.CHECKOUT} element={<CheckoutPage />} />
+                                <Route path={ROUTERS.USER.CHAPTERDETAIL} element={<ChapterDetailPage />} />
                             </Routes>
                         </MasterLayout>
                     }

@@ -1,0 +1,43 @@
+@use "sass:map";
+@import "styles/pages/theme";
+
+.breadCrumb {
+    padding: 10px 0;
+    font-size: 14px;
+
+    .breadCrumb_text {
+
+        .breadCrumb_option {
+            ul {
+                display: flex;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                gap: 5px;
+
+                li {
+                    color: #333;
+                    font-weight: 400;
+
+                    a {
+                        text-decoration: none;
+                        color: #333;
+
+                        &:hover {
+                            color: #007bff;
+                        }
+                    }
+
+                    &::after {
+                        content: " / ";
+                        color: #666;
+                    }
+
+                    &:last-child::after {
+                        content: "";
+                    }
+                }
+            }
+        }
+    }
+}

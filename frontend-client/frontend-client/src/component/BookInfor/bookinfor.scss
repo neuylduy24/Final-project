@@ -1,0 +1,82 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+.book-info {
+    flex: 2;
+    max-width: 65%;
+
+    .book-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .book-description {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+
+    .book-meta {
+        p {
+            font-size: 14px;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+
+            b {
+                color: #222;
+                font-weight: bold;
+            }
+
+            span {
+                font-weight: 500;
+                color: #007bff;
+            }
+
+            svg {
+                font-size: 16px;
+                color: #007bff;
+            }
+        }
+    }
+}
+
+
+.book-tags {
+    margin-top: 15px;
+
+    span {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        margin-right: 5px;
+        transition: background 0.3s;
+
+        &:hover {
+            background: #0056b3;
+        }
+    }
+}
+
+
+.book-rating {
+    margin-top: 15px;
+
+    svg {
+        color: #f8b400;
+    }
+
+    .star {
+        font-size: 18px;
+        color: #ccc;
+    }
+}
+
+

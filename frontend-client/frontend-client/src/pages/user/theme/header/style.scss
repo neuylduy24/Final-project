@@ -53,6 +53,93 @@
     padding: 10px 0 13px;
     font-size: 20px;
 
+    .auth-links {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        li {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-auth {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            a {
+                text-decoration: none;
+                color: #000;
+                font-weight: bold;
+
+                &:hover {
+                    color: #007bff;
+                }
+            }
+
+            span {
+                font-weight: bold;
+            }
+        }
+
+        .user-menu {
+            position: relative;
+
+            button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 24px;
+
+                svg {
+                    padding: 5px;
+                    color: #404040;
+                    border: 1px solid #ededed;
+                    border-radius: 50%;
+                    transition: all 0.3s;
+                    background: #E5E5E5;
+                    cursor: pointer;
+                }
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 35px;
+                right: -100px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                width: 200px;
+                padding: 10px;
+                z-index: 100;
+
+                li {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px;
+                    cursor: pointer;
+
+
+                    a {
+                        text-decoration: none;
+                        color: black;
+                        font-weight: 500;
+                        font-size: 14px;
+                    }
+
+
+                    &:hover {
+                        background: #f5f5f5;
+                    }
+                }
+
+            }
+        }
+    }
+
     ul {
         column-gap: 8px;
         list-style: none;
@@ -372,79 +459,80 @@
 .menu_open {
     display: none;
 }
+
 .auth-links {
     display: flex;
     align-items: center;
     gap: 15px;
-  
+
     li {
-      list-style: none;
-      display: flex;
-      align-items: center;
+        list-style: none;
+        display: flex;
+        align-items: center;
     }
-  
+
     .user-auth {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-  
-      a {
-        text-decoration: none;
-        color: #000;
-        font-weight: bold;
-  
-        &:hover {
-          color: #007bff;
-        }
-      }
-  
-      span {
-        font-weight: bold;
-      }
-    }
-  
-    .user-menu {
-      position: relative;
-  
-      button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-      }
-  
-      .dropdown-menu {
-        position: absolute;
-        top: 40px;
-        right: 0;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        width: 200px;
-        padding: 10px;
-        z-index: 100;
-  
-        li {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 10px;
-          cursor: pointer;
-  
-          a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        a {
             text-decoration: none;
-            color: black;
-            font-weight: 500;
-          }
-  
-          &:hover {
-            background: #f5f5f5;
-          }
+            color: #000;
+            font-weight: bold;
+
+            &:hover {
+                color: #007bff;
+            }
         }
-      }
+
+        span {
+            font-weight: bold;
+        }
     }
-  }
-  
+
+    .user-menu {
+        position: relative;
+
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 200px;
+            padding: 10px;
+            z-index: 100;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                cursor: pointer;
+
+                a {
+                    text-decoration: none;
+                    color: black;
+                    font-weight: 500;
+                }
+
+                &:hover {
+                    background: #f5f5f5;
+                }
+            }
+        }
+    }
+}
+
 
 
 @include Responsive($MEDIUM_DEVICE) {

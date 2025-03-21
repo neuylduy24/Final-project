@@ -78,6 +78,7 @@ public class ChapterController {
         return ResponseEntity.ok().build();
     }
 
+
     // API lấy tổng lượt xem của một sách
     @GetMapping("/book/{bookId}/views")
     public ResponseEntity<Integer> getTotalViewsByBookId(@PathVariable String bookId) {

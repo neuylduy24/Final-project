@@ -1,19 +1,23 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
+import com.btec.bookmanagement_api.entities.Feedback;
 import com.btec.bookmanagement_api.services.BookService;
+import com.btec.bookmanagement_api.services.FeedbackService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
     @Autowired
     private BookService bookService;
+    private FeedbackService feedbackService;
 
     @GetMapping
     public List<Book> getAllBooks() {
@@ -61,5 +65,17 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable String id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // 2️⃣ API lấy thông tin sách + Feedback & Rating
+    @GetMapping("/{id}/details")
+    public ResponseEntity<Book> getBookWithFeedback(@PathVariable String id) {
+        return bookService.getBookById(id)
+                .map(book -> {
+                    book.setFeedbacks(feedbackService.getFeedbacksByBookId(id));
+                    book.setAverageRating(feedbackService.getAverageRating(id));
+                    return ResponseEntity.ok(book);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

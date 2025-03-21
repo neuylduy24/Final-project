@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -31,5 +32,11 @@ public class Book {
     private List<Chapter> chapters;
     private List<Category> categories;
     private int views = 0 ;
+    @Transient  // Không lưu vào MongoDB
+    private List<Feedback> feedbacks;
+
+    @Transient
+    private double averageRating;
+
 }
 

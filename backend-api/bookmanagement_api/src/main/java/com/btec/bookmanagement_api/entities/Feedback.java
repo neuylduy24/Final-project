@@ -7,15 +7,20 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "comments")
+import java.time.LocalDateTime;
+
+@Document(collection = "feedbacks")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Feedback {
     @Id
     private String id;
     private String userId;
     private String bookId;
-    private String content;
+    private String content;  // Comment content (optional)
+    private int rating;      // Star rating (1-5)
+    private LocalDateTime createdAt;
+
 }

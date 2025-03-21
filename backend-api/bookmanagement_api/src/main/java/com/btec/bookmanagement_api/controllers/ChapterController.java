@@ -23,6 +23,7 @@ public class ChapterController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Chapter> getChapterById(@PathVariable String id) {
+        chapterService.incrementChapterViews(id); // Tăng số lượt xem
         Optional<Chapter> chapter = chapterService.getChapterById(id);
         return chapter.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

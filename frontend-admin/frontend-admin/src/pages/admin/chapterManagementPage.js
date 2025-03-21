@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ChapterForm from "../../component/Chapter/ChapterForm";
 import ChapterTable from "../../component/Chapter/ChapterTable";
 import Pagination from "../../component/common/Pagination";
@@ -12,7 +12,7 @@ const ChapterManagementPage = () => {
     chapterNumber: "",
     title: "",
     content: "",
-    images: []
+    images: [],
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -39,64 +39,27 @@ const ChapterManagementPage = () => {
     }
   };
 
-  // Xử lý việc tải ảnh lên từ files
-  const uploadImages = async (files) => {
-    try {
-      // Giả lập việc upload - trong thực tế, thay thế bằng API thật
-      return await chapterService.uploadImages(files);
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      throw new Error("Không thể tải ảnh lên. Vui lòng thử lại.");
-    }
-  };
-
   const handleSubmit = async (e, formDataWithImages) => {
     e.preventDefault();
     
+    let dataToSubmit = formDataWithImages ? formDataWithImages : { ...form };
+  
+    console.log("🚀 Gửi dữ liệu:", dataToSubmit);
+  
     try {
-      let dataToSubmit;
-      
-      // Nếu form đã có dữ liệu ảnh từ tùy chọn tải lên (formDataWithImages được truyền)
-      if (formDataWithImages) {
-        dataToSubmit = {
-          ...formDataWithImages,
-          createdAt: isEditing ? form.createdAt : new Date().toISOString()
-        };
-      } else {
-        // Trường hợp thông thường (sử dụng URL)
-        dataToSubmit = {
-          ...form,
-          createdAt: isEditing ? form.createdAt : new Date().toISOString()
-        };
-      }
-      
-      if (isEditing) {
-        await chapterService.updateChapter(dataToSubmit.id, dataToSubmit);
-        setChapters(chapters.map((ch) => (ch.id === dataToSubmit.id ? dataToSubmit : ch)));
-      } else {
-        const newChapter = await chapterService.createChapter(dataToSubmit);
-        
-        const chapterWithDate = newChapter.createdAt 
-          ? newChapter 
-          : { ...newChapter, createdAt: new Date().toISOString() };
-        
-        setChapters([...chapters, chapterWithDate]);
-      }
-      
-      setForm({
-        bookId: "",
-        chapterNumber: "",
-        title: "",
-        content: "",
-        images: []
-      });
-      setIsEditing(false);
-      setShowForm(false);
-      setError(null);
+      const response = await chapterService.createChapter(dataToSubmit);
+      console.log("✅ API response:", response);
     } catch (err) {
-      setError(isEditing ? "Không thể cập nhật chương" : "Không thể thêm chương mới");
-      console.error("Error submitting chapter:", err);
+      console.error("❌ Lỗi từ API:", err.response?.data || err.message);
+      setError("Không thể thêm chương mới");
     }
+  };
+  
+
+  const resetForm = () => {
+    setForm({ bookId: "", chapterNumber: "", title: "", content: "", images: [] });
+    setIsEditing(false);
+    setShowForm(false);
   };
 
   const handleEdit = (chapter) => {
@@ -109,8 +72,7 @@ const ChapterManagementPage = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa chương này?")) {
       try {
         await chapterService.deleteChapter(id);
-        setChapters(chapters.filter((ch) => ch.id !== id));
-        setError(null);
+        fetchChapters(); // Cập nhật danh sách sau khi xóa
       } catch (err) {
         setError("Không thể xóa chương");
         console.error("Error deleting chapter:", err);
@@ -118,9 +80,13 @@ const ChapterManagementPage = () => {
     }
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = chapters.slice(indexOfFirstItem, indexOfLastItem);
+  // Tính toán danh sách chương được hiển thị theo trang
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return chapters.slice(indexOfFirstItem, indexOfLastItem);
+  }, [chapters, currentPage]);
+
   const totalPages = Math.ceil(chapters.length / itemsPerPage);
 
   if (loading) {
@@ -139,7 +105,7 @@ const ChapterManagementPage = () => {
             form={form}
             setForm={setForm}
             handleSubmit={handleSubmit}
-            closeForm={() => setShowForm(false)}
+            closeForm={resetForm}
             isEditing={isEditing}
           />
         )}

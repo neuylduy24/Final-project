@@ -126,43 +126,29 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        
-        // Nếu upload là kiểu file, cần xử lý tải file lên trước
-        if (uploadType === 'file' && selectedFiles.length > 0) {
-            try {
-                // Giả định chúng ta đang sử dụng hàm upload ảnh giả lập (cần thay bằng hàm thực tế)
-                const uploadedUrls = await Promise.all(
-                    selectedFiles.map(async (file) => {
-                        // Giả lập việc tải ảnh lên - trong thực tế, cần thay thế bằng API upload thật
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        
-                        // Giả định chúng ta đang gọi một API upload ảnh
-                        // const response = await axios.post('your-upload-api-endpoint', formData);
-                        // return response.data.url;
-                        
-                        // Trong ví dụ này, chúng ta chỉ trả về URL giả
-                        return URL.createObjectURL(file); // Trong thực tế, sẽ trả về URL từ server
-                    })
-                );
-                
-                // Cập nhật form với URLs của ảnh đã tải lên
-                setForm(prev => ({
-                    ...prev,
-                    images: uploadedUrls
-                }));
-                
-                // Tiếp tục với form submit
-                handleSubmit(e, { ...form, images: uploadedUrls });
-            } catch (error) {
-                console.error("Error uploading images:", error);
-                alert("Không thể tải ảnh lên. Vui lòng thử lại sau.");
-            }
-        } else {
-            // Nếu không có file nào được chọn hoặc upload là kiểu URL, tiếp tục với submit bình thường
-            handleSubmit(e);
+      
+        if (!form.bookId) {
+          console.error("❌ Thiếu bookId");
+          return;
         }
-    };
+      
+        try {
+          console.log("🚀 Gửi dữ liệu chương:", form);
+      
+          await bookService.addChapter(form.bookId, {
+            chapterNumber: form.chapterNumber,
+            title: form.title,
+            content: form.content,
+            images: form.images,
+          });
+      
+          console.log("✅ Thêm chương thành công!");
+        } catch (error) {
+          console.error("❌ Lỗi khi thêm chương:", error.response?.data || error.message);
+        }
+      };
+      
+    
 
     return (
         <div className="form-overlay">

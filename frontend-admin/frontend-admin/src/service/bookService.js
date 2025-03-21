@@ -13,6 +13,8 @@ const bookService = {
         }
     },
 
+    addChapter: (bookId, chapterData) => 
+    axios.post(`${API_URL}/${bookId}/chapters`, chapterData),
     // Lấy sách theo ID
     getBookById: async (id) => {
         try {

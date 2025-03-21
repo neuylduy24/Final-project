@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class FollowBook {
     @Id
     private String id;

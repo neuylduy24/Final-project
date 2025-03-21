@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class Role {
     @Id
     private String id;

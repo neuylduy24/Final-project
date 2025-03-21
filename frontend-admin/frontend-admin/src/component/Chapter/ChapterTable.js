@@ -1,50 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import bookService from '../../service/bookService';
 
 const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm }) => {
-    const [bookTitles, setBookTitles] = useState({});
+    const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetchBookTitles();
-    }, [chapters]);
+        fetchBooks();
+    }, []);
 
-    const fetchBookTitles = async () => {
+    const fetchBooks = async () => {
         try {
             setLoading(true);
-            const uniqueBookIds = [...new Set(chapters.map(chapter => chapter.bookId))];
-            const titles = {};
-            
-            for (const bookId of uniqueBookIds) {
-                const book = await bookService.getBookById(bookId);
-                titles[bookId] = book.title;
-            }
-            
-            setBookTitles(titles);
-            setError(null);
+            const data = await bookService.getAllBooks(); // Lấy tất cả sách một lần
+            setBooks(data);
         } catch (err) {
-            setError("Không thể tải thông tin sách");
-            console.error("Error fetching book titles:", err);
+            setError("Không thể tải danh sách sách");
+            console.error("Error fetching books:", err);
         } finally {
             setLoading(false);
         }
     };
 
+    // Dùng useMemo để tạo ánh xạ ID -> title, tránh tính toán lại không cần thiết
+    const bookTitleMap = useMemo(() => {
+        return books.reduce((acc, book) => {
+            acc[book.id] = book.title;
+            return acc;
+        }, {});
+    }, [books]);
+
     // Hàm format ngày tạo
     const formatCreatedDate = (dateString) => {
         if (!dateString) return 'N/A';
-        
         try {
-            // Xử lý cả trường hợp nhận ISO string hoặc timestamp
             const date = new Date(dateString);
-            
-            // Kiểm tra nếu là ngày hợp lệ
-            if (isNaN(date.getTime())) {
-                return 'N/A';
-            }
-            
-            // Format ngày theo định dạng Việt Nam
+            if (isNaN(date.getTime())) return 'N/A';
             return new Intl.DateTimeFormat('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -88,7 +80,7 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm }) => {
                                 ) : error ? (
                                     <span className="error-text">{error}</span>
                                 ) : (
-                                    bookTitles[chapter.bookId] || 'Không tìm thấy'
+                                    bookTitleMap[chapter.bookId] || 'Không tìm thấy'
                                 )}
                             </td>
                             <td>{chapter.chapterNumber}</td>
@@ -97,18 +89,8 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm }) => {
                             <td>{formatCreatedDate(chapter.createdAt)}</td>
                             <td>
                                 <div className="action-buttons">
-                                    <button
-                                        className="btn-edit"
-                                        onClick={() => handleEdit(chapter)}
-                                    >
-                                        Sửa
-                                    </button>
-                                    <button
-                                        className="btn-delete"
-                                        onClick={() => handleDelete(chapter.id)}
-                                    >
-                                        Xóa
-                                    </button>
+                                    <button className="btn-edit" onClick={() => handleEdit(chapter)}>Sửa</button>
+                                    <button className="btn-delete" onClick={() => handleDelete(chapter.id)}>Xóa</button>
                                 </div>
                             </td>
                         </tr>

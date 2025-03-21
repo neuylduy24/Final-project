@@ -1,0 +1,297 @@
+@use "sass:map";
+@import "styles/pages/theme";
+@import "styles/pages/all";
+@import "styles/pages/responsive";
+
+.register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f4f7f9;
+
+  .register-container {
+    display: flex;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .register-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0eaff;
+    padding: 20px;
+  }
+
+  .register-right {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+    }
+  }
+
+  .register-form-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #444;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.3s;
+
+      &:focus {
+        border-color: #007bff;
+      }
+    }
+  }
+
+  .password-group {
+    .password-input {
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      input {
+        flex: 1;
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+      }
+    }
+  }
+
+  .message {
+    text-align: center;
+    font-size: 14px;
+
+    &.error {
+      color: #d9534f;
+    }
+
+    &.success {
+      color: #5cb85c;
+    }
+  }
+
+  .register-button {
+    background: #007bff;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: #0056b3;
+    }
+
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+
+  .text-center {
+    text-align: center;
+    margin-top: 10px;
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      label {
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #007bff;
+        }
+      }
+    }
+
+    .forgot-password {
+      font-size: 14px;
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #0056b3;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @include Responsive($DESKTOP) {
+    .register-container {
+      flex-direction: row;
+    }
+
+    .register-left {
+      img {
+        width: 90%;
+      }
+    }
+
+    .input-email {
+      width: 95%;
+    }
+  }
+
+  @include Responsive($TABLET_DEVICE) {
+    .register-container {
+      flex-direction: row;
+    }
+
+    .register-left {
+      img {
+        width: 90%;
+      }
+    }
+
+    .register-form-group {
+      .input-email {
+        width: 94%;
+        padding: 10px;
+      }
+
+      .input-password {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+  }
+
+  @include Responsive($MEDIUM_DEVICE) {
+    .register-container {
+      flex-direction: row;
+    }
+
+    .register-left {
+      img {
+        width: 90%;
+      }
+    }
+
+    .register-form-group {
+      .input-email {
+        width: 95%;
+        padding: 10px;
+      }
+
+      .input-password {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+  }
+
+  @include Responsive($WIDE_MOBILE) {
+    .register-container {
+      flex-direction: row;
+    }
+
+    .register-left {
+      img {
+        width: 90%;
+      }
+    }
+
+    .register-form-group {
+      .input-email {
+        width: 93%;
+        padding: 10px;
+      }
+
+      .input-password {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+  }
+
+  @include Responsive($SMALL_DEVICE) {
+    .register-container {
+      flex-direction: row;
+    }
+
+    .register-left {
+      img {
+        width: 90%;
+      }
+    }
+
+    .register-form-group {
+      .input-email {
+        width: 90.2975%;
+        padding: 10px;
+      }
+
+      .input-password {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+  }
+}

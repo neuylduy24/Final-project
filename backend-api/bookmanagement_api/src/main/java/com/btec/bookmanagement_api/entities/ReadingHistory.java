@@ -10,7 +10,6 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ReadingHistory {
     private String bookId;     // ID sách
     private int progress;      // Tiến độ đọc (0-100%)

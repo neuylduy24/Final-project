@@ -1,0 +1,34 @@
+@use "sass:map";
+@import "styles/pages/all";
+.book-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+
+        &-read {
+            background: #40c057;
+            color: white;
+
+            &:hover {
+                background: #2e8b3d;
+            }
+        }
+
+        &-follow {
+            background: #a933f7;
+            color: white;
+
+            &:hover {
+                background: #9029c6;
+            }
+        }
+    }
+}

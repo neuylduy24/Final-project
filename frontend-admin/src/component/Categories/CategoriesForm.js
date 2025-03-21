@@ -28,7 +28,7 @@ const CategoriesForm = ({ category = {}, onSave, setShowForm, isEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      toast.error("⚠️ Vui lòng nhập tên thể loại!");
+      toast.error("⚠️ Please enter category name!");
       return;
     }
     await onSave(formData);
@@ -38,17 +38,22 @@ const CategoriesForm = ({ category = {}, onSave, setShowForm, isEditing }) => {
     <div className="modal-overlay" onClick={() => setShowForm(false)}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} className="container-form">
-          <h3>{isEditing ? "Chỉnh sửa thể loại" : "Thêm mới thể loại"}</h3>
+          <h3>{isEditing ? "Edit Category" : "Add New Category"}</h3>
           <input
             type="text"
             name="name"
-            placeholder="Tên thể loại"
+            placeholder="Category name"
             value={formData.name}
             onChange={handleChange}
-            required
           />
-            <button type="submit">{isEditing ? "Cập nhật" : "Thêm mới"}</button>
-            <button type="button" onClick={() => setShowForm(false)}>Hủy</button>
+          <div className="form-actions">
+            <button type="submit" className="save">
+              {isEditing ? "Update" : "Add"}
+            </button>
+            <button type="button" className="cancel" onClick={() => setShowForm(false)}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>

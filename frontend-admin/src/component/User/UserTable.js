@@ -1,9 +1,22 @@
 import React from 'react';
 
+// Thêm mảng các màu pastel đẹp mắt
+const AVATAR_COLORS = [
+    '#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB',
+    '#B5EAD7', '#C7CEEA', '#E8E8E4', '#F8B195',
+    '#F67280', '#C06C84', '#6C5B7B', '#355C7D'
+];
+
+// Hàm lấy màu ngẫu nhiên dựa trên username
+const getRandomColor = (username) => {
+    const index = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return AVATAR_COLORS[index % AVATAR_COLORS.length];
+};
+
 const UserTable = ({ users, handleEdit, handleDelete, setShowForm }) => {
     // Hàm hiển thị vai trò với các màu sắc khác nhau
     const renderRoles = (roles) => {
-        if (!roles || roles.length === 0) return <span>Không có vai trò</span>;
+        if (!roles || roles.length === 0) return <span>No roles</span>;
         
         return (
             <div className="role-badges">
@@ -46,8 +59,8 @@ const UserTable = ({ users, handleEdit, handleDelete, setShowForm }) => {
                 return 'N/A';
             }
             
-            // Format ngày theo định dạng Việt Nam
-            return new Intl.DateTimeFormat('vi-VN', {
+            // Format ngày theo định dạng Anh
+            return new Intl.DateTimeFormat('en-US', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -63,26 +76,26 @@ const UserTable = ({ users, handleEdit, handleDelete, setShowForm }) => {
     return (
         <div className="table-container">
             <div className="table-header">
-                <h2>Danh sách người dùng</h2>
+                <h2>User List</h2>
                 <button className="btn-add" onClick={() => setShowForm(true)}>
-                    Thêm người dùng mới
+                    Add New User
                 </button>
             </div>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Người dùng</th>
+                        <th>User</th>
                         <th>Email</th>
-                        <th>Vai trò</th>
-                        <th>Ngày tạo</th>
-                        <th>Thao tác</th>
+                        <th>Role</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center' }}>Không có dữ liệu người dùng</td>
+                            <td colSpan="6" style={{ textAlign: 'center' }}>No user data available</td>
                         </tr>
                     ) : (
                         users.map((user) => (
@@ -97,12 +110,43 @@ const UserTable = ({ users, handleEdit, handleDelete, setShowForm }) => {
                                                 alt={user.username}
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = 'https://via.placeholder.com/40';
+                                                    e.target.style.display = 'none';
+                                                    const parent = e.target.parentElement;
+                                                    const avatarText = document.createElement('div');
+                                                    avatarText.className = 'user-avatar';
+                                                    avatarText.style.backgroundColor = getRandomColor(user.username || '');
+                                                    avatarText.style.display = 'flex';
+                                                    avatarText.style.justifyContent = 'center';
+                                                    avatarText.style.alignItems = 'center';
+                                                    avatarText.style.color = '#ffffff';
+                                                    avatarText.style.fontWeight = 'bold';
+                                                    avatarText.style.fontSize = '16px';
+                                                    avatarText.style.textTransform = 'uppercase';
+                                                    avatarText.style.width = '40px';
+                                                    avatarText.style.height = '40px';
+                                                    avatarText.style.borderRadius = '50%';
+                                                    avatarText.textContent = user.username ? user.username.charAt(0) : '?';
+                                                    parent.insertBefore(avatarText, e.target);
                                                 }}
                                             />
                                         ) : (
-                                            <div className="user-avatar" style={{ backgroundColor: '#e0e0e0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                {user.username ? user.username.charAt(0).toUpperCase() : '?'}
+                                            <div 
+                                                className="user-avatar" 
+                                                style={{ 
+                                                    backgroundColor: getRandomColor(user.username || ''),
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    color: '#ffffff',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '16px',
+                                                    textTransform: 'uppercase',
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    borderRadius: '50%'
+                                                }}
+                                            >
+                                                {user.username ? user.username.charAt(0) : '?'}
                                             </div>
                                         )}
                                         {user.username}
@@ -117,13 +161,13 @@ const UserTable = ({ users, handleEdit, handleDelete, setShowForm }) => {
                                             className="btn-edit"
                                             onClick={() => handleEdit(user)}
                                         >
-                                            Sửa
+                                            Edit
                                         </button>
                                         <button
                                             className="btn-delete"
                                             onClick={() => handleDelete(user.id)}
                                         >
-                                            Xóa
+                                            Delete
                                         </button>
                                     </div>
                                 </td>

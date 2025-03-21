@@ -1,4 +1,3 @@
-
 import feat1Img from "assets/user/image/categories/sach1.webp";
 import feat2Img from "assets/user/image/categories/sach2.webp";
 import feat3Img from "assets/user/image/categories/sach3.webp";
@@ -9,11 +8,11 @@ import feat7Img from "assets/user/image/categories/sach7.webp";
 import feat8Img from "assets/user/image/categories/sach8.webp";
 export const featProducts = {
     all: {
-      title: "Toàn bộ",
+      title: "All",
       products: [
         {
           img: feat1Img,
-          name: "Đắc Nhân Tâm",
+          name: "How to Win Friends and Influence People",
         },
         {
           img: feat2Img,
@@ -22,7 +21,7 @@ export const featProducts = {
         }, 
         {
           img: feat3Img,
-          name: "Toán 10",
+          name: "Math Grade 10",
           
         },{
           img: feat4Img,
@@ -31,33 +30,33 @@ export const featProducts = {
         }, 
         {
           img: feat5Img,
-          name: "Người Phụ Nữ Tự Do",
+          name: "The Free Woman",
           
         },
         {
           img: feat1Img,
-          name: "Đắc Nhân Tâm",
+          name: "How to Win Friends and Influence People",
           
         },
         {
           img: feat6Img,
-          name: "Thư Cho Em",
+          name: "Letter To You",
           
         }, 
         {
           img: feat7Img,
-          name: "Lý Do Để Sống Tiếp",
+          name: "Reasons To Live",
           
         }, 
         {
           img: feat8Img,
-          name: "Sống Thay Phần Mẹ",
+          name: "Living For Mom",
           
         },
       ]
     },
     Comic: {
-      title: "Truyện tranh",
+      title: "Comics",
       products: [
         {
           img: feat1Img,
@@ -66,32 +65,32 @@ export const featProducts = {
         },
         {
           img: feat5Img,
-          name: "Người Phụ Nữ Tự Do",
+          name: "The Free Woman",
           price: 29000,
         },
         {
           img: feat6Img,
-          name: "Thư Cho Em",
+          name: "Letter To You",
           price: 12000,
         }, 
         {
           img: feat7Img,
-          name: "Lý Do Để Sống Tiếp",
+          name: "Reasons To Live",
           price: 20000,
         }
       ]
     },
     textBook: {
-      title: "Sách giáo khoa",
+      title: "Textbooks",
       products: [
         {
           img: feat1Img,
-          name: "Toán 10",
+          name: "Math Grade 10",
           price: 16000,
         },
         {
           img: feat3Img,
-          name: "Toán 10",
+          name: "Math Grade 10",
           price: 12000,
         },{
           img: feat4Img,
@@ -100,13 +99,13 @@ export const featProducts = {
         }, 
         {
           img: feat5Img,
-          name: "Người Phụ Nữ Tự Do",
+          name: "The Free Woman",
           price: 20000,
         },
       ]
     },
     Literature: {
-      title: "Văn học",
+      title: "Literature",
       products: [
         {
           img: feat1Img,
@@ -115,23 +114,23 @@ export const featProducts = {
         },
         {
           img: feat5Img,
-          name: "Người Phụ Nữ Tự Do",
+          name: "The Free Woman",
           price: 29000,
         },
         {
           img: feat6Img,
-          name: "Thư Cho Em",
+          name: "Letter To You",
           price: 12000,
         }, 
         {
           img: feat7Img,
-          name: "Lý Do Để Sống Tiếp",
+          name: "Reasons To Live",
           price: 20000,
         }
       ]
     },
     mentality: {
-      title: "Tâm lý và kĩ năng",
+      title: "Psychology & Skills",
       products: [
         {
           img: feat1Img,
@@ -145,7 +144,7 @@ export const featProducts = {
         }, 
         {
           img: feat3Img,
-          name: "Toán 10",
+          name: "Math Grade 10",
           price: 60000,
         },{
           img: feat4Img,
@@ -155,7 +154,7 @@ export const featProducts = {
       ]
     },
     Biography: {
-      title: "Tiểu sử hồi kí",
+      title: "Biography & Memoir",
       products: [
         {
           img: feat1Img,
@@ -164,23 +163,23 @@ export const featProducts = {
         },
         {
           img: feat5Img,
-          name: "Người Phụ Nữ Tự Do",
+          name: "The Free Woman",
           price: 29000,
         },
         {
           img: feat6Img,
-          name: "Thư Cho Em",
+          name: "Letter To You",
           price: 12000,
         }, 
         {
           img: feat7Img,
-          name: "Lý Do Để Sống Tiếp",
+          name: "Reasons To Live",
           price: 20000,
         }
       ]
     },
     Religious: {
-      title: "Tôn giáo",
+      title: "Religion",
       products: [
         {
           img: feat1Img,
@@ -194,7 +193,7 @@ export const featProducts = {
         }, 
         {
           img: feat3Img,
-          name: "Toán 10",
+          name: "Math Grade 10",
           price: 60000,
         },{
           img: feat4Img,

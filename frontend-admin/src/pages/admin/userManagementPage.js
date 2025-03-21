@@ -32,7 +32,7 @@ const UserManagementPage = () => {
       setUsers(data);
       setError(null);
     } catch (err) {
-      setError("Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
+      setError("Unable to load user list. Please try again later.");
       console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
@@ -44,19 +44,19 @@ const UserManagementPage = () => {
     try {
       const formToSubmit = updatedForm || form;
       
-      // Nếu không đang chỉnh sửa, đảm bảo vai trò là reader
+      // If not editing, ensure role is reader
       if (!isEditing) {
-        formToSubmit.roles = [2]; // Giả sử 2 là ID của role reader, điều chỉnh nếu cần
+        formToSubmit.roles = [2]; // Assuming 2 is the ID for reader role, adjust if needed
       }
       
       if (isEditing) {
-        // Khi chỉnh sửa, giữ nguyên vai trò hiện tại
+        // When editing, keep current roles
         await userService.updateUser(formToSubmit.id, formToSubmit);
         setUsers(users.map((user) => (user.id === formToSubmit.id ? formToSubmit : user)));
       } else {
         const newUser = await userService.createUser(formToSubmit);
         
-        // Đảm bảo có trường createdAt
+        // Ensure createdAt field exists
         const userWithDate = newUser.createdAt 
           ? newUser 
           : { ...newUser, createdAt: new Date().toISOString() };
@@ -75,7 +75,7 @@ const UserManagementPage = () => {
       setShowForm(false);
       setError(null);
     } catch (err) {
-      setError(isEditing ? "Không thể cập nhật người dùng" : "Không thể thêm người dùng mới");
+      setError(isEditing ? "Unable to update user" : "Unable to add new user");
       console.error("Error submitting user:", err);
     }
   };
@@ -95,13 +95,13 @@ const UserManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+    if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await userService.deleteUser(id);
         setUsers(users.filter((user) => user.id !== id));
         setError(null);
       } catch (err) {
-        setError("Không thể xóa người dùng");
+        setError("Unable to delete user");
         console.error("Error deleting user:", err);
       }
     }
@@ -113,13 +113,13 @@ const UserManagementPage = () => {
   const totalPages = Math.ceil(users.length / itemsPerPage);
 
   if (loading) {
-    return <div className="loading">Đang tải...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   return (
     <div className="container">
       <div className="container-management">
-        <h2>Quản lý người dùng</h2>
+        <h2>User Management</h2>
 
         {error && <div className="error-message">{error}</div>}
 

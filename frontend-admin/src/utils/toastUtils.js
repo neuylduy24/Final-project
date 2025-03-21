@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-// Tùy chọn mặc định cho toast
+// Default options for toast
 const defaultOptions = {
   position: "top-right",
   autoClose: 3000,
@@ -10,7 +10,7 @@ const defaultOptions = {
   draggable: true,
 };
 
-// Các hàm tiện ích hiển thị toast
+// Utility functions for displaying toasts
 export const toastSuccess = (message, options = {}) => {
   return toast.success(message, { ...defaultOptions, ...options });
 };
@@ -27,23 +27,23 @@ export const toastWarning = (message, options = {}) => {
   return toast.warning(message, { ...defaultOptions, ...options });
 };
 
-// Hiển thị toast thành công khi thêm mới
-export const toastAddSuccess = (item = 'dữ liệu') => {
-  return toastSuccess(`Thêm ${item} thành công!`);
+// Display success toast when adding new item
+export const toastAddSuccess = (item = 'data') => {
+  return toastSuccess(`Added ${item} successfully!`);
 };
 
-// Hiển thị toast thành công khi cập nhật
-export const toastUpdateSuccess = (item = 'dữ liệu') => {
-  return toastSuccess(`Cập nhật ${item} thành công!`);
+// Display success toast when updating
+export const toastUpdateSuccess = (item = 'data') => {
+  return toastSuccess(`Updated ${item} successfully!`);
 };
 
-// Hiển thị toast thành công khi xóa
-export const toastDeleteSuccess = (item = 'dữ liệu') => {
-  return toastSuccess(`Xóa ${item} thành công!`);
+// Display success toast when deleting
+export const toastDeleteSuccess = (item = 'data') => {
+  return toastSuccess(`Deleted ${item} successfully!`);
 };
 
-// Hiển thị toast lỗi
+// Display error toast
 export const toastErrorMessage = (error) => {
-  const message = error?.response?.data?.message || error?.message || 'Có lỗi xảy ra!';
+  const message = error?.response?.data?.message || error?.message || 'An error occurred!';
   return toastError(message);
 }; 

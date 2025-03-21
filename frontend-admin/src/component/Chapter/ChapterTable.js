@@ -15,12 +15,12 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
         fetchBooks();
     }, []);
 
-    // Reset trang khi selectedBookId thay đổi
+    // Reset page when selectedBookId changes
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedBookId]);
 
-    // Thêm useEffect để lọc các chương khi chapters hoặc selectedBookId thay đổi
+    // Add useEffect to filter chapters when chapters or selectedBookId changes
     useEffect(() => {
         if (chapters && chapters.length > 0) {
             let filtered = chapters;
@@ -29,13 +29,13 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
                 filtered = chapters.filter(chapter => chapter.bookId === selectedBookId);
             }
             
-            // Sắp xếp các chapter đã lọc
+            // Sort filtered chapters
             const sorted = [...filtered].sort((a, b) => {
-                // So sánh trước theo bookId
+                // Compare by bookId first
                 if (a.bookId !== b.bookId) {
                     return a.bookId.localeCompare(b.bookId);
                 }
-                // Nếu cùng bookId thì so sánh theo chapterNumber
+                // If same bookId, compare by chapterNumber
                 return parseInt(a.chapterNumber) - parseInt(b.chapterNumber);
             });
             
@@ -51,7 +51,7 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
             const data = await bookService.getAllBooks();
             setBooks(data);
             
-            // Tạo mapping từ bookId đến bookTitle
+            // Create mapping from bookId to bookTitle
             const titles = {};
             data.forEach(book => {
                 titles[book.id] = book.title;
@@ -60,36 +60,36 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
             
             setError(null);
         } catch (err) {
-            setError("Không thể tải thông tin sách");
+            setError("Unable to load book information");
             console.error("Error fetching books:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Hàm format số chương
+    // Function to format chapter number
     const formatChapterNumber = (number) => {
         if (number === null || number === undefined) return 'N/A';
         
-        // Luôn hiển thị số chương dưới dạng số nguyên
+        // Always display chapter number as integer
         return parseInt(number).toString();
     };
 
-    // Hàm format ngày tạo
+    // Function to format creation date
     const formatCreatedDate = (dateString) => {
         if (!dateString) return 'N/A';
         
         try {
-            // Xử lý cả trường hợp nhận ISO string hoặc timestamp
+            // Handle both ISO string and timestamp cases
             const date = new Date(dateString);
             
-            // Kiểm tra nếu là ngày hợp lệ
+            // Check if date is valid
             if (isNaN(date.getTime())) {
                 return 'N/A';
             }
             
-            // Format ngày theo định dạng Việt Nam
-            return new Intl.DateTimeFormat('vi-VN', {
+            // Format date in English format
+            return new Intl.DateTimeFormat('en-US', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -103,27 +103,27 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
     };
 
     const handleEditChapter = (chapter) => {
-        // Đặt thông tin chương vào form để chỉnh sửa
+        // Set chapter information in form for editing
         const chapterToEdit = {
             ...chapter,
-            bookId: chapter.bookId // Đảm bảo bookId được thiết lập chính xác
+            bookId: chapter.bookId // Ensure bookId is set correctly
         };
         handleEdit(chapterToEdit);
     };
 
     const handleDeleteChapter = (bookId, chapterId) => {
-        // Gọi hàm xóa chương từ component cha
+        // Call delete chapter function from parent component
         handleDelete(bookId, chapterId);
     };
 
-    // Tính toán phân trang
+    // Calculate pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredChapters.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredChapters.length / itemsPerPage);
 
     if (loading && books.length === 0) {
-        return <div className="loading-container">Đang tải danh sách chương...</div>;
+        return <div className="loading-container">Loading chapter list...</div>;
     }
 
     if (error) {
@@ -133,14 +133,14 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
     return (
         <div className="table-container">
             <div className="table-header">
-                <h2>Danh sách chương</h2>
+                <h2>Chapter List</h2>
             </div>
             
             {filteredChapters.length === 0 ? (
                 <div className="no-data">
                     {selectedBookId !== "all" 
-                        ? "Sách này chưa có chương nào. Hãy thêm chương mới." 
-                        : "Chưa có chương nào. Hãy thêm chương mới."}
+                        ? "This book has no chapters yet. Please add new chapters." 
+                        : "No chapters available. Please add new chapters."}
                 </div>
             ) : (
                 <>
@@ -148,19 +148,19 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Tên sách</th>
-                                <th>Số chương</th>
-                                <th>Tiêu đề</th>
-                                <th>Lượt xem</th>
-                                <th>Ngày tải lên</th>
-                                <th>Thao tác</th>
+                                <th>Book Name</th>
+                                <th>Chapter Number</th>
+                                <th>Title</th>
+                                <th>Views</th>
+                                <th>Upload Date</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentItems.map((chapter) => (
                                 <tr key={`${chapter.bookId}-${chapter.id}`}>
                                     <td>{chapter.id}</td>
-                                    <td>{chapter.bookTitle || bookTitles[chapter.bookId] || 'Không tìm thấy'}</td>
+                                    <td>{chapter.bookTitle || bookTitles[chapter.bookId] || 'Not found'}</td>
                                     <td>{formatChapterNumber(chapter.chapterNumber)}</td>
                                     <td>{chapter.title}</td>
                                     <td>{chapter.views || 0}</td>
@@ -171,13 +171,13 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
                                                 className="btn-edit"
                                                 onClick={() => handleEditChapter(chapter)}
                                             >
-                                                Sửa
+                                                Edit
                                             </button>
                                             <button
                                                 className="btn-delete"
                                                 onClick={() => handleDeleteChapter(chapter.bookId, chapter.id)}
                                             >
-                                                Xóa
+                                                Delete
                                             </button>
                                         </div>
                                     </td>

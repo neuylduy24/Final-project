@@ -15,14 +15,14 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
 
-  // Lấy danh sách thể loại từ API
+  // Get category list from API
   const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(API_URL);
       setCategories(response.data);
       setFilteredCategories(response.data);
     } catch (error) {
-      toast.error("🚨 Lỗi khi lấy danh sách thể loại!");
+      toast.error("🚨 Error fetching categories!");
     }
   }, []);
 
@@ -30,7 +30,7 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Xử lý tìm kiếm
+  // Handle search
   useEffect(() => {
     const filtered = categories.filter((category) =>
       category.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -38,7 +38,7 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
     setFilteredCategories(filtered);
   }, [searchTerm, categories]);
 
-  // Xử lý thêm & cập nhật thể loại
+  // Handle add & update category
   const handleSave = async (category) => {
     try {
       if (!isEditing) {
@@ -56,34 +56,34 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
         setCategories((prevCategories) => [...prevCategories, savedCategory]);
 
         toast.success(
-          `📂 Đã thêm thể loại "${savedCategory.name}" thành công!`
+          `📂 Added category "${savedCategory.name}" successfully!`
         );
       } else {
         await axios.put(`${API_URL}/${category.id}`, category);
         setCategories((prevCategories) =>
           prevCategories.map((c) => (c.id === category.id ? category : c))
         );
-        toast.info(`✏️ Đã cập nhật thể loại "${category.name}"!`);
+        toast.info(`✏️ Updated category "${category.name}"!`);
       }
 
       setShowForm(false);
     } catch (error) {
-      toast.error("❌ Lỗi khi lưu thể loại!");
-      console.error("Lỗi khi lưu thể loại:", error);
+      toast.error("❌ Error saving category!");
+      console.error("Error saving category:", error);
     }
   };
 
-  // Xử lý xóa thể loại
+  // Handle delete category
   const handleDelete = async (id) => {
-    // Kiểm tra nếu ID không hợp lệ (null, undefined, rỗng)
+    // Check if ID is invalid (null, undefined, empty)
     if (!id || id === "" || id === null || id === undefined) {
-      toast.error("❌ Không thể xóa thể loại vì thiếu ID hợp lệ!");
+      toast.error("❌ Cannot delete category due to invalid ID!");
       return;
     }
   
     const categoryToDelete = categories.find((c) => c.id === id);
     if (!categoryToDelete) {
-      toast.error("❌ Không tìm thấy thể loại để xóa!");
+      toast.error("❌ Category not found!");
       return;
     }
   
@@ -92,52 +92,20 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
       setCategories((prevCategories) =>
         prevCategories.filter((c) => c.id !== id)
       );
-      toast.warning(`🗑️ Đã xóa thể loại "${categoryToDelete.name}"!`);
+      toast.warning(`🗑️ Deleted category "${categoryToDelete.name}"!`);
     } catch (error) {
-      toast.error("❌ Lỗi khi xóa thể loại!");
-      console.error("Lỗi khi xóa thể loại:", error);
+      toast.error("❌ Error deleting category!");
+      console.error("Error deleting category:", error);
     }
   };
-  // const deleteEmptyCategories = async () => {
-  //   try {
-  //     // Lọc các thể loại có ID rỗng hoặc không hợp lệ
-  //     const emptyCategories = categories.filter((c) => !c.id || c.id === "");
-  
-  //     if (emptyCategories.length === 0) {
-  //       toast.info("✅ Không có thể loại nào có ID rỗng để xóa!");
-  //       return;
-  //     }
-  
-  //     // Chỉ gửi yêu cầu DELETE nếu ID hợp lệ
-  //     await Promise.all(
-  //       emptyCategories
-  //         .filter((c) => c.id) // Chặn gửi ID rỗng
-  //         .map(async (category) => {
-  //           await axios.delete(`${API_URL}/${category.id}`);
-  //         })
-  //     );
-  
-  //     // Cập nhật danh sách thể loại sau khi xóa
-  //     setCategories((prevCategories) =>
-  //       prevCategories.filter((c) => c.id) // Xóa thể loại có ID rỗng khỏi UI
-  //     );
-  
-  //     toast.success("🗑️ Đã xóa tất cả thể loại có ID rỗng!");
-  //   } catch (error) {
-  //     toast.error("❌ Lỗi khi xóa các thể loại có ID rỗng!");
-  //     console.error("Lỗi khi xóa thể loại:", error);
-  //   }
-  // };
-  
-  
-  
 
-  // Mở form thêm thể loại
+  // Open add category form
   const handleAddCategory = () => {
     setSelectedCategory(null);
     setShowForm(true);
     setIsEditing(false);
   };
+
   const indexOfLastBook = currentPage * categoriesPerPage;
   const indexOfFirstBook = indexOfLastBook - categoriesPerPage;
   const currentCategories = filteredCategories.slice(indexOfFirstBook, indexOfLastBook);
@@ -154,28 +122,28 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
         />
       )}
 
-      {/* Thanh tìm kiếm */}
+      {/* Search bar */}
       <div className="search-container">
         <FaSearch className="search-icon" />
         <input
           className="search-input"
           type="text"
-          placeholder="Tìm kiếm thể loại..."
+          placeholder="Search categories..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button className="add-button" onClick={handleAddCategory}>
-          ➕ Thêm
+          ➕ Add
         </button>
       </div>
 
-      {/* Bảng danh sách thể loại */}
+      {/* Category list table */}
       <table className="container-table">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tên thể loại</th>
-            <th>Hành động</th>
+            <th>Category Name</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -194,13 +162,13 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
                         setIsEditing(true);
                       }}
                     >
-                      ✏️ Sửa
+                      ✏️ Edit
                     </button>
                     <button
                       className="delete-button"
                       onClick={() => handleDelete(category.id)}
                     >
-                      🗑️ Xóa
+                      🗑️ Delete
                     </button>
                   </td>
                 </tr>
@@ -208,7 +176,7 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
           ) : (
             <tr>
               <td colSpan="3" style={{ textAlign: "center" }}>
-                Không có thể loại nào
+                No categories found
               </td>
             </tr>
           )}

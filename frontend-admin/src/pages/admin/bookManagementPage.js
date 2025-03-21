@@ -27,16 +27,16 @@ const BookManagementPage = () => {
       setBooks(response.data);
       setCurrentPage(1);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu sách:", error);
+      console.error("Error fetching books:", error);
     }
   };
 
   const handleSubmit = async (bookData) => {
     try {
-      // Đảm bảo dữ liệu đầy đủ trước khi gửi đi
+      // Ensure data is complete before sending
       const dataToSend = { ...bookData };
       
-      // Đảm bảo có trường categories nếu chưa có
+      // Ensure categories field exists if not present
       if (!dataToSend.categories && dataToSend.category) {
         if (typeof dataToSend.category === 'string') {
           dataToSend.categories = [{ name: dataToSend.category }];
@@ -56,7 +56,7 @@ const BookManagementPage = () => {
   
       fetchBooks();
     } catch (error) {
-      console.error("Lỗi khi lưu sách:", error);
+      console.error("Error saving book:", error);
     }
   };
   
@@ -69,7 +69,7 @@ const BookManagementPage = () => {
   return (
     <div className="container">
       <div className="container-management">
-        <h2>Quản lý Sách</h2>
+        <h2>Book Management</h2>
 
         {showForm && (
           <BookForm

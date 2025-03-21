@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import userService from '../../service/userService';
+import { toast } from 'react-toastify';
 
 const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const [loading, setLoading] = useState(false);
@@ -8,7 +9,7 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
-        // Cập nhật avatar preview khi form thay đổi
+        // Update avatar preview when form changes
         if (form.avatar) {
             setAvatarPreview(form.avatar);
         }
@@ -37,33 +38,58 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         
+        // Validate required fields
+        if (!form.username || !form.username.trim()) {
+            toast.error("Please enter username");
+            return;
+        }
+
+        if (!form.email || !form.email.trim()) {
+            toast.error("Please enter email");
+            return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email)) {
+            toast.error("Please enter a valid email address");
+            return;
+        }
+
+        // Validate password for new users
+        if (!isEditing) {
+            if (!form.password || form.password.length < 6) {
+                toast.error("Password must be at least 6 characters long");
+                return;
+            }
+        }
+        
         try {
             let updatedForm = { ...form };
             
-            // Nếu đang thêm mới, tự động gán vai trò "reader"
+            // If adding new user, automatically assign "reader" role
             if (!isEditing) {
-                // Tìm ID của vai trò reader hoặc dùng ID cố định nếu biết trước
-                updatedForm.roles = [2]; // Giả sử ID của vai trò reader là 2, điều chỉnh nếu cần
+                updatedForm.roles = [2]; // Assuming reader role ID is 2
             }
             
-            // Nếu có file ảnh đại diện mới, upload lên server
+            // If there's a new avatar file, upload to server
             if (selectedFile) {
                 const avatarUrl = await userService.uploadAvatar(selectedFile);
                 updatedForm.avatar = avatarUrl;
             }
             
-            // Gọi hàm submit của parent
+            // Call parent's submit function
             handleSubmit(e, updatedForm);
+            toast.success(isEditing ? "User updated successfully!" : "User added successfully!");
         } catch (error) {
-            console.error("Error submitting form:", error);
-            alert("Không thể lưu thông tin người dùng. Vui lòng thử lại sau.");
+            toast.error("Unable to save user information. Please try again later.");
         }
     };
 
     return (
         <div className="form-overlay">
             <div className="form-container">
-                <h3>{isEditing ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới'}</h3>
+                <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
                 <form onSubmit={handleFormSubmit}>
                     <div className="avatar-upload">
                         <div className="avatar-preview">
@@ -71,11 +97,11 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                                 <img src={avatarPreview} alt="Avatar" />
                             ) : (
                                 <div className="avatar-placeholder">
-                                    Chưa có ảnh
+                                    No image
                                 </div>
                             )}
                         </div>
-                        <label htmlFor="avatar-input">Chọn ảnh đại diện</label>
+                        <label htmlFor="avatar-input">Choose Avatar</label>
                         <input 
                             type="file" 
                             id="avatar-input" 
@@ -85,14 +111,13 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="username">Tên người dùng:</label>
+                        <label htmlFor="username">Username:</label>
                         <input
                             type="text"
                             id="username"
                             name="username"
                             value={form.username || ''}
                             onChange={handleChange}
-                            required
                         />
                     </div>
 
@@ -104,45 +129,42 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                             name="email"
                             value={form.email || ''}
                             onChange={handleChange}
-                            required
                         />
                     </div>
 
                     {!isEditing && (
                         <div className="form-group">
-                            <label htmlFor="password">Mật khẩu:</label>
+                            <label htmlFor="password">Password:</label>
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
                                 value={form.password || ''}
                                 onChange={handleChange}
-                                required={!isEditing}
-                                minLength={6}
                             />
                         </div>
                     )}
 
                     {isEditing && (
                         <div className="form-group">
-                            <label>Vai trò:</label>
+                            <label>Role:</label>
                             <div className="role-badges">
                                 {form.roles && form.roles.includes(1) ? (
                                     <span className="role-badge admin">Admin</span>
                                 ) : (
                                     <span className="role-badge reader">Reader</span>
                                 )}
-                                <p className="note">Vai trò được thiết lập tự động, không thể thay đổi</p>
+                                <p className="note">Role is set automatically and cannot be changed</p>
                             </div>
                         </div>
                     )}
 
-                    <div className="form-buttons">
-                        <button type="submit" className="btn-submit">
-                            {isEditing ? 'Cập nhật' : 'Thêm mới'}
+                    <div className="form-actions">
+                        <button type="submit" className="save">
+                            {isEditing ? 'Update' : 'Add'}
                         </button>
-                        <button type="button" className="btn-cancel" onClick={closeForm}>
-                            Hủy
+                        <button type="button" className="cancel" onClick={closeForm}>
+                            Cancel
                         </button>
                     </div>
                 </form>

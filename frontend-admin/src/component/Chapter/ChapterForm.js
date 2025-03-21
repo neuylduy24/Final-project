@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import bookService from '../../service/bookService';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [uploadType, setUploadType] = useState('url'); // 'url' hoặc 'file'
+    const [uploadType, setUploadType] = useState('url'); // 'url' or 'file'
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
     const [successMessage, setSuccessMessage] = useState('');
@@ -15,7 +17,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     }, []);
 
     useEffect(() => {
-        // Xóa preview URLs khi component unmount
+        // Clear preview URLs when component unmounts
         return () => {
             previewUrls.forEach(url => URL.revokeObjectURL(url));
         };
@@ -28,7 +30,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
             setBooks(data);
             setError(null);
         } catch (err) {
-            setError("Không thể tải danh sách sách");
+            setError("Unable to load book list");
             console.error("Error fetching books:", err);
         } finally {
             setLoading(false);
@@ -48,12 +50,12 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
         
         if (files.length === 0) return;
         
-        // Tạo preview URLs cho các files đã chọn
+        // Create preview URLs for selected files
         const newPreviewUrls = files.map(file => URL.createObjectURL(file));
         
         setSelectedFiles(files);
         setPreviewUrls(prevUrls => {
-            // Xóa các URL cũ để tránh memory leak
+            // Clear old URLs to avoid memory leak
             prevUrls.forEach(url => URL.revokeObjectURL(url));
             return newPreviewUrls;
         });
@@ -63,7 +65,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
         if (uploadType === 'url') {
             return (
                 <div className="form-group">
-                    <label htmlFor="images">Hình ảnh (URL, phân tách bằng dấu phẩy):</label>
+                    <label htmlFor="images">Images (URLs, comma-separated):</label>
                     <input
                         type="text"
                         id="images"
@@ -76,14 +78,14 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                                 images: imageUrls.filter(url => url !== '')
                             }));
                         }}
-                        placeholder="Nhập URL hình ảnh, phân tách bằng dấu phẩy"
+                        placeholder="Enter image URLs, separated by commas"
                     />
                 </div>
             );
         } else {
             return (
                 <div className="form-group">
-                    <label htmlFor="fileImages">Tải lên hình ảnh:</label>
+                    <label htmlFor="fileImages">Upload Images:</label>
                     <input
                         type="file"
                         id="fileImages"
@@ -128,68 +130,100 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         
+        // Validate required fields
+        if (!form.bookId) {
+            toast.error("Please select a book");
+            return;
+        }
+
+        if (!form.chapterNumber) {
+            toast.error("Please enter chapter number");
+            return;
+        }
+
+        if (!form.title) {
+            toast.error("Please enter chapter title");
+            return;
+        }
+
+        if (!form.content) {
+            toast.error("Please enter chapter content");
+            return;
+        }
+
+        // Validate images based on upload type
+        if (uploadType === 'url' && (!form.images || form.images.length === 0)) {
+            toast.error("Please enter at least one image URL");
+            return;
+        }
+
+        if (uploadType === 'file' && selectedFiles.length === 0) {
+            toast.error("Please select at least one image file");
+            return;
+        }
+        
         try {
-            // Đảm bảo chapterNumber là số nguyên
+            // Ensure chapterNumber is an integer
             const chapterData = {
                 chapterNumber: parseInt(form.chapterNumber),
                 title: form.title,
                 content: form.content,
                 views: 0,
-                bookId: null,  // Giá trị mặc định là null theo ảnh Postman
-                createdAt: isEditing ? form.createdAt : null  // Giá trị mặc định là null theo ảnh Postman
+                bookId: null,  // Default value is null according to Postman
+                createdAt: isEditing ? form.createdAt : null  // Default value is null according to Postman
             };
             
-            // Thêm createdAt là thời gian hiện tại theo múi giờ Việt Nam
+            // Add createdAt as current time in Vietnam timezone
             const now = new Date();
-            // Điều chỉnh về múi giờ Việt Nam (UTC+7)
+            // Adjust to Vietnam timezone (UTC+7)
             const vietnamTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
             
             if (isEditing) {
-                // Nếu đang chỉnh sửa, giữ nguyên createdAt cũ
+                // If editing, keep old createdAt
                 chapterData.createdAt = form.createdAt;
             } else {
-                // Nếu thêm mới, đặt thời gian hiện tại theo múi giờ Việt Nam
+                // If adding new, set current time in Vietnam timezone
                 chapterData.createdAt = vietnamTime.toISOString();
             }
             
-            // Xử lý hình ảnh
+            // Handle images
             if (uploadType === 'file' && selectedFiles.length > 0) {
                 try {
-                    // Giả định chúng ta đang sử dụng hàm upload ảnh giả lập (cần thay bằng hàm thực tế)
+                    // Assuming we're using a mock image upload function (need to replace with actual function)
                     const uploadedUrls = await Promise.all(
                         selectedFiles.map(async (file) => {
-                            // Giả lập việc tải ảnh lên - trong thực tế, cần thay thế bằng API upload thật
+                            // Mock image upload - in reality, need to replace with real API
                             const formData = new FormData();
                             formData.append('file', file);
                             
-                            // Giả định chúng ta đang gọi một API upload ảnh
+                            // Assuming we're calling an image upload API
                             // const response = await axios.post('your-upload-api-endpoint', formData);
                             // return response.data.url;
                             
-                            // Trong ví dụ này, chúng ta chỉ trả về URL giả
-                            return URL.createObjectURL(file); // Trong thực tế, sẽ trả về URL từ server
+                            // In this example, we just return a mock URL
+                            return URL.createObjectURL(file); // In reality, will return URL from server
                         })
                     );
                     
-                    // Thêm URLs hình ảnh vào chapterData
+                    // Add image URLs to chapterData
                     chapterData.images = uploadedUrls;
                     
                 } catch (error) {
                     console.error("Error uploading images:", error);
-                    setError("Không thể tải ảnh lên. Vui lòng thử lại sau.");
+                    setError("Unable to upload images. Please try again later.");
                     return;
                 }
             } else if (form.images && form.images.length > 0) {
                 chapterData.images = form.images;
             } else {
-                chapterData.images = null; // Giá trị mặc định là null theo ảnh Postman
+                chapterData.images = null; // Default value is null according to Postman
             }
             
             if (isEditing) {
-                // Cập nhật chương
+                // Update chapter
                 await bookService.updateChapterInBook(form.bookId, form.id, chapterData);
             } else {
-                // Thêm chương mới vào sách
+                // Add new chapter to book
                 await bookService.addChapterToBook(form.bookId, chapterData);
             }
             
@@ -202,130 +236,134 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                 images: []
             });
             
-            // Hiển thị thông báo thành công
-            setSuccessMessage(isEditing ? 'Đã cập nhật chương thành công!' : 'Đã thêm chương mới thành công!');
+            // Display success message
+            setSuccessMessage(isEditing ? 'Chapter updated successfully!' : 'New chapter added successfully!');
             
-            // Đóng form sau khi thành công
+            // Close form after success
             setTimeout(() => {
                 setSuccessMessage('');
                 closeForm();
             }, 2000);
             
-            // Gọi hàm handleSubmit để thông báo cho component cha
+            // Call handleSubmit to notify parent component
             handleSubmit(e, true);
             
         } catch (error) {
-            console.error("Error submitting chapter:", error);
-            setError(isEditing ? 'Không thể cập nhật chương: ' + error.message : 'Không thể thêm chương mới: ' + error.message);
+            toast.error(isEditing ? 'Unable to update chapter: ' + error.message : 'Unable to add new chapter: ' + error.message);
         }
     };
 
     return (
-        <div className="form-overlay">
-            <div className="form-container">
-                <h3>{isEditing ? 'Chỉnh sửa chương' : 'Thêm chương mới'}</h3>
-                {successMessage && <div className="success-message">{successMessage}</div>}
-                {error && <div className="error-message">{error}</div>}
-                
-                <form onSubmit={handleFormSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="bookId">Chọn sách:</label>
-                        <select
-                            id="bookId"
-                            name="bookId"
-                            value={form.bookId || ''}
-                            onChange={handleChange}
-                            required
-                            disabled={loading || isEditing}
-                        >
-                            <option value="">-- Chọn sách --</option>
-                            {books.map(book => (
-                                <option key={book.id} value={book.id}>
-                                    {book.title}
-                                </option>
-                            ))}
-                        </select>
-                        {loading && <span className="loading-text">Đang tải danh sách sách...</span>}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="chapterNumber">Số chương:</label>
-                        <input
-                            type="number"
-                            id="chapterNumber"
-                            name="chapterNumber"
-                            value={form.chapterNumber || ''}
-                            onChange={handleChange}
-                            required
-                            min="1"
-                            step="1"
-                            placeholder="Ví dụ: 1, 2, 3"
-                        />
-                        <small className="form-text text-muted">Số chương phải là số nguyên dương (ví dụ: 1, 2, 3)</small>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="title">Tiêu đề:</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={form.title || ''}
-                            onChange={handleChange}
-                            required
-                            placeholder="Ví dụ: Chương 1: Gặp gỡ"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="content">Nội dung:</label>
-                        <textarea
-                            id="content"
-                            name="content"
-                            value={form.content || ''}
-                            onChange={handleChange}
-                            required
-                            rows="10"
-                            placeholder="Nhập nội dung chương vào đây..."
-                        />
-                    </div>
+        <>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
+            <div className="form-overlay">
+                <div className="form-container">
+                    <h3>{isEditing ? 'Edit Chapter' : 'Add New Chapter'}</h3>
+                    {successMessage && <div className="success-message">{successMessage}</div>}
+                    {error && <div className="error-message">{error}</div>}
                     
-                    <div className="form-group">
-                        <label>Phương thức tải ảnh:</label>
-                        <div className="upload-type-options">
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="uploadType"
-                                    value="url"
-                                    checked={uploadType === 'url'}
-                                    onChange={() => setUploadType('url')}
-                                />
-                                Từ URL
-                            </label>
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="uploadType"
-                                    value="file"
-                                    checked={uploadType === 'file'}
-                                    onChange={() => setUploadType('file')}
-                                />
-                                Từ máy tính
-                            </label>
+                    <form onSubmit={handleFormSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="bookId">Select Book:</label>
+                            <select
+                                id="bookId"
+                                name="bookId"
+                                value={form.bookId || ''}
+                                onChange={handleChange}
+                                disabled={loading || isEditing}
+                            >
+                                <option value="">-- Select a book --</option>
+                                {books.map(book => (
+                                    <option key={book.id} value={book.id}>
+                                        {book.title}
+                                    </option>
+                                ))}
+                            </select>
+                            {loading && <span className="loading-text">Loading book list...</span>}
                         </div>
-                    </div>
-                    
-                    {renderImageInput()}
-                    
-                    <div className="form-buttons">
-                        <button type="submit" className="btn-submit">
-                            {isEditing ? 'Cập nhật' : 'Thêm mới'}
-                        </button>
-                        <button type="button" className="btn-cancel" onClick={closeForm}>
-                            Hủy
-                        </button>
-                    </div>
-                </form>
+                        <div className="form-group">
+                            <label htmlFor="chapterNumber">Chapter Number:</label>
+                            <input
+                                type="number"
+                                id="chapterNumber"
+                                name="chapterNumber"
+                                value={form.chapterNumber || ''}
+                                onChange={handleChange}
+                                min="1"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="title">Title:</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value={form.title || ''}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="content">Content:</label>
+                            <textarea
+                                id="content"
+                                name="content"
+                                value={form.content || ''}
+                                onChange={handleChange}
+                                rows="5"
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Image Upload Type:</label>
+                            <div className="image-input-type-selector">
+                                <label className={uploadType === "url" ? "active" : ""}>
+                                    <input
+                                        type="radio"
+                                        name="uploadType"
+                                        value="url"
+                                        checked={uploadType === "url"}
+                                        onChange={(e) => setUploadType(e.target.value)}
+                                    />
+                                    Enter Image URL
+                                </label>
+                                <label className={uploadType === "file" ? "active" : ""}>
+                                    <input
+                                        type="radio"
+                                        name="uploadType"
+                                        value="file"
+                                        checked={uploadType === "file"}
+                                        onChange={(e) => setUploadType(e.target.value)}
+                                    />
+                                    Upload Image
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {renderImageInput()}
+                        
+                        <div className="form-actions">
+                            <button type="submit" className="save">
+                                {isEditing ? 'Update Chapter' : 'Add Chapter'}
+                            </button>
+                            <button type="button" className="cancel" onClick={closeForm}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

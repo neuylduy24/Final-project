@@ -30,7 +30,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
       const response = await axios.get("https://api.it-ebook.io.vn/api/books");
       setBooks(response.data);
     } catch (error) {
-      toast.error("❌ Lỗi khi lấy dữ liệu sách!");
+      toast.error("❌ Error fetching books!");
     }
   }
 
@@ -47,19 +47,19 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           ...book,
           createdAt: new Date().toISOString(),
         };
-        await axios.post("http://150.95.105.147:8080/api/books", newBook);
-        toast.success("📖 Thêm sách thành công!");
+        await axios.post("https://api.it-ebook.io.vn/api/books", newBook);
+        toast.success("📖 Book added successfully!");
       } else {
         await axios.put(
-          `http://150.95.105.147:8080/api/books/${book.id}`,
+          `https://api.it-ebook.io.vn/api/books/${book.id}`,
           book
         );
-        toast.info("✏️ Cập nhật sách thành công!");
+        toast.info("✏️ Book updated successfully!");
       }
       fetchBooks();
       setShowForm(false);
     } catch (error) {
-      toast.error("❌ Lỗi khi lưu sách!");
+      toast.error("❌ Error saving book!");
     }
   };
 
@@ -67,9 +67,9 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
     try {
       await axios.delete(`http://150.95.105.147:8080/api/books/${id}`);
       fetchBooks();
-      toast.warning("🗑️ Xóa sách thành công!");
+      toast.warning("🗑️ Book deleted successfully!");
     } catch (error) {
-      toast.error("❌ Lỗi khi xóa sách!");
+      toast.error("❌ Error deleting book!");
     }
   };
 
@@ -95,7 +95,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
         <input
           className="search-input"
           type="text"
-          placeholder="Tìm kiếm sách..."
+          placeholder="Search books..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -107,7 +107,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             setIsEditing(false);
           }}
         >
-          Thêm
+          Add
         </button>
       </div>
 
@@ -115,11 +115,11 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Ảnh bìa</th>
-            <th>Tiêu đề</th>
-            <th>Tác giả</th>
-            <th>Thể loại</th>
-            <th>Hành động</th>
+            <th>Cover Image</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Categories</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -136,7 +136,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                     />
                   ) : (
                     <div className="no-image-placeholder">
-                      Không có ảnh
+                      No image
                     </div>
                   )}
                 </td>
@@ -155,13 +155,13 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                     className="edit-button"
                     onClick={() => handleEdit(book)}
                   >
-                    Sửa
+                    Edit
                   </button>
                   <button
                     className="delete-button"
                     onClick={() => handleDelete(book.id)}
                   >
-                    Xóa
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -169,7 +169,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           ) : (
             <tr>
               <td colSpan="6" style={{ textAlign: "center" }}>
-                Không có sách nào
+                No books found
               </td>
             </tr>
           )}

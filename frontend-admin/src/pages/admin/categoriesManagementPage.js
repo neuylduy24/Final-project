@@ -22,9 +22,9 @@ const CategoriesManagementAdPage = () => {
         "https://api.it-ebook.io.vn/api/categories"
       );
       setCategories(response.data);
-      setCurrentPage(1); // Reset về trang đầu tiên khi dữ liệu thay đổi
+      setCurrentPage(1); // Reset to first page when data changes
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu thể loại:", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -66,13 +66,13 @@ const CategoriesManagementAdPage = () => {
         updatedCategories.length / categoriesPerPage
       );
       if (currentPage > newTotalPages) {
-        setCurrentPage(newTotalPages || 1); // Giữ trang hợp lệ sau khi xóa
+        setCurrentPage(newTotalPages || 1); // Keep page number valid after deletion
       }
       return updatedCategories;
     });
   };
 
-  // Xác định danh sách thể loại cho trang hiện tại
+  // Determine category list for current page
   const indexOfLastCategory = currentPage * categoriesPerPage;
   const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
   const currentCategories = categories.slice(
@@ -84,7 +84,7 @@ const CategoriesManagementAdPage = () => {
   return (
     <div className="container">
       <div className="container-management">
-        <h2>Quản lý thể loại</h2>
+        <h2>Category Management</h2>
 
         {showForm && (
           <CategoriesForm

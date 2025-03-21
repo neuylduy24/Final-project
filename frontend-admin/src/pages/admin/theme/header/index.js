@@ -36,7 +36,7 @@ const HeaderAd = ({ ...props }) => {
 
         setUsername(response.data.username);
       } catch (error) {
-        console.error("Lỗi khi lấy thông tin người dùng:", error);
+        console.error("Error fetching user information:", error);
         navigate(ROUTERS.ADMIN.LOGIN);
       }
     };
@@ -45,19 +45,19 @@ const HeaderAd = ({ ...props }) => {
   }, [navigate]);
 
   const [navItems, setMenu] = useState([
-    { label: "Tổng quan", path: ROUTERS.ADMIN.STATISTICS },
+    { label: "Overview", path: ROUTERS.ADMIN.STATISTICS },
     {
-      label: "Quản lý",
+      label: "Management",
       isShowSubmenu: false,
       child: [
-        { label: "Quản lý sách", path: ROUTERS.ADMIN.BOOKS },
-        { label: "Quản lý thể loại", path: ROUTERS.ADMIN.BOOKSCATEGORIES },
-        { label: "Quản lý chương", path: ROUTERS.ADMIN.CHAPTERBOOKS },
-        // { label: "Quản lý bookmarks ", path: ROUTERS.ADMIN.BOOKS },
+        { label: "Book Management", path: ROUTERS.ADMIN.BOOKS },
+        { label: "Category Management", path: ROUTERS.ADMIN.BOOKSCATEGORIES },
+        { label: "Chapter Management", path: ROUTERS.ADMIN.CHAPTERBOOKS },
+        // { label: "Bookmark Management", path: ROUTERS.ADMIN.BOOKS },
       ],
     },
-    { label: "Quản lý người dùng", path: ROUTERS.ADMIN.USERS },
-    { label: "Đăng xuất", path: ROUTERS.ADMIN.LOGIN, icon: <IoLogOut /> },
+    { label: "User Management", path: ROUTERS.ADMIN.USERS },
+    { label: "Logout", path: ROUTERS.ADMIN.LOGIN, icon: <IoLogOut /> },
   ]);
 
   const handleNavClick = (path) => {
@@ -99,21 +99,21 @@ const HeaderAd = ({ ...props }) => {
                     className="admin_sidebar-row"
                     onClick={() => handleMenuClick(index)}
                   >
-                    <span className="admin_sidebar-label">{item.label}</span>
+                    <span>{item.label}</span>
                     {item.isShowSubmenu ? (
                       <FaCircleChevronUp />
                     ) : (
                       <FaCircleChevronDown />
                     )}
                   </div>
-                  <ul className="header_menu_dropdown">
+                  <ul className="submenu">
                     {item.child.map((childItem, childIndex) => (
                       <li
                         key={childIndex}
                         className={activePath === childItem.path ? "active" : ""}
                         onClick={() => handleNavClick(childItem.path)}
                       >
-                        <Link to={childItem.path}>{childItem.label}</Link>
+                        <span>{childItem.label}</span>
                       </li>
                     ))}
                   </ul>
@@ -123,10 +123,8 @@ const HeaderAd = ({ ...props }) => {
                   className="admin_sidebar-row"
                   onClick={() => handleNavClick(item.path)}
                 >
-                  <Link to={item.path} className="admin_sidebar-label">
-                    {item.label}
-                    {item.icon}
-                  </Link>
+                  <span>{item.label}</span>
+                  {item.icon}
                 </div>
               )}
             </li>

@@ -19,7 +19,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
     }
   };
 
-  // Hiển thị tối đa 5 nút trang
+  // Display maximum 5 page buttons
   const getVisiblePageNumbers = () => {
     let startPage, endPage;
     if (totalPages <= 5) {
@@ -48,7 +48,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
         onClick={goToPrevPage} 
         disabled={currentPage === 1}
       >
-        &laquo; Trước
+        &laquo; Previous
       </button>
       
       {getVisiblePageNumbers().map(number => (
@@ -65,7 +65,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
         onClick={goToNextPage} 
         disabled={currentPage === totalPages}
       >
-        Sau &raquo;
+        Next &raquo;
       </button>
     </div>
   );

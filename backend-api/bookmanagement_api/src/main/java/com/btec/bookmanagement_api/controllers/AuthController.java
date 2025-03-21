@@ -96,44 +96,73 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String email,
-                                                @RequestParam String otp,
-                                                @RequestParam String newPassword) {
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Email không tồn tại!");
-        }
 
-        // 🛠 Kiểm tra mã OTP có hợp lệ không
-        if (user.getResetPasswordCode().equals(otp) && LocalDateTime.now().isBefore(user.getResetCodeExpiry())) {
-            user.setPassword(passwordEncoder.encode(newPassword)); // Cập nhật mật khẩu mới
-            user.setResetPasswordCode(null); // Xóa mã OTP sau khi đặt lại
-            user.setResetCodeExpiry(null);
-            userRepository.save(user);
-            return ResponseEntity.ok("✅ Mật khẩu đã được đặt lại thành công!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("❌ Mã OTP không đúng hoặc đã hết hạn.");
-        }
-    }
-    @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestParam("email") String email) {
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
         Map<String, String> response = new HashMap<>();
 
-        // 🔍 Kiểm tra user có tồn tại không
+        // 🛠 Kiểm tra đầu vào hợp lệ
+        if (!request.containsKey("email") || !request.containsKey("otp") || !request.containsKey("newPassword")) {
+            response.put("message", "❌ Thiếu thông tin yêu cầu!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        String email = request.get("email");
+        String otp = request.get("otp");
+        String newPassword = request.get("newPassword");
+
         User user = userService.getUserByEmail(email);
         if (user == null) {
             response.put("message", "❌ Email không tồn tại!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        // 🛠 Tạo mã OTP gồm 6 chữ số (đảm bảo luôn đủ 6 số)
+        // 🔥 Kiểm tra OTP hợp lệ
+        if (user.getResetPasswordCode() == null || !user.getResetPasswordCode().equals(otp)) {
+            response.put("message", "❌ Mã OTP không đúng!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        if (LocalDateTime.now().isAfter(user.getResetCodeExpiry())) {
+            response.put("message", "❌ Mã OTP đã hết hạn!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // 🔒 Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordCode(null); // Xóa mã OTP sau khi dùng
+        user.setResetCodeExpiry(null);
+        userRepository.save(user);
+
+        response.put("message", "✅ Mật khẩu đã được đặt lại thành công!");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
+        Map<String, String> response = new HashMap<>();
+
+        // 🔍 Kiểm tra email có trong request không
+        if (!request.containsKey("email") || request.get("email").isBlank()) {
+            response.put("message", "❌ Vui lòng nhập email!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        String email = request.get("email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            response.put("message", "❌ Email không tồn tại!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // 🛠 Tạo mã OTP gồm 6 số
         String otp = String.format("%06d", new Random().nextInt(1000000));
         user.setResetPasswordCode(otp);
         user.setResetCodeExpiry(LocalDateTime.now().plusMinutes(5)); // Hết hạn sau 5 phút
-        userService.saveUser(user); // 🔄 Cập nhật thông tin user vào DB
+        userService.saveUser(user); // 🔄 Cập nhật DB
 
-        // ✉ Gửi email OTP (kiểm tra phương thức sendResetPasswordCode)
+        // ✉ Gửi email OTP
         try {
             emailService.sendResetPasswordCode(user.getEmail(), otp);
             response.put("message", "✅ Mã OTP đã được gửi vào email của bạn!");
@@ -143,6 +172,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 
 
 

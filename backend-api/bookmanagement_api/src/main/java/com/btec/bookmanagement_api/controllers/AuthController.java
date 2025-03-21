@@ -96,7 +96,6 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
-
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
         Map<String, String> response = new HashMap<>();

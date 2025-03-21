@@ -4,7 +4,12 @@ import com.btec.bookmanagement_api.entities.Chapter;
 import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.repositories.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +18,11 @@ import java.util.Optional;
 public class ChapterService {
     @Autowired
     private ChapterRepository chapterRepository;
+    @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public List<Chapter> getAllChapters() {
         return chapterRepository.findAll();
@@ -68,11 +77,11 @@ public class ChapterService {
     }
 
     public void incrementChapterViews(String id) {
-        chapterRepository.findById(id).ifPresent(chapter -> {
-            chapter.incrementViews();
-            chapterRepository.save(chapter);
-        });
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update().inc("views", 1);
+        mongoTemplate.updateFirst(query, update, Chapter.class);
     }
+
 
 
 

@@ -8,37 +8,34 @@ import BookDetailProductPage from "./pages/user/BookDetailProductPage/bookDetail
 import LoginPage from "./pages/user/loginForm/login";
 import RegisterPage from "./pages/user/loginForm/register";
 import ChapterDetailPage from "component/ChapterDetail/ChapterDetailPage";
+import ForgotPasswordPage from "pages/user/loginForm/forgotPassword";
 
 const RouterCustom = () => {
     const location = useLocation();
-    const isRegisterPage = location.pathname === ROUTERS.USER.REGISTER;
-    const isUserRouters = location.pathname.startsWith(USER_PATH);
+    const isUserRoute = location.pathname.startsWith(USER_PATH);
 
-    if (!isUserRouters) {
-        return <Navigate to={ROUTERS.USER.LOGINPAGE} replace />;
+    if (!isUserRoute) {
+        return <Navigate to={ROUTERS.USER.HOME} replace />;
     }
 
     return (
         <Routes>
-            {isRegisterPage ? (
-                <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
-            ) : (
-                <Route
-                    path="*"
-                    element={
-                        <MasterLayout>
-                            <Routes>
-                                <Route path="/" element={<Navigate to={ROUTERS.USER.LOGINPAGE} replace />} />
-                                <Route path={ROUTERS.USER.LOGINPAGE} element={<LoginPage />} />
-                                <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
-                                <Route path={ROUTERS.USER.HOME} element={<HomePage />} />
-                                <Route path={ROUTERS.USER.BOOKDETAIL} element={<BookDetailProductPage />} />
-                                <Route path={ROUTERS.USER.CHAPTERDETAIL} element={<ChapterDetailPage />} />
-                            </Routes>
-                        </MasterLayout>
-                    }
-                />
-            )}
+            <Route path={ROUTERS.USER.LOGINPAGE} element={<LoginPage />} />
+            <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
+            <Route path={ROUTERS.USER.FORGOTPASSWORD} element={<ForgotPasswordPage />} />
+
+            <Route
+                path="*"
+                element={
+                    <MasterLayout>
+                        <Routes>
+                            <Route path={ROUTERS.USER.HOME} element={<HomePage />} />
+                            <Route path={ROUTERS.USER.BOOKDETAIL} element={<BookDetailProductPage />} />
+                            <Route path={ROUTERS.USER.CHAPTERDETAIL} element={<ChapterDetailPage />} />
+                        </Routes>
+                    </MasterLayout>
+                }
+            />
         </Routes>
     );
 };

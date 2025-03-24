@@ -63,6 +63,7 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      color: #333;
       font-size: 16px;
       outline: none;
       transition: border 0.3s;
@@ -129,11 +130,16 @@
 
   .text-center {
     text-align: center;
-    margin-top: 10px;
 
     a {
       color: #007bff;
       text-decoration: none;
+
+      svg {
+        vertical-align: middle;
+        margin-left: 5px;
+        margin-top: -2px;
+      }
 
       &:hover {
         text-decoration: underline;

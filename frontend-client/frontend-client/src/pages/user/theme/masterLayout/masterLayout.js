@@ -6,7 +6,7 @@ import { ROUTERS } from 'utils/path';
 
 const MasterLayoutUser = ({ children }) => {
     const location = useLocation();
-    const isLoginPage = location.pathname.startsWith(ROUTERS.USER.LOGINPAGE);
+    const isLoginPage = location.pathname.startsWith(ROUTERS.USER.HOME);
 
     const isAuthenticated = localStorage.getItem('token'); 
 
@@ -16,9 +16,9 @@ const MasterLayoutUser = ({ children }) => {
 
     return (
         <div>
-            {!isLoginPage && <Header />}
+            {isLoginPage && <Header />}
             {children}
-            {!isLoginPage && <Footer />}
+            {isLoginPage && <Footer />}
         </div>
     );
 }

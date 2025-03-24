@@ -5,6 +5,7 @@ export const ROUTERS = {
         HOME: `${USER_PATH}`,
         LOGINPAGE: `${USER_PATH}/login`,
         REGISTER: `${USER_PATH}/register`,
+        FORGOTPASSWORD: `${USER_PATH}/forgot-password`,
         PROFILE: `${USER_PATH}/thong-tin-ca-nhan`,
         BOOKNEW: `${USER_PATH}/truyen-moi`,
         BOOKLIST: `${USER_PATH}/danh-sach-truyen`,

@@ -19,6 +19,49 @@
     text-transform: uppercase;
   }
 
+  .search-sort-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .search-input {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      font-size: 12px;
+      background: white;
+      color: #222;
+      transition: all 0.3s ease-in-out;
+      width: 100px;
+      height: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sort-button {
+      margin-bottom: 10px;
+      padding: 17px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      height: 43px;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      background: white;
+      color: #222;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-transform: uppercase;
+      cursor: pointer;
+
+      &:hover {
+        background: #2196f3;
+        color: white;
+      }
+    }
+  }
+
   .chapter-items {
     list-style: none;
     padding: 0;

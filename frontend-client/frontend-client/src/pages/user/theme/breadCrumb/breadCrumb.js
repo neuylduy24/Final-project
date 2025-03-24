@@ -8,7 +8,7 @@ const breadCrumb = (props) => {
       <div className="breadCrumb_option">
         <ul>
           <li className="link">
-            <Link to={ROUTERS.USER.HOME}>Trang chủ</Link>
+            <Link to={ROUTERS.USER.HOME}>Home</Link>
           </li>
           <li>
             {props.name}

@@ -17,7 +17,7 @@ const BookCarousel = ({ books, navigate }) => {
       <Carousel className="categories_slider" responsive={responsive} autoPlay={true} autoPlaySpeed={2000} infinite={true} arrows={true}>
         {books.map((book) => (
           <div className="carousel-item" key={book.id} onClick={() => navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.id)}`)}>
-            <img src={book.image} alt={book.title} className="slider-image" />
+            <img src={book.image}  alt={book.title} className="slider-image" />
           </div>
         ))}
       </Carousel>

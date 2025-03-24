@@ -146,9 +146,12 @@ const LoginPage = () => {
                 />
                 <label htmlFor="rememberMe">Remember me</label>
               </div>
-              <a href="#!" className="forgot-password">
+              <Link
+                to={ROUTERS.USER.FORGOTPASSWORD}
+                className="forgot-password"
+              >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             {message.text && (

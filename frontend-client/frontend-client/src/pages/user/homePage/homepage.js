@@ -31,9 +31,7 @@ const HomePage = () => {
           <FeaturedBooks books={memoizedBooks} navigate={navigate} />
         </div>
         <div className="see-more-container">
-          <button className="see-more-button">
-            See More
-          </button>
+          <button className="see-more-button">See More</button>
         </div>
       </div>
     </>

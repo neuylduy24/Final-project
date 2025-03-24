@@ -4,7 +4,6 @@ import {
   FaInstagram,
   FaUser,
   FaListUl,
-  FaPhone,
   FaCircleChevronUp,
   FaCircleChevronDown,
   FaCommentDots,
@@ -15,14 +14,9 @@ import { MdEmail } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { ROUTERS } from "utils/path";
 import { FaHistory, FaSignOutAlt } from "react-icons/fa";
-
-export const categories = [
-  "Comic",
-  "Science Books",
-  "Romance Books",
-  "Political Books",
-  "Technology Books",
-];
+import SearchBar from "component/SearchBar/searchBar";
+import logo from "../../../../assets/user/image/hero/logo.png";
+import axios from "axios";
 
 const Header = () => {
   const location = useLocation();
@@ -31,6 +25,7 @@ const Header = () => {
   const [isShowCategories, setShowCategories] = useState(isHome);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [showMenu, setShowMenu] = useState(false);
+
   const [menu, setMenu] = useState([
     {
       name: "Home",
@@ -44,32 +39,7 @@ const Header = () => {
       name: "Categories",
       path: "",
       isShowSubmenu: false,
-      child: [
-        "Action",
-        "Adventure",
-        "Anime",
-        "Cổ Đại",
-        "Comedy",
-        "Comic",
-        "Detective",
-        "Doujinshi",
-        "Drama",
-        "Fantasy",
-        "Gender Bender",
-        "Historical",
-        "Horror",
-        "Isekai",
-        "Josei",
-        "Magic",
-        "Manga",
-        "Manhua",
-        "Manhwa",
-        "Martial Arts",
-        "Mystery",
-        "Ngôn Tình",
-        "One shot",
-        "Psychological",
-      ].map((name) => ({ name, path: "" })),
+      child: [],
     },
     {
       name: "Ranking",
@@ -78,19 +48,19 @@ const Header = () => {
       child: [
         {
           name: "Top day",
-          path: "",
+          path: "Top day",
         },
         {
           name: "Top week",
-          path: "",
+          path: "Top week",
         },
         {
           name: "Top month",
-          path: "",
+          path: "Top month",
         },
         {
           name: "Update new",
-          path: "",
+          path: "Update new",
         },
       ],
     },
@@ -103,6 +73,29 @@ const Header = () => {
       path: ROUTERS.USER.BOOKHISTORY,
     },
   ]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.it-ebook.io.vn/api/categories"
+        ); 
+        const categories = response.data.map((category) => ({
+          name: category.name,
+          path: `${ROUTERS.USER.BOOKLIST}?category=${category.id}`, 
+        }));
+
+        setMenu((prevMenu) =>
+          prevMenu.map((item) =>
+            item.name === "Categories" ? { ...item, child: categories } : item
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
   const handleMenuClick = (menuKey) => {
     setMenu((prevMenu) => {
       const newMenu = [...prevMenu];
@@ -117,12 +110,15 @@ const Header = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
     };
 
-    window.addEventListener("storage", checkLoginStatus); // Lắng nghe thay đổi từ localStorage
+    window.addEventListener("storage", checkLoginStatus);
+
+    // Kiểm tra trạng thái đăng nhập mỗi khi location thay đổi
+    checkLoginStatus();
 
     return () => {
       window.removeEventListener("storage", checkLoginStatus);
     };
-  }, []);
+  }, [location]);
 
   useEffect(() => {
     const isHome = location.pathname.length <= 1;
@@ -144,7 +140,7 @@ const Header = () => {
           <Link to={ROUTERS.USER.HOME}>
             <img
               width="250px"
-              src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
+              src={logo}
               alt="Logo"
             />
           </Link>
@@ -217,8 +213,8 @@ const Header = () => {
               <ul>
                 <Link to={ROUTERS.USER.HOME}>
                   <img
-                    width="100px"
-                    src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
+                    width="60px"
+                    src= {logo}
                     alt="Logo"
                   />
                 </Link>
@@ -251,18 +247,22 @@ const Header = () => {
                           </li>
                           <li>
                             <FaBookmark />{" "}
-                            <Link to={ROUTERS.USER.BOOKFOLLOW}>Danh sách theo dõi</Link>
+                            <Link to={ROUTERS.USER.BOOKFOLLOW}>
+                              Danh sách theo dõi
+                            </Link>
                           </li>
                           <li>
                             <FaHistory />{" "}
-                            <Link to={ROUTERS.USER.BOOKHISTORY}>Lịch sử đọc truyện</Link>
+                            <Link to={ROUTERS.USER.BOOKHISTORY}>
+                              Lịch sử đọc truyện
+                            </Link>
                           </li>
                           <li>
                             <FaSignOutAlt />{" "}
                             <Link
                               onClick={() => {
-                                localStorage.removeItem("token"); 
-                                setIsLoggedIn(false); 
+                                localStorage.removeItem("token");
+                                setIsLoggedIn(false);
                                 setShowMenu(false);
                               }}
                             >
@@ -293,13 +293,13 @@ const Header = () => {
           <div className="col-lg-6">
             <nav className="header_menu">
               <ul>
-                {menu?.map((menu, menuKey) => (
+                {menu.map((menuItem, menuKey) => (
                   <li key={menuKey} className={menuKey === 0 ? "active" : ""}>
-                    <Link to={menu?.path}>{menu?.name}</Link>
-                    {menu.child && (
+                    <Link to={menuItem?.path}>{menuItem?.name}</Link>
+                    {menuItem.child && (
                       <ul className="header_menu_dropdown">
-                        {menu.child.map((childItem, childKey) => (
-                          <li key={`${menuKey} - ${childKey}`}>
+                        {menuItem.child.map((childItem, childKey) => (
+                          <li key={`${menuKey}-${childKey}`}>
                             <Link to={childItem.path}>{childItem.name}</Link>
                           </li>
                         ))}
@@ -325,43 +325,21 @@ const Header = () => {
               onClick={() => setShowCategories(!isShowCategories)}
             >
               <FaListUl />
-              List Books
+              Ranking
             </div>
             {isShowCategories && (
               <ul>
-                {categories.map((category, key) => (
-                  <li key={key}>
-                    <Link to={ROUTERS.USER.BOOKLIST}>{category}</Link>
-                  </li>
-                ))}
+                {menu
+                  .find((item) => item.name === "Ranking")
+                  ?.child.map((rankingItem, key) => (
+                    <li key={key}>
+                      <Link to={rankingItem.path}>{rankingItem.name}</Link>
+                    </li>
+                  ))}
               </ul>
             )}
           </div>
-
-          <div className="col-lg-9 col-sm-12 col-xs-12 col-md-12 hero-search-container">
-            <div className="hero-search">
-              <div className="hero-search-form">
-                <form>
-                  <input
-                    type="text"
-                    placeholder="What are you looking for????"
-                  />
-                  <button type="submit" className="site-btn">
-                    Search
-                  </button>
-                </form>
-              </div>
-              <div className="hero-search-phone">
-                <div className="hero-search-phone-icon">
-                  <FaPhone />
-                </div>
-                <div className="hero-search-phone-text">
-                  <p>0987.654.321</p>
-                  <span>Hotline 24/7</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SearchBar />
         </div>
       </div>
     </>

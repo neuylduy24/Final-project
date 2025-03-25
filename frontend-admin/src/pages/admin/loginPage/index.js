@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ROUTERS } from "../../../utils/router";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS cho toast
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -26,21 +26,21 @@ const LoginPage = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("email", formData.email);
 
-        toast.success("✅ Đăng nhập thành công!", { autoClose: 1000 });
+        toast.success("✅ Login successful!", { autoClose: 1000 });
 
         setTimeout(() => {
           navigate(ROUTERS.ADMIN.STATISTICS);
         }, 2000);
       } else {
-        toast.error("❌ Email hoặc mật khẩu không chính xác!");
+        toast.error("❌ Email or password is incorrect!");
       }
     } catch (err) {
       if (!err.response) {
-        toast.error("❌ Không thể kết nối đến máy chủ!");
+        toast.error("❌ Cannot connect to server!");
       } else if (err.response.status === 401) {
-        toast.error("❌ Email hoặc mật khẩu không đúng!");
+        toast.error("❌ Email or password is incorrect!");
       } else {
-        toast.error(err.response?.data?.message || "❌ Đã xảy ra lỗi, vui lòng thử lại!");
+        toast.error(err.response?.data?.message || "❌ An error occurred, please try again!");
       }
     } finally {
       setLoading(false);
@@ -49,7 +49,6 @@ const LoginPage = () => {
 
   return (
     <div className="login">
-      {/* ToastContainer để hiển thị thông báo */}
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="login-container">
@@ -61,7 +60,7 @@ const LoginPage = () => {
               alt="Logo"
             />
           </Link>
-          <h2 className="login-title">Chào mừng bạn đến với BookStore!!</h2>
+          <h2 className="login-title">Welcome to BookStore!!</h2>
         </div>
 
         <div className="login-right">
@@ -76,13 +75,13 @@ const LoginPage = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Nhập email"
+                placeholder="Enter email"
                 required
               />
             </div>
             <div className="login-form-group">
               <label htmlFor="password" className="login-label">
-                Mật khẩu:
+                Password:
               </label>
               <input
                 type="password"
@@ -90,12 +89,12 @@ const LoginPage = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Nhập mật khẩu"
+                placeholder="Enter password"
                 required
               />
             </div>
             <button type="submit" className="login-button" disabled={loading}>
-              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>

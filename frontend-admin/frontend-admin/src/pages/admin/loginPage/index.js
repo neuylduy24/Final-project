@@ -1,4 +1,4 @@
-  import { memo, useState } from "react";
+import { memo, useState } from "react";
 import "./style.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { ROUTERS } from "../../../utils/router";
@@ -56,14 +56,16 @@ const LoginPage = () => {
           <Link to={ROUTERS.USER.HOME}>
             <img
               className="footer__about_logo"
-              src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
-              alt="Logo"
+              src="/logo.png"
+              alt="Book Store Logo"
             />
           </Link>
-          <h2 className="login-title">Welcome to BookStore!!</h2>
+          <h2 className="login-title">Welcome to BookStore Admin!</h2>
+          <p className="login-subtitle">Please sign in to continue</p>
         </div>
 
         <div className="login-right">
+          <h3 className="form-title">Sign In</h3>
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="login-form-group">
               <label htmlFor="email" className="login-label">

@@ -20,7 +20,6 @@ public class ChapterService {
     private ChapterRepository chapterRepository;
     @Autowired
     private BookRepository bookRepository;
-
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -28,22 +27,15 @@ public class ChapterService {
         return chapterRepository.findAll();
     }
 
-    public Optional<Chapter> getChapterById(String id) {
-        return chapterRepository.findById(id);
-    }
-
-    public List<Chapter> getChaptersByBookId(String bookId) {
-        return chapterRepository.findByBookId(bookId);
-    }
-
+    // ✅ Tạo chapter (chỉ khi Book tồn tại)
     public Chapter createChapter(Chapter chapter) {
-        // Check if the book exists before saving the chapter
         if (!bookRepository.existsById(chapter.getBookId())) {
             throw new RuntimeException("Book ID not found: " + chapter.getBookId());
         }
         return chapterRepository.save(chapter);
     }
 
+    // ✅ Cập nhật chapter
     public Chapter updateChapter(String id, Chapter updatedChapter) {
         return chapterRepository.findById(id)
                 .map(chapter -> {
@@ -57,35 +49,43 @@ public class ChapterService {
                 .orElseThrow(() -> new RuntimeException("Chapter not found"));
     }
 
+    // ✅ Xóa chapter
     public void deleteChapter(String id) {
         chapterRepository.deleteById(id);
     }
 
-    public ChapterService(ChapterRepository chapterRepository, BookRepository bookRepository) {
-        this.chapterRepository = chapterRepository;
-        this.bookRepository = bookRepository;
+    // ✅ Lấy danh sách chương theo Book ID
+    public List<Chapter> getChaptersByBookId(String bookId) {
+        return chapterRepository.findByBookId(bookId);
     }
 
-  // Get all chapters sorted by createdAt (latest first)
+    // ✅ Lấy tất cả chapter mới nhất
     public List<Chapter> getLatestChapters() {
         return chapterRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    // Get only the latest 5 chapters
+    // ✅ Lấy 5 chapter mới nhất
     public List<Chapter> getTop5LatestChapters() {
         return chapterRepository.findTop5ByOrderByCreatedAtDesc();
     }
 
+    // ✅ Lấy chapter và tự động tăng số lượt xem
+    public Optional<Chapter> getChapterById(String id) {
+        Optional<Chapter> chapter = chapterRepository.findById(id);
+        if (chapter.isPresent()) {
+            incrementChapterViews(id); // 🔥 Tăng views khi có người đọc
+        }
+        return chapter;
+    }
+
+    // ✅ Cập nhật số lượt xem (tăng +1 mỗi lần đọc)
     public void incrementChapterViews(String id) {
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update().inc("views", 1);
         mongoTemplate.updateFirst(query, update, Chapter.class);
     }
 
-
-
-
-    // Tính tổng lượt xem của sách
+    // ✅ Lấy tổng số lượt xem của tất cả chương trong sách
     public int getTotalViewsByBookId(String bookId) {
         return chapterRepository.findByBookId(bookId)
                 .stream()

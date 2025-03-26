@@ -1,125 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import bookService from '../../service/bookService';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import chapterService from "../../service/chapterService";
 
-const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
-    const [books, setBooks] = useState([]);
+const ChapterForm = ({ 
+    form, 
+    setForm, 
+    isEditing, 
+    closeForm, 
+    handleSubmit, 
+    books 
+}) => {
+    const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [uploadType, setUploadType] = useState('url'); // 'url' or 'file'
+    const [uploadType, setUploadType] = useState("file");
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [previewUrls, setPreviewUrls] = useState([]);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [imageUrls, setImageUrls] = useState([]);
 
     useEffect(() => {
-        fetchBooks();
-    }, []);
-
-    useEffect(() => {
-        // Clear preview URLs when component unmounts
-        return () => {
-            previewUrls.forEach(url => URL.revokeObjectURL(url));
-        };
-    }, [previewUrls]);
-
-    const fetchBooks = async () => {
-        try {
-            setLoading(true);
-            const data = await bookService.getAllBooks();
-            setBooks(data);
-            setError(null);
-        } catch (err) {
-            setError("Unable to load book list");
-            console.error("Error fetching books:", err);
-        } finally {
-            setLoading(false);
+        // Initialize image URLs if editing a chapter with existing images
+        if (isEditing && form.images && form.images.length > 0) {
+            setImageUrls(form.images);
         }
-    };
+    }, [isEditing, form.images]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
+        setForm({
+            ...form,
             [name]: value
-        }));
+        });
     };
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
-        
-        if (files.length === 0) return;
-        
-        // Create preview URLs for selected files
-        const newPreviewUrls = files.map(file => URL.createObjectURL(file));
-        
         setSelectedFiles(files);
-        setPreviewUrls(prevUrls => {
-            // Clear old URLs to avoid memory leak
-            prevUrls.forEach(url => URL.revokeObjectURL(url));
-            return newPreviewUrls;
-        });
+    };
+
+    const handleUrlChange = (e, index) => {
+        const newUrls = [...imageUrls];
+        newUrls[index] = e.target.value;
+        setImageUrls(newUrls);
+    };
+
+    const addUrlField = () => {
+        setImageUrls([...imageUrls, ""]);
+    };
+
+    const removeUrlField = (index) => {
+        const newUrls = [...imageUrls];
+        newUrls.splice(index, 1);
+        setImageUrls(newUrls);
     };
 
     const renderImageInput = () => {
-        if (uploadType === 'url') {
+        if (uploadType === "url") {
             return (
                 <div className="form-group">
-                    <label htmlFor="images">Images (URLs, comma-separated):</label>
-                    <input
-                        type="text"
-                        id="images"
-                        name="images"
-                        value={form.images ? form.images.join(', ') : ''}
-                        onChange={(e) => {
-                            const imageUrls = e.target.value.split(',').map(url => url.trim());
-                            setForm(prev => ({
-                                ...prev,
-                                images: imageUrls.filter(url => url !== '')
-                            }));
-                        }}
-                        placeholder="Enter image URLs, separated by commas"
-                    />
+                    <label>Image URLs:</label>
+                    {imageUrls.map((url, index) => (
+                        <div key={index} className="url-input-container">
+                            <input
+                                type="text"
+                                value={url}
+                                onChange={(e) => handleUrlChange(e, index)}
+                                placeholder="Enter image URL"
+                            />
+                            <button
+                                type="button"
+                                className="remove-url"
+                                onClick={() => removeUrlField(index)}
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        className="add-url"
+                        onClick={addUrlField}
+                    >
+                        Add URL
+                    </button>
                 </div>
             );
         } else {
             return (
                 <div className="form-group">
-                    <label htmlFor="fileImages">Upload Images:</label>
+                    <label htmlFor="images">Upload Images:</label>
                     <input
                         type="file"
-                        id="fileImages"
-                        accept="image/*"
-                        multiple
+                        id="images"
+                        name="images"
                         onChange={handleFileChange}
-                        className="file-input"
+                        multiple
+                        accept="image/*"
                     />
-                    {previewUrls.length > 0 && (
-                        <div className="image-previews">
-                            {previewUrls.map((url, index) => (
-                                <div key={index} className="image-preview">
-                                    <img src={url} alt={`Preview ${index}`} />
-                                    <button 
-                                        type="button" 
-                                        className="remove-image"
-                                        onClick={() => {
-                                            setPreviewUrls(prevUrls => {
-                                                const newUrls = [...prevUrls];
-                                                URL.revokeObjectURL(newUrls[index]);
-                                                newUrls.splice(index, 1);
-                                                return newUrls;
-                                            });
-                                            setSelectedFiles(prevFiles => {
-                                                const newFiles = [...prevFiles];
-                                                newFiles.splice(index, 1);
-                                                return newFiles;
-                                            });
-                                        }}
-                                    >
-                                        &times;
-                                    </button>
-                                </div>
-                            ))}
+                    {selectedFiles.length > 0 && (
+                        <div className="selected-files">
+                            <p>Selected files:</p>
+                            <ul>
+                                {selectedFiles.map((file, index) => (
+                                    <li key={index}>{file.name}</li>
+                                ))}
+                            </ul>
                         </div>
                     )}
                 </div>
@@ -130,90 +115,81 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         
-        // Validate required fields
+        // Validate form
         if (!form.bookId) {
-            toast.error("Please select a book");
+            setError("Please select a book");
             return;
         }
-
+        
         if (!form.chapterNumber) {
-            toast.error("Please enter chapter number");
+            setError("Please enter a chapter number");
             return;
         }
-
+        
         if (!form.title) {
-            toast.error("Please enter chapter title");
+            setError("Please enter a title");
             return;
         }
-
+        
         if (!form.content) {
-            toast.error("Please enter chapter content");
+            setError("Please enter content");
             return;
         }
         
         try {
-            // Ensure chapterNumber is an integer
+            setLoading(true);
+            
+            // Prepare chapter data
             const chapterData = {
-                chapterNumber: parseInt(form.chapterNumber),
+                bookId: form.bookId,
+                chapterNumber: parseFloat(form.chapterNumber), // Use parseFloat to match backend Double type
                 title: form.title,
                 content: form.content,
-                views: 0,
-                bookId: null,  // Default value is null according to Postman
-                createdAt: isEditing ? form.createdAt : null  // Default value is null according to Postman
+                views: form.views || 0,
+                // Set createdAt with Vietnam timezone (UTC+7)
+                createdAt: isEditing ? form.createdAt : new Date(new Date().getTime() + (7 * 60 * 60 * 1000)).toISOString()
             };
-            
-            // Add createdAt as current time in Vietnam timezone
-            const now = new Date();
-            // Adjust to Vietnam timezone (UTC+7)
-            const vietnamTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
-            
-            if (isEditing) {
-                // If editing, keep old createdAt
-                chapterData.createdAt = form.createdAt;
-            } else {
-                // If adding new, set current time in Vietnam timezone
-                chapterData.createdAt = vietnamTime.toISOString();
-            }
             
             // Handle images
             if (uploadType === 'file' && selectedFiles.length > 0) {
                 try {
-                    // Assuming we're using a mock image upload function (need to replace with actual function)
+                    // In a real implementation, you would upload the files to a server
+                    // and get back URLs. For now, we'll use mock URLs
                     const uploadedUrls = await Promise.all(
                         selectedFiles.map(async (file) => {
-                            // Mock image upload - in reality, need to replace with real API
+                            // This is a placeholder. In a real app, you would upload to a server
                             const formData = new FormData();
                             formData.append('file', file);
                             
-                            // Assuming we're calling an image upload API
-                            // const response = await axios.post('your-upload-api-endpoint', formData);
-                            // return response.data.url;
-                            
-                            // In this example, we just return a mock URL
-                            return URL.createObjectURL(file); // In reality, will return URL from server
+                            // Mock URL for demonstration
+                            return URL.createObjectURL(file);
                         })
                     );
                     
-                    // Add image URLs to chapterData
                     chapterData.images = uploadedUrls;
                     
                 } catch (error) {
                     console.error("Error uploading images:", error);
                     setError("Unable to upload images. Please try again later.");
+                    setLoading(false);
                     return;
                 }
+            } else if (uploadType === 'url' && imageUrls.length > 0) {
+                chapterData.images = imageUrls.filter(url => url.trim() !== '');
             } else if (form.images && form.images.length > 0) {
                 chapterData.images = form.images;
             } else {
-                chapterData.images = null; // Default value is null according to Postman
+                chapterData.images = [];
             }
             
             if (isEditing) {
-                // Update chapter
-                await bookService.updateChapterInBook(form.bookId, form.id, chapterData);
+                // Update existing chapter
+                await chapterService.updateChapter(form.id, chapterData);
+                toast.success("Chapter updated successfully!");
             } else {
-                // Add new chapter to book
-                await bookService.addChapterToBook(form.bookId, chapterData);
+                // Create new chapter
+                await chapterService.createChapter(chapterData);
+                toast.success("New chapter added successfully!");
             }
             
             // Reset form
@@ -239,6 +215,9 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
             
         } catch (error) {
             toast.error(isEditing ? 'Unable to update chapter: ' + error.message : 'Unable to add new chapter: ' + error.message);
+            console.error("Error saving chapter:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -290,6 +269,7 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                                 value={form.chapterNumber || ''}
                                 onChange={handleChange}
                                 min="1"
+                                step="0.1" // Allow decimal values like 1.0, 1.5, etc.
                             />
                         </div>
                         <div className="form-group">
@@ -342,10 +322,10 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
                         {renderImageInput()}
                         
                         <div className="form-actions">
-                            <button type="submit" className="save">
-                                {isEditing ? 'Update Chapter' : 'Add Chapter'}
+                            <button type="submit" className="save" disabled={loading}>
+                                {loading ? 'Processing...' : isEditing ? 'Update Chapter' : 'Add Chapter'}
                             </button>
-                            <button type="button" className="cancel" onClick={closeForm}>
+                            <button type="button" className="cancel" onClick={closeForm} disabled={loading}>
                                 Cancel
                             </button>
                         </div>

@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_URL = 'https://api.it-ebook.io.vn/api/chapters';
 
 const chapterService = {
-    // Lấy tất cả chương
+    // Get all chapters
     getAllChapters: async () => {
         try {
             const response = await axios.get(API_URL);
@@ -13,7 +13,7 @@ const chapterService = {
         }
     },
 
-    // Lấy chương theo ID
+    // Get chapter by ID
     getChapterById: async (id) => {
         try {
             const response = await axios.get(`${API_URL}/${id}`);
@@ -23,7 +23,7 @@ const chapterService = {
         }
     },
 
-    // Lấy chương theo ID sách
+    // Get chapters by book ID
     getChaptersByBookId: async (bookId) => {
         try {
             const response = await axios.get(`${API_URL}/book/${bookId}`);
@@ -33,17 +33,23 @@ const chapterService = {
         }
     },
 
-    // Tạo chương mới
+    // Create new chapter
     createChapter: async (chapter) => {
         try {
+            // Ensure chapter has bookId
+            if (!chapter.bookId) {
+                throw new Error('Chapter must have a bookId');
+            }
+            
             const response = await axios.post(API_URL, chapter);
             return response.data;
         } catch (error) {
+            console.error('Error creating chapter:', error);
             throw error;
         }
     },
 
-    // Cập nhật chương
+    // Update chapter
     updateChapter: async (id, chapter) => {
         try {
             const response = await axios.put(`${API_URL}/${id}`, chapter);
@@ -53,16 +59,17 @@ const chapterService = {
         }
     },
 
-    // Xóa chương
+    // Delete chapter
     deleteChapter: async (id) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
+            return true;
         } catch (error) {
             throw error;
         }
     },
 
-    // Lấy chương mới nhất
+    // Get latest chapters
     getLatestChapters: async () => {
         try {
             const response = await axios.get(`${API_URL}/latest`);
@@ -72,7 +79,7 @@ const chapterService = {
         }
     },
 
-    // Lấy top 5 chương mới nhất
+    // Get top 5 latest chapters
     getTop5LatestChapters: async () => {
         try {
             const response = await axios.get(`${API_URL}/latest/top5`);
@@ -82,16 +89,17 @@ const chapterService = {
         }
     },
 
-    // Tăng lượt xem chương
+    // Increment chapter views
     incrementChapterViews: async (id) => {
         try {
             await axios.post(`${API_URL}/${id}/view`);
+            return true;
         } catch (error) {
             throw error;
         }
     },
 
-    // Lấy tổng lượt xem của sách
+    // Get total views by book ID
     getTotalViewsByBookId: async (bookId) => {
         try {
             const response = await axios.get(`${API_URL}/book/${bookId}/views`);
@@ -102,4 +110,4 @@ const chapterService = {
     }
 };
 
-export default chapterService; 
+export default chapterService;

@@ -68,7 +68,7 @@ const bookService = {
                 book.chapters = [];
             }
             
-            // Tạo ID ngẫu nhiên dạng chuỗi hex cho chapter mới (tương tự như ID trong hình)
+            // Tạo ID ngẫu nhiên dạng chuỗi hex cho chapter mới 
             const randomHexId = Array.from({length: 24}, () => 
                 Math.floor(Math.random() * 16).toString(16)).join('');
             chapter.id = randomHexId;

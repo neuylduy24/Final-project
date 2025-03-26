@@ -16,23 +16,33 @@ public class ChapterController {
     @Autowired
     private ChapterService chapterService;
 
+    // ✅ Lấy tất cả chapter
     @GetMapping
     public List<Chapter> getAllChapters() {
         return chapterService.getAllChapters();
     }
 
+    // ✅ Lấy chapter theo ID và tự động tăng số lượt xem
     @GetMapping("/{id}")
     public ResponseEntity<Chapter> getChapterById(@PathVariable String id) {
-        chapterService.incrementChapterViews(id); // Tăng số lượt xem
         Optional<Chapter> chapter = chapterService.getChapterById(id);
         return chapter.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ✅ API tăng view riêng (nếu không muốn tự động tăng trong GET)
+    @PostMapping("/{id}/view")
+    public ResponseEntity<Void> incrementChapterViews(@PathVariable String id) {
+        chapterService.incrementChapterViews(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // ✅ Lấy chapter theo Book ID
     @GetMapping("/book/{bookId}")
     public List<Chapter> getChaptersByBookId(@PathVariable String bookId) {
         return chapterService.getChaptersByBookId(bookId);
     }
 
+    // ✅ Tạo chapter
     @PostMapping
     public ResponseEntity<Chapter> createChapter(@RequestBody @Valid Chapter chapter) {
         try {
@@ -42,6 +52,7 @@ public class ChapterController {
         }
     }
 
+    // ✅ Cập nhật chapter
     @PutMapping("/{id}")
     public ResponseEntity<Chapter> updateChapter(@PathVariable String id, @RequestBody Chapter updatedChapter) {
         try {
@@ -51,36 +62,14 @@ public class ChapterController {
         }
     }
 
+    // ✅ Xóa chapter
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChapter(@PathVariable String id) {
         chapterService.deleteChapter(id);
         return ResponseEntity.noContent().build();
     }
 
-    public ChapterController(ChapterService chapterService) {
-        this.chapterService = chapterService;
-    }
-
-    // Get all latest chapters
-    @GetMapping("/latest")
-    public List<Chapter> getLatestChapters() {
-        return chapterService.getLatestChapters();
-    }
-
-    // Get only top 5 latest chapters
-    @GetMapping("/latest/top5")
-    public List<Chapter> getTop5LatestChapters() {
-        return chapterService.getTop5LatestChapters();
-    }
-
-    @PostMapping("/{id}/view")
-    public ResponseEntity<Void> incrementChapterViews(@PathVariable String id) {
-        chapterService.incrementChapterViews(id);
-        return ResponseEntity.ok().build();
-    }
-
-
-    // API lấy tổng lượt xem của một sách
+    // ✅ API lấy tổng lượt xem của một sách
     @GetMapping("/book/{bookId}/views")
     public ResponseEntity<Integer> getTotalViewsByBookId(@PathVariable String bookId) {
         int totalViews = chapterService.getTotalViewsByBookId(bookId);

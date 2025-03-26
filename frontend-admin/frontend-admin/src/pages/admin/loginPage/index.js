@@ -53,78 +53,50 @@ const LoginPage = () => {
 
       <div className="login-container">
         <div className="login-left">
-          <div className="login-left-content">
-            <Link to={ROUTERS.USER.HOME}>
-              <img
-                className="login-logo"
-                src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
-                alt="Logo"
-              />
-            </Link>
-            <h2 className="login-title">Welcome to BookStore</h2>
-            <p className="login-subtitle">Sign in to access the admin dashboard</p>
-            <div className="login-decoration">
-              <img 
-                src="https://img.freepik.com/free-vector/book-lovers-concept-illustration_114360-1107.jpg" 
-                alt="Books illustration" 
-                className="login-illustration" 
-              />
-            </div>
-          </div>
+          <Link to={ROUTERS.USER.HOME}>
+            <img
+              className="footer__about_logo"
+              src="/logo.png"
+              alt="Book Store Logo"
+            />
+          </Link>
+          <h2 className="login-title">Welcome to BookStore Admin!</h2>
+          <p className="login-subtitle">Please sign in to continue</p>
         </div>
 
         <div className="login-right">
-          <div className="login-header">
-            <h3>Admin Login</h3>
-            <p>Enter your credentials to continue</p>
-          </div>
-          
+          <h3 className="form-title">Sign In</h3>
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="login-form-group">
               <label htmlFor="email" className="login-label">
-                Email
+                Email:
               </label>
-              <div className="input-container">
-                <i className="input-icon">📧</i>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter email"
+                required
+              />
             </div>
-            
             <div className="login-form-group">
               <label htmlFor="password" className="login-label">
-                Password
+                Password:
               </label>
-              <div className="input-container">
-                <i className="input-icon">🔒</i>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+                required
+              />
             </div>
-            
             <button type="submit" className="login-button" disabled={loading}>
-              {loading ? (
-                <span className="loading-spinner">
-                  <span className="spinner"></span>
-                  <span>Logging in...</span>
-                </span>
-              ) : (
-                "Login"
-              )}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>

@@ -77,7 +77,7 @@ const HeaderAd = ({ ...props }) => {
     <div className="admin_sidebar" {...props}>
       <div className="header_logo">
         <img
-          src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png"
+          src="/logo.png"
           alt="Logo"
         />
       </div>

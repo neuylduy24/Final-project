@@ -14,38 +14,42 @@ public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;
 
-    @GetMapping
-    public List<Feedback> getAllFeedbacks() {
-        return feedbackService.getAllFeedbacks();
+    // ✅ Lấy danh sách comment theo bookId
+    @GetMapping("/comments/{bookId}")
+    public ResponseEntity<List<Feedback>> getComments(@PathVariable String bookId) {
+        return ResponseEntity.ok(feedbackService.getCommentsByBookId(bookId));
     }
 
-    @GetMapping("/book/{bookId}")
-    public List<Feedback> getFeedbacksByBookId(@PathVariable String bookId) {
-        return feedbackService.getFeedbacksByBookId(bookId);
+    // ✅ Lấy danh sách rating theo bookId
+    @GetMapping("/ratings/{bookId}")
+    public ResponseEntity<List<Feedback>> getRatings(@PathVariable String bookId) {
+        return ResponseEntity.ok(feedbackService.getRatingsByBookId(bookId));
     }
 
-    @GetMapping("/user/{userId}")
-    public List<Feedback> getFeedbacksByUserId(@PathVariable String userId) {
-        return feedbackService.getFeedbacksByUserId(userId);
+    // ✅ Lấy điểm trung bình rating theo bookId
+    @GetMapping("/average-rating/{bookId}")
+    public ResponseEntity<Double> getAverageRating(@PathVariable String bookId) {
+        return ResponseEntity.ok(feedbackService.getAverageRating(bookId));
     }
 
+    // ✅ Thêm mới feedback (comment hoặc rating)
     @PostMapping
-    public ResponseEntity<Feedback> addFeedback(@RequestBody Feedback feedback) {
-        try {
-            return ResponseEntity.ok(feedbackService.addFeedback(feedback));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback) {
+        return ResponseEntity.ok(feedbackService.createFeedback(feedback));
     }
 
+    // ✅ Cập nhật feedback
+    @PutMapping("/{id}")
+    public ResponseEntity<Feedback> updateFeedback(@PathVariable String id, @RequestBody Feedback updatedFeedback) {
+        return feedbackService.updateFeedback(id, updatedFeedback)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ✅ Xóa feedback
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFeedback(@PathVariable String id) {
         feedbackService.deleteFeedback(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/book/{bookId}/average-rating")
-    public ResponseEntity<Double> getAverageRating(@PathVariable String bookId) {
-        return ResponseEntity.ok(feedbackService.getAverageRating(bookId));
     }
 }

@@ -68,8 +68,9 @@ const bookService = {
                 book.chapters = [];
             }
             
-            // Tạo ID cho chapter mới
-            chapter.id = `chap${book.chapters.length + 1}`;
+            // Tạo ID ngẫu nhiên dạng chuỗi số cho chapter mới 
+            const randomNumericId = Math.floor(Math.random() * 100000000).toString();
+            chapter.id = randomNumericId;
             
             // Thêm chapter vào mảng chapters của book
             book.chapters.push(chapter);
@@ -176,4 +177,4 @@ const bookService = {
     }
 };
 
-export default bookService; 
+export default bookService;

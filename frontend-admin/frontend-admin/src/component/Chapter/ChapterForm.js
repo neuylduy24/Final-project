@@ -150,17 +150,6 @@ const ChapterForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
             toast.error("Please enter chapter content");
             return;
         }
-
-        // Validate images based on upload type
-        if (uploadType === 'url' && (!form.images || form.images.length === 0)) {
-            toast.error("Please enter at least one image URL");
-            return;
-        }
-
-        if (uploadType === 'file' && selectedFiles.length === 0) {
-            toast.error("Please select at least one image file");
-            return;
-        }
         
         try {
             // Ensure chapterNumber is an integer

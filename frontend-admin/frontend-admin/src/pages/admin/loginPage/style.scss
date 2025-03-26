@@ -17,7 +17,13 @@
 
 
 .login {
+<<<<<<< Updated upstream:frontend-admin/src/pages/admin/loginPage/style.scss
     min-height: 85vh;
+=======
+    height: 100vh; /* Fixed height to viewport */
+    width: 90%;
+    overflow: hidden; /* Prevent scrolling */
+>>>>>>> Stashed changes:frontend-admin/frontend-admin/src/pages/admin/loginPage/style.scss
     display: flex;
     align-items: center;
     justify-content: center;

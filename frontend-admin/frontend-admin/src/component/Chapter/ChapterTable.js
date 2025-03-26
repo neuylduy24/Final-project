@@ -26,14 +26,17 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
             let filtered = chapters;
             
             if (selectedBookId && selectedBookId !== "all") {
-                filtered = chapters.filter(chapter => chapter.bookId === selectedBookId);
+                // Compare as strings
+                filtered = chapters.filter(chapter => 
+                    chapter.bookId.toString() === selectedBookId.toString()
+                );
             }
             
             // Sort filtered chapters
             const sorted = [...filtered].sort((a, b) => {
-                // Compare by bookId first
+                // Compare by bookId first as strings
                 if (a.bookId !== b.bookId) {
-                    return a.bookId.localeCompare(b.bookId);
+                    return a.bookId.toString().localeCompare(b.bookId.toString());
                 }
                 // If same bookId, compare by chapterNumber
                 return parseInt(a.chapterNumber) - parseInt(b.chapterNumber);
@@ -112,8 +115,8 @@ const ChapterTable = ({ chapters, handleEdit, handleDelete, setShowForm, selecte
     };
 
     const handleDeleteChapter = (bookId, chapterId) => {
-        // Call delete chapter function from parent component
-        handleDelete(bookId, chapterId);
+        // Call delete chapter function from parent component with string IDs
+        handleDelete(bookId.toString(), chapterId.toString());
     };
 
     // Calculate pagination

@@ -9,6 +9,7 @@ import LoginPage from "./pages/user/loginForm/login";
 import RegisterPage from "./pages/user/loginForm/register";
 import ChapterDetailPage from "component/ChapterDetail/ChapterDetailPage";
 import ForgotPasswordPage from "pages/user/loginForm/forgotPassword";
+import FollowedBooksPage from "pages/user/FollowedBooksPage/FollowedBooks"; // Trang danh sách truyện theo dõi
 
 const RouterCustom = () => {
     const location = useLocation();
@@ -20,10 +21,12 @@ const RouterCustom = () => {
 
     return (
         <Routes>
+            {/* Các trang đăng nhập, đăng ký */}
             <Route path={ROUTERS.USER.LOGINPAGE} element={<LoginPage />} />
             <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
             <Route path={ROUTERS.USER.FORGOTPASSWORD} element={<ForgotPasswordPage />} />
 
+            {/* Gói trang user trong MasterLayout để giữ Header và Footer cố định */}
             <Route
                 path="*"
                 element={
@@ -32,6 +35,7 @@ const RouterCustom = () => {
                             <Route path={ROUTERS.USER.HOME} element={<HomePage />} />
                             <Route path={ROUTERS.USER.BOOKDETAIL} element={<BookDetailProductPage />} />
                             <Route path={ROUTERS.USER.CHAPTERDETAIL} element={<ChapterDetailPage />} />
+                            <Route path={ROUTERS.USER.BOOKFOLLOW} element={<FollowedBooksPage />} /> {/* Trang danh sách truyện theo dõi */}
                         </Routes>
                     </MasterLayout>
                 }

@@ -31,6 +31,21 @@ public class JwtUtil {
                 .compact();
     }
 
+    public static String extractEmail(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("Token đã hết hạn!");
+        } catch (SignatureException e) {
+            throw new RuntimeException("Chữ ký JWT không hợp lệ!");
+        } catch (Exception e) {
+            throw new RuntimeException("Token không hợp lệ!");
+        }
+    }
 
     public static boolean verifyToken(String token) throws Exception {
         try {

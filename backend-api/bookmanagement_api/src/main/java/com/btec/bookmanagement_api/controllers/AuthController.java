@@ -172,7 +172,55 @@ public class AuthController {
         }
     }
 
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @RequestBody Map<String, String> request,
+            @RequestHeader("Authorization") String token) {
 
+        Map<String, String> response = new HashMap<>();
+
+        try {
+            String email = JwtUtil.extractEmail(token.replace("Bearer ", ""));
+            if (email == null) {
+                response.put("message", "❌ Token không hợp lệ!");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            User user = userService.getUserByEmail(email);
+            if (user == null) {
+                response.put("message", "❌ Người dùng không tồn tại!");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            String currentPassword = request.get("currentPassword");
+            String newPassword = request.get("newPassword");
+
+            if (currentPassword == null || newPassword == null) {
+                response.put("message", "❌ Vui lòng nhập mật khẩu hiện tại và mật khẩu mới!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                response.put("message", "❌ Mật khẩu hiện tại không đúng!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            if (passwordEncoder.matches(newPassword, user.getPassword())) {
+                response.put("message", "❌ Mật khẩu mới không được trùng với mật khẩu cũ!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+
+            response.put("message", "✅ Đổi mật khẩu thành công!");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "❌ Lỗi hệ thống: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
 
 

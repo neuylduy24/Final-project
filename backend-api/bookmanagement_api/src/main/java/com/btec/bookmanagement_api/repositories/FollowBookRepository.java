@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface FollowBookRepository extends MongoRepository<FollowBook, String> {
+    List<FollowBook> findAll();
     List<FollowBook> findByUserId(String userId);
     Optional<FollowBook> findByUserIdAndBookId(String userId, String bookId);
     void deleteByUserIdAndBookId(String userId, String bookId);

@@ -26,6 +26,9 @@ public class FollowBookService {
         this.bookRepository = bookRepository;
         this.chapterRepository = chapterRepository;
     }
+    public List<FollowBook> getAllFollowBooks() {
+        return followBookRepository.findAll();
+    }
 
     public List<FollowBook> getFollowBooksByUserId(String userId) {
         return followBookRepository.findByUserId(userId);

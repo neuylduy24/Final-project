@@ -14,14 +14,17 @@ public class FollowBookController {
     @Autowired
     private FollowBookService followBookService;
 
-    @GetMapping("/user/{userId}")
-    public List<FollowBook> getFollowBooksByUserId(@PathVariable String userId) {
-        return followBookService.getFollowBooksByUserId(userId);
+    // Thay đổi từ userId sang email trong các endpoint
+    @GetMapping("/user/{email}")
+    public List<FollowBook> getFollowBooksByEmail(@PathVariable String email) {
+        return followBookService.getFollowBooksByEmail(email);
     }
 
-    @GetMapping("/user/{userId}/book/{bookId}")
-    public ResponseEntity<FollowBook> getFollowBookByUserAndBook(@PathVariable String userId, @PathVariable String bookId) {
-        return followBookService.getFollowBookByUserAndBook(userId, bookId)
+    @GetMapping("/user/{email}/book/{bookId}")
+    public ResponseEntity<FollowBook> getFollowBookByEmailAndBook(
+            @PathVariable String email,
+            @PathVariable String bookId) {
+        return followBookService.getFollowBookByEmailAndBook(email, bookId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -41,9 +44,12 @@ public class FollowBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/user/{userId}/book/{bookId}")
-    public ResponseEntity<Void> deleteFollowBookByUserAndBook(@PathVariable String userId, @PathVariable String bookId) {
-        followBookService.deleteFollowBookByUserAndBook(userId, bookId);
+    // Thay đổi từ userId sang email
+    @DeleteMapping("/user/{email}/book/{bookId}")
+    public ResponseEntity<Void> deleteFollowBookByEmailAndBook(
+            @PathVariable String email,
+            @PathVariable String bookId) {
+        followBookService.deleteFollowBookByEmailAndBook(email, bookId);
         return ResponseEntity.noContent().build();
     }
 }

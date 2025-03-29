@@ -1,6 +1,7 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Category;
+import com.btec.bookmanagement_api.repositories.CategoryRepository;
 import com.btec.bookmanagement_api.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @GetMapping
     public List<Category> getAllCategories() {
@@ -50,7 +53,11 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
-
+    @DeleteMapping("/by-name/{name}")
+    public ResponseEntity<?> deleteCategoryByName(@PathVariable String name) {
+        categoryRepository.deleteByName(name);
+        return ResponseEntity.ok("Category deleted successfully");
+    }
 //    @DeleteMapping("/{name}")
 //    public ResponseEntity<Void> deleteCategory(@PathVariable String name) {
 //        categoryService.deleteCategory(name);

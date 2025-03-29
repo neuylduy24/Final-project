@@ -16,8 +16,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class Category {
     @Id
-    @NotNull(message = "Id is required")
-    @NotBlank(message = "Id cannot be blank")
     private String id;
 
     @NotBlank(message = "Category name is required")

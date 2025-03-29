@@ -1,11 +1,13 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Feedback;
+import com.btec.bookmanagement_api.security.JwtUtil;
 import com.btec.bookmanagement_api.services.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -13,6 +15,8 @@ import java.util.List;
 public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // ✅ Lấy danh sách comment theo bookId
     @GetMapping("/comments/{bookId}")
@@ -34,9 +38,21 @@ public class FeedbackController {
 
     // ✅ Thêm mới feedback (comment hoặc rating)
     @PostMapping
-    public ResponseEntity<Feedback> createFeedback(@RequestBody Feedback feedback) {
-        return ResponseEntity.ok(feedbackService.createFeedback(feedback));
+    public ResponseEntity<Feedback> createFeedback(
+            @RequestBody Feedback feedback,
+            @RequestHeader("Authorization") String token) {
+
+        // Loại bỏ "Bearer " trước khi xử lý token
+        String jwt = token.replace("Bearer ", "");
+
+        String userId = jwtUtil.extractEmail(jwt); // Lấy userId (ở đây là email)
+        feedback.setUserId(userId);
+        feedback.setCreatedAt(LocalDateTime.now()); // Gán thời gian tạo
+
+        Feedback savedFeedback = feedbackService.createFeedback(feedback);
+        return ResponseEntity.ok(savedFeedback);
     }
+
 
     // ✅ Cập nhật feedback
     @PutMapping("/{id}")

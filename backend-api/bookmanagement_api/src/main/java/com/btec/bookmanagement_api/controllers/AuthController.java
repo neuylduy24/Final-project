@@ -82,10 +82,10 @@ public class AuthController {
                     .body(Map.of("message", "Invalid email or password"));
         }
 
-        if (!user.isVerified()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "Account not verified. Please check your email."));
-        }
+//        if (!user.isVerified()) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body(Map.of("message", "Account not verified. Please check your email."));
+//        }
 
         String roles = String.join(",", user.getRoles());
         String token = JwtUtil.generateToken(user.getEmail(), roles);

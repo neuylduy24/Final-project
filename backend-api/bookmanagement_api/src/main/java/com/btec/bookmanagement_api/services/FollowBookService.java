@@ -19,6 +19,9 @@ public class FollowBookService {
     public List<FollowBook> getFollowBooksByEmail(String email) {
         return followBookRepository.findByEmail(email);
     }
+    public List<FollowBook> getAllFollowBooks() {
+        return followBookRepository.findAll();
+    }
 
     public Optional<FollowBook> getFollowBookByEmailAndBook(String email, String bookId) {
         return followBookRepository.findByEmailAndBookId(email, bookId);

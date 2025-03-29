@@ -11,31 +11,25 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const savedEmail = localStorage.getItem("email") || "";
-  const savedPassword = localStorage.getItem("password") || "";
   const savedRememberMe = localStorage.getItem("rememberMe") === "true";
 
   const [formData, setFormData] = useState({
     email: savedRememberMe ? savedEmail : "",
-    password: savedRememberMe ? savedPassword : "",
+    password: "",
   });
 
   const [rememberMe, setRememberMe] = useState(savedRememberMe);
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (rememberMe) {
-      setFormData({ email: savedEmail, password: savedPassword });
+      setFormData((prev) => ({ ...prev, email: savedEmail }));
     }
-  }, [rememberMe, savedEmail, savedPassword]);
+  }, [rememberMe, savedEmail]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRememberMe = (e) => {
-    setRememberMe(e.target.checked);
   };
 
   const toggleShowPassword = () => {
@@ -44,8 +38,13 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
     setLoading(true);
+
+    if (!formData.email.trim() || !formData.password.trim()) {
+      toast.error("Vui lòng nhập email và mật khẩu!");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -54,35 +53,35 @@ const LoginPage = () => {
       );
 
       if (response.status === 200 && response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("email", formData.email);
+        const { token, email } = response.data; // Nhận email từ response thay vì userId
+        const expiresAt = new Date().getTime() + 10 * 24 * 60 * 60 * 1000; // 10 ngày
+
+        // Lưu thông tin đăng nhập (chỉ lưu email)
+        localStorage.setItem("token", token);
+        localStorage.setItem("email", email); // Lưu email thay vì userId
+        localStorage.setItem("expiresAt", expiresAt.toString());
 
         if (rememberMe) {
           localStorage.setItem("email", formData.email);
-          localStorage.setItem("password", formData.password);
           localStorage.setItem("rememberMe", "true");
         } else {
           localStorage.removeItem("email");
-          localStorage.removeItem("password");
           localStorage.removeItem("rememberMe");
         }
 
-        toast.success("Login successful!");
+        toast.success("Đăng nhập thành công!");
         setTimeout(() => navigate(ROUTERS.USER.HOME), 1500);
       } else {
-        toast.error("Invalid email or password.");
+        toast.error("Email hoặc mật khẩu không đúng.");
       }
     } catch (err) {
-      console.error("Login error:", err);
-
+      console.error("Lỗi đăng nhập:", err);
       if (!err.response) {
-        toast.error("Cannot connect to the server. Please check your network.");
+        toast.error("Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng!");
       } else if (err.response.status === 401) {
-        toast.error("Incorrect email or password.");
+        toast.error("Email hoặc mật khẩu không chính xác.");
       } else {
-        toast.error(
-          err.response?.data?.message || "An error occurred. Please try again."
-        );
+        toast.error(err.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại!");
       }
     } finally {
       setLoading(false);
@@ -142,7 +141,7 @@ const LoginPage = () => {
                   type="checkbox"
                   id="rememberMe"
                   checked={rememberMe}
-                  onChange={handleRememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                 />
                 <label htmlFor="rememberMe">Remember me</label>
               </div>
@@ -153,10 +152,6 @@ const LoginPage = () => {
                 Forgot password?
               </Link>
             </div>
-
-            {message.text && (
-              <p className={`message ${message.type}`}>{message.text}</p>
-            )}
 
             <button
               className="register-button"

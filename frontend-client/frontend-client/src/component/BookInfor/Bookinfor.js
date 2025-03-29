@@ -5,27 +5,22 @@ import Quantity from "component/Quantity/quantity";
 import "./bookinfor.scss";
 
 const BookInfo = ({ book }) => {
+  if (!book || !book.id) {
+    console.error("Lỗi: Không tìm thấy thông tin sách!", book);
+    return <p>Không tìm thấy thông tin sách.</p>;
+  }
+
   return (
     <div className="col-lg-9 col-lg-6 book-info">
       <h2 className="book-title">{book.title}</h2>
       <p className="book-description">{book.description || "Not yet description"}</p>
 
       <div className="book-meta">
-        <p>
-          <FaUser /> <b>Author:</b> <span>{book.author}</span>
-        </p>
-        <p>
-          <FaBookOpen /> <b>Status:</b> <span>{book.status || "Updating"}</span>
-        </p>
-        <p>
-          <FaEye /> <b>View:</b> <span>{book.views || 0}</span>
-        </p>
-        <p>
-          <b>Follow:</b> <span>{book.followers || 0}</span>
-        </p>
-        <p>
-          <b>Vote:</b> <span>{book.rating}/5 - {book.voteCount} Voted</span>
-        </p>
+        <p><FaUser /> <b>Author:</b> <span>{book.author}</span></p>
+        <p><FaBookOpen /> <b>Status:</b> <span>{book.status || "Updating"}</span></p>
+        <p><FaEye /> <b>View:</b> <span>{book.views || 0}</span></p>
+        <p><b>Follow:</b> <span>{book.followers || 0}</span></p>
+        <p><b>Vote:</b> <span>{book.rating}/5 - {book.voteCount} Voted</span></p>
       </div>
 
       <div className="book-tags">
@@ -40,7 +35,8 @@ const BookInfo = ({ book }) => {
         )}
       </div>
       
-      <Quantity />
+      {/* ✅ TRUYỀN ĐÚNG bookId */}
+      <Quantity bookId={book.id} />
     </div>
   );
 };

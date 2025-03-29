@@ -66,7 +66,7 @@ const Header = () => {
     },
     {
       name: "Follow",
-      path: ROUTERS.USER.BOOKHISTORY,
+      path: ROUTERS.USER.BOOKFOLLOW,
     },
     {
       name: "History",
@@ -260,14 +260,16 @@ const Header = () => {
                           <li>
                             <FaSignOutAlt />{" "}
                             <Link
-                              onClick={() => {
-                                localStorage.removeItem("token");
-                                setIsLoggedIn(false);
-                                setShowMenu(false);
-                              }}
-                            >
-                              Đăng xuất
-                            </Link>
+  onClick={() => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setShowMenu(false);
+    window.location.href = ROUTERS.USER.LOGINPAGE; // Chuyển hướng về trang đăng nhập
+  }}
+>
+  Đăng xuất
+</Link>
+
                           </li>
                         </ul>
                       )}

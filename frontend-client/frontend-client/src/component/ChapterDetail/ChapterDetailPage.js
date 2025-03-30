@@ -11,59 +11,81 @@ const ChapterDetail = () => {
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
+  const [chapterList, setChapterList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch book data
   const fetchBookData = useCallback(async () => {
     try {
       const response = await axios.get(
         `https://api.it-ebook.io.vn/api/books/${id}`
       );
-      const bookData = response.data;
-
-      if (!bookData || !bookData.chapters || bookData.chapters.length === 0) {
-        console.error("There are no chapters in this book..");
-        setLoading(false);
-        return;
-      }
-
-      setBook(bookData);
-
-      const foundIndex = bookData.chapters.findIndex(
-        (ch) => ch.id === chapterId
-      );
-      if (foundIndex === -1) {
-        console.warn("Chapter not found, navigate to first chapter.");
-        navigate(
-          ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(
-            ":chapterId",
-            bookData.chapters[0].id
-          ),
-          {
-            replace: true,
-          }
-        );
-        return;
-      }
-
-      setCurrentChapter(bookData.chapters[foundIndex]);
+      setBook(response.data);
     } catch (error) {
       console.error("Error fetching book data:", error);
+    }
+  }, [id]);
+
+  // Fetch chapters list
+  const fetchChapters = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/chapters?bookId=${id}`
+      );
+      console.log("Fetched chapters for book ID:", id, response.data);
+      // Filter chapters to ensure they belong to the current book
+      const filteredChapters = response.data.filter(chapter => chapter.bookId === id);
+      setChapterList(filteredChapters);
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+    }
+  }, [id]);
+
+  // Fetch specific chapter content
+  const fetchChapterContent = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/chapters/${chapterId}`
+      );
+      console.log("Chapter content data:", response.data);
+      setCurrentChapter(response.data);
+    } catch (error) {
+      console.error("Error fetching chapter content:", error);
     } finally {
       setLoading(false);
     }
-  }, [id, chapterId, navigate]);
+  }, [chapterId]);
 
   useEffect(() => {
     fetchBookData();
-  }, [fetchBookData]);
+    fetchChapters();
+    fetchChapterContent();
+  }, [fetchBookData, fetchChapters, fetchChapterContent]);
+
+  // Find previous and next chapter IDs
+  const findAdjacentChapters = useCallback(() => {
+    if (!chapterList || chapterList.length === 0) return { prev: null, next: null };
+    
+    const currentIndex = chapterList.findIndex(ch => ch.id === chapterId);
+    if (currentIndex === -1) return { prev: null, next: null };
+    
+    return {
+      prev: currentIndex > 0 ? chapterList[currentIndex - 1].id : null,
+      next: currentIndex < chapterList.length - 1 ? chapterList[currentIndex + 1].id : null
+    };
+  }, [chapterId, chapterList]);
+
+  const { prev, next } = findAdjacentChapters();
 
   if (loading) return <p>Loading chapter content...</p>;
-  if (!currentChapter) return <p>Chapter not found!!!</p>;
+  if (!currentChapter) return <p>Chapter not found!</p>;
 
   return (
     <div className="chapter-detail">
       {book && <h1>{book.title}</h1>}
       <h2>{currentChapter.title}</h2>
+      
       <div className="chapter-dropdown">
         <select
           className="chapter-select"
@@ -77,16 +99,54 @@ const ChapterDetail = () => {
             )
           }
         >
-          {book?.chapters?.map((chapter) => (
+          {chapterList?.map((chapter) => (
             <option key={chapter.id} value={chapter.id}>
               {chapter.title}
             </option>
           ))}
         </select>
       </div>
-      <div className="chapter-content">{currentChapter.content}</div>
+      
+      {/* Display chapter images if available */}
+      {currentChapter.images && currentChapter.images.length > 0 && (
+        <div className="chapter-images">
+          {currentChapter.images.map((imageUrl, index) => (
+            <img 
+              key={index} 
+              src={imageUrl} 
+              alt={`${currentChapter.title} - Image ${index + 1}`}
+              className="chapter-image"
+            />
+          ))}
+        </div>
+      )}
+      
+      {/* Display chapter content */}
+      <div className="chapter-content" dangerouslySetInnerHTML={{ __html: currentChapter.content }}></div>
+      
+      <div className="chapter-navigation">
+        <button 
+          className="nav-button prev-button" 
+          disabled={!prev}
+          onClick={() => prev && navigate(
+            ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(":chapterId", prev)
+          )}
+        >
+          Previous Chapter
+        </button>
+        
+        <button 
+          className="nav-button next-button" 
+          disabled={!next}
+          onClick={() => next && navigate(
+            ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(":chapterId", next)
+          )}
+        >
+          Next Chapter
+        </button>
+      </div>
+      
       <Comment />
-      <NavigationChapter />
     </div>
   );
 };

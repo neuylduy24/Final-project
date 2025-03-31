@@ -64,7 +64,7 @@ const RegisterPage = () => {
       );
       if (response.status === 201) {
         toast.success("Registration successful! Redirecting...");
-        setTimeout(() => navigate(ROUTERS.USER.LOGINPAGE), 2000);
+        setTimeout(() => navigate(ROUTERS.USER.LOGINPAGE), 1500);
       }
     } catch (err) {
       toast.error(
@@ -78,7 +78,7 @@ const RegisterPage = () => {
   return (
     <div className="register">
       <div className="register-container">
-        <ToastContainer position="top-right" autoClose={2000} />
+        <ToastContainer position="top-right" autoClose={1500} />
         <div className="register-left">
           <img src={logologin} alt="Register Illustration" />
         </div>

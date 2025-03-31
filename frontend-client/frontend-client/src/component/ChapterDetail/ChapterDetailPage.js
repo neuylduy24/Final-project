@@ -12,7 +12,9 @@ const ChapterDetail = () => {
   const [book, setBook] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [chapterList, setChapterList] = useState([]);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
   const fetchBookData = useCallback(async () => {
     try {
@@ -25,29 +27,26 @@ const ChapterDetail = () => {
     }
   }, [id]);
 
-  // Fetch chapters list
   const fetchChapters = useCallback(async () => {
     try {
       const response = await axios.get(
         `https://api.it-ebook.io.vn/api/chapters?bookId=${id}`
       );
-      console.log("Fetched chapters for book ID:", id, response.data);
-      // Filter chapters to ensure they belong to the current book
-      const filteredChapters = response.data.filter(chapter => chapter.bookId === id);
+      const filteredChapters = response.data.filter(
+        (chapter) => chapter.bookId === id
+      );
       setChapterList(filteredChapters);
     } catch (error) {
       console.error("Error fetching chapters:", error);
     }
   }, [id]);
 
-  // Fetch specific chapter content
   const fetchChapterContent = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(
         `https://api.it-ebook.io.vn/api/chapters/${chapterId}`
       );
-      console.log("Chapter content data:", response.data);
       setCurrentChapter(response.data);
     } catch (error) {
       console.error("Error fetching chapter content:", error);
@@ -56,15 +55,39 @@ const ChapterDetail = () => {
     }
   }, [chapterId]);
 
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/feedbacks/comments/${chapterId}`
+      );
+      setComments(response.data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  }, [chapterId]);
+
   useEffect(() => {
     fetchBookData();
     fetchChapters();
     fetchChapterContent();
-  }, [fetchBookData, fetchChapters, fetchChapterContent]);
+    fetchComments();
+  }, [fetchBookData, fetchChapters, fetchChapterContent, fetchComments]);
 
-  useEffect(() => {
-    fetchBookData();
-  }, [fetchBookData]);
+  const handleCommentAdded = (newComment) => {
+    setComments((prevComments) => [newComment, ...prevComments]);
+  };
+
+  const emailColors = [
+    "#ff5733",
+    "#33ff57",
+    "#3357ff",
+    "#ff33a1",
+    "#f39c12",
+    "#18a6be",
+    "#24e948",
+  ];
+  const getRandomColor = () =>
+    emailColors[Math.floor(Math.random() * emailColors.length)];
 
   if (!currentChapter) return <p>Chapter not found!!!</p>;
 
@@ -98,7 +121,43 @@ const ChapterDetail = () => {
         ))}
       </div>
       <NavigationChapter chapterList={chapterList} />
-      <Comment />
+      <Comment
+        bookId={chapterId}
+        token={token}
+        onCommentAdded={handleCommentAdded}
+      />
+
+      {/* ✅ Hiển thị danh sách comments */}
+      <div className="comment-section">
+        <h3 className="comment-title">All Comments</h3>
+        {comments.length === 0 ? (
+          <p className="no-comments">No comments yet.</p>
+        ) : (
+          <ul className="comment-list">
+            {comments.map((comment) => (
+              <li key={comment.id} className="comment-item">
+                <div className="comment-header">
+                  <h3 className="email" style={{ color: getRandomColor() }}>
+                    {comment.userId}
+                  </h3>
+                  <span className="chapter-title">{currentChapter.title}</span>
+                </div>
+                <p className="comment-content">{comment.content}</p>
+                <small className="comment-date">
+                  {new Date(comment.createdAt).toLocaleString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </small>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

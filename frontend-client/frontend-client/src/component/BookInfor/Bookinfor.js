@@ -1,32 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaEye, FaStar, FaRegStar } from "react-icons/fa6";
 import { FaUser, FaBookOpen } from "react-icons/fa";
-import Quantity from "component/Quantity/quantity";
+import ButtonFollow from "component/ButtonFollow/buttonFollow";
+import chapterService from "service/chapterService";
 import "./bookinfor.scss";
 
 const BookInfo = ({ book }) => {
-  if (!book || !book.id) {
-    console.error("Lỗi: Không tìm thấy thông tin sách!", book);
-    return <p>Không tìm thấy thông tin sách.</p>;
-  }
+  const [totalViews, setTotalViews] = useState(book.views || 0);
+
+  useEffect(() => {
+    if (!book.views) {
+      chapterService
+        .getTotalViewsByBookId(book.id)
+        .then((total) => setTotalViews(total))
+        .catch((error) => console.error("Error fetching total views:", error));
+    }
+  }, [book.id, book.views]);
 
   return (
-    <div className="col-lg-9 col-lg-6 book-info">
+    <div className="book-info">
       <h2 className="book-title">{book.title}</h2>
-      <p className="book-description">{book.description || "Not yet description"}</p>
+      <p className="book-description">
+        {book.description || "Not yet description"}
+      </p>
 
       <div className="book-meta">
-        <p><FaUser /> <b>Author:</b> <span>{book.author}</span></p>
-        <p><FaBookOpen /> <b>Status:</b> <span>{book.status || "Updating"}</span></p>
-        <p><FaEye /> <b>View:</b> <span>{book.views || 0}</span></p>
-        <p><b>Follow:</b> <span>{book.followers || 0}</span></p>
-        <p><b>Vote:</b> <span>{book.rating}/5 - {book.voteCount} Voted</span></p>
+        <p>
+          <FaUser /> <b>Author:</b> <span>{book.author}</span>
+        </p>
+        <p>
+          <FaBookOpen /> <b>Status:</b> <span>{book.status || "Updating"}</span>
+        </p>
+        <p>
+          <FaEye /> <b>View:</b> <span>{totalViews}</span>
+        </p>
+          <p>
+            <FaStar /> <b>Rating:</b>{" "}
+            <span>{book.rating ? book.rating.toFixed(1) : "0.0"}/5</span>
+          </p>
       </div>
 
       <div className="book-tags">
-        {book.categories?.map((tag, index) => (
-          <span key={index}>{tag.name}</span>
-        ))}
+        {book.categories?.length ? (
+          book.categories.map((tag, index) => (
+            <span key={index}>{tag.name}</span>
+          ))
+        ) : (
+          <span className="no-tags">No Categories</span>
+        )}
       </div>
 
       <div className="book-rating">
@@ -34,9 +55,7 @@ const BookInfo = ({ book }) => {
           i < book.rating ? <FaStar key={i} /> : <FaRegStar key={i} />
         )}
       </div>
-      
-      {/* ✅ TRUYỀN ĐÚNG bookId */}
-      <Quantity bookId={book.id} />
+      <ButtonFollow bookId={book.id} />
     </div>
   );
 };

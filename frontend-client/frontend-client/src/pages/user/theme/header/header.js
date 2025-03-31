@@ -7,16 +7,16 @@ import {
   FaCircleChevronUp,
   FaCircleChevronDown,
   FaCommentDots,
-  FaBookmark,
 } from "react-icons/fa6";
 import { SiFacebook } from "react-icons/si";
 import { MdEmail } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { ROUTERS } from "utils/path";
-import { FaHistory, FaSignOutAlt } from "react-icons/fa";
-import SearchBar from "component/SearchBar/searchBar";
+import SearchBar from "../../../../component/Header/SearchBar/searchBar";
 import logo from "../../../../assets/user/image/hero/logo.png";
 import axios from "axios";
+import UserMenu from "../../../../component/Header/userMenu/userMenuDropdown";
+import MenuItem from "component/Header/MenuItem/menuItem";
 
 const Header = () => {
   const location = useLocation();
@@ -24,7 +24,6 @@ const Header = () => {
   const [isHome, setIsHome] = useState(location.pathname.length <= 1);
   const [isShowCategories, setShowCategories] = useState(isHome);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [showMenu, setShowMenu] = useState(false);
 
   const [menu, setMenu] = useState([
     {
@@ -48,19 +47,19 @@ const Header = () => {
       child: [
         {
           name: "Top day",
-          path: "Top day",
+          path: "#",
         },
         {
           name: "Top week",
-          path: "Top week",
+          path: "#",
         },
         {
           name: "Top month",
-          path: "Top month",
+          path: "#",
         },
         {
           name: "Update new",
-          path: "Update new",
+          path: "#",
         },
       ],
     },
@@ -112,7 +111,6 @@ const Header = () => {
 
     window.addEventListener("storage", checkLoginStatus);
 
-    // Kiểm tra trạng thái đăng nhập mỗi khi location thay đổi
     checkLoginStatus();
 
     return () => {
@@ -139,7 +137,6 @@ const Header = () => {
         <div className="header_logo">
           <Link to={ROUTERS.USER.HOME}>
             <img
-              width="250px"
               src={logo}
               alt="Logo"
             />
@@ -235,51 +232,13 @@ const Header = () => {
                         <FaInstagram />
                       </Link>
                     </li>
-                    <li className="user-menu">
-                      <button onClick={() => setShowMenu(!showMenu)}>
-                        <FaUser />
-                      </button>
-                      {showMenu && (
-                        <ul className="dropdown-menu">
-                          <li>
-                            <FaUser />{" "}
-                            <Link to={ROUTERS.USER.PROFILE}>Trang cá nhân</Link>
-                          </li>
-                          <li>
-                            <FaBookmark />{" "}
-                            <Link to={ROUTERS.USER.BOOKFOLLOW}>
-                              Danh sách theo dõi
-                            </Link>
-                          </li>
-                          <li>
-                            <FaHistory />{" "}
-                            <Link to={ROUTERS.USER.BOOKHISTORY}>
-                              Lịch sử đọc truyện
-                            </Link>
-                          </li>
-                          <li>
-                            <FaSignOutAlt />{" "}
-                            <Link
-  onClick={() => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    setShowMenu(false);
-    window.location.href = ROUTERS.USER.LOGINPAGE; // Chuyển hướng về trang đăng nhập
-  }}
->
-  Đăng xuất
-</Link>
-
-                          </li>
-                        </ul>
-                      )}
-                    </li>
+                    <UserMenu onLogout={() => setIsLoggedIn(false)} />
                   </>
                 ) : (
                   <li className="user-auth">
-                    <Link to={ROUTERS.USER.REGISTER}>Đăng Ký</Link>
+                    <Link to={ROUTERS.USER.REGISTER}>Sign Up</Link>
                     <span>|</span>
-                    <Link to={ROUTERS.USER.LOGINPAGE}>Đăng Nhập</Link>
+                    <Link to={ROUTERS.USER.LOGINPAGE}>Sign In</Link>
                   </li>
                 )}
               </ul>
@@ -294,22 +253,7 @@ const Header = () => {
           </div>
           <div className="col-lg-6">
             <nav className="header_menu">
-              <ul>
-                {menu.map((menuItem, menuKey) => (
-                  <li key={menuKey} className={menuKey === 0 ? "active" : ""}>
-                    <Link to={menuItem?.path}>{menuItem?.name}</Link>
-                    {menuItem.child && (
-                      <ul className="header_menu_dropdown">
-                        {menuItem.child.map((childItem, childKey) => (
-                          <li key={`${menuKey}-${childKey}`}>
-                            <Link to={childItem.path}>{childItem.name}</Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <MenuItem menu={menu} />
             </nav>
           </div>
           <div className="col-lg-3">

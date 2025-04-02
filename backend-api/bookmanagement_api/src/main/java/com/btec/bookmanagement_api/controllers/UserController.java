@@ -62,14 +62,7 @@ public class UserController {
     }
 
 
-    @PutMapping("/{userId}/bookmark-book/{bookId}")
-    public User bookmarkBook(@PathVariable String userId, @PathVariable String bookId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        if (!user.getBookmarkedBooks().contains(bookId)) {
-            user.getBookmarkedBooks().add(bookId);
-        }
-        return userRepository.save(user);
-    }
+
 
     @PutMapping("/{userId}/reading-history")
     public User updateReadingHistory(@PathVariable String userId, @RequestBody ReadingHistory history) {
@@ -95,18 +88,8 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{userId}/remove-bookmark/{bookId}")
-    public User removeBookmarkedBook(@PathVariable String userId, @PathVariable String bookId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        user.getBookmarkedBooks().remove(bookId);
-        return userRepository.save(user);
-    }
 
-    @GetMapping("/{userId}/bookmarked-books")
-    public List<String> getBookmarkedBooks(@PathVariable String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getBookmarkedBooks();
-    }
+
 
     @GetMapping("/validate-token")
     public ResponseEntity<String> validateToken(@RequestParam String token) {

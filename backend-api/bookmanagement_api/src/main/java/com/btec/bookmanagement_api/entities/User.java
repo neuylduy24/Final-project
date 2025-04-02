@@ -42,8 +42,6 @@ public class User {
 
     private List<String> searchHistory;
 
-    private List<String> bookmarkedBooks;
-
     private List<ReadingHistory> readingHistory;
 
     private LocalDateTime createdAt = LocalDateTime.now();

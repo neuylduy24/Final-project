@@ -10,7 +10,10 @@ import java.util.Optional;
 @Repository
 public interface FollowBookRepository extends MongoRepository<FollowBook, String> {
 
+
+
     // Lấy danh sách theo dõi theo email người dùng
+
     List<FollowBook> findByEmail(String email);
 
     // Tìm theo email và bookId

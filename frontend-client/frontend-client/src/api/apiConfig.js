@@ -1,35 +1,60 @@
-// src/api/apiConfig.js
-const API_BASE_URL = "http://localhost:8080/api"; // ⚡ Đổi khi deploy lên server production
+import axios from "axios";
 
-export default API_BASE_URL;
+export const API_BASE_URL = "https://api.it-ebook.io.vn"; // 🔹 URL API chính xác
+
+
+export default API_BASE_URL; // ✅ Export mặc định
+
 
 export const API_ENDPOINTS = {
-  GET_USER_READING_HISTORY: '/reading-history', // 🛠️ Đổi thành POST để gửi email trong body
-  UPDATE_READING_PROGRESS: '/reading-history/update', // 🔄 POST để cập nhật tiến trình đọc
-  GET_BOOKS: '/books',
+  // Nếu dùng để GET lịch sử đọc theo email, có thể giữ nguyên:
+  GET_USER_READING_HISTORY: "/api/reading-history",
+  
+  // Endpoint dùng để lưu lịch sử đọc, phải đúng với backend
+  UPDATE_READING_PROGRESS: "/api/reading-history/start",
+
   GET_BOOK_BY_ID: (bookId) => `/books/${bookId}`,
-  GET_BOOKS_BY_AUTHOR: (author) => `/books/author/${author}`,
-  GET_BOOKS_BY_GENRE: (genre) => `/books/genre/${genre}`,
-  GET_FOLLOWED_BOOKS: (userId) => `/follow-books/user/${userId}`,
-  FOLLOW_BOOK: '/follow-books', // 🆕 API theo dõi sách
-  UNFOLLOW_BOOK: (userId, bookId) => `/follow-books/user/${userId}/book/${bookId}` // 🛠️ API bỏ theo dõi sách
 };
 
 export const API_METHODS = {
-  GET: 'GET',
-  POST: 'POST',
-  PUT: 'PUT',
-  DELETE: 'DELETE'
+  GET: "GET",
+  POST: "POST",
+  PUT: "PUT",
+  DELETE: "DELETE",
 };
 
-export const API_TIMEOUT = 15000; // ⏳ Giảm timeout xuống 15s để phản hồi nhanh hơn
+export const API_TIMEOUT = 15000; // Timeout 15s
 
 export const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
+  "Content-Type": "application/json",
+  Accept: "application/json",
 };
 
 export const AUTH_HEADERS = (token) => ({
   ...DEFAULT_HEADERS,
-  Authorization: `Bearer ${token}` // 🛡️ Thêm JWT Token cho các API cần xác thực
+  Authorization: `Bearer ${token}`,
 });
+
+// Tạo instance của axios nếu cần dùng chung
+export const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  headers: DEFAULT_HEADERS,
+});
+
+// Thêm interceptor để tự động gắn token vào header request
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("Lỗi API:", error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);

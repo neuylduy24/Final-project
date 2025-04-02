@@ -5,31 +5,39 @@ import { useParams, useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { ROUTERS } from "utils/path";
+// Giả sử bạn đã import cấu hình API nếu cần
+
+
+import { API_BASE_URL, API_ENDPOINTS, AUTH_HEADERS } from "../../api/apiConfig";
+
 
 const Chapter = () => {
   const { id } = useParams(); // Lấy id sách từ URL
-  const navigate = useNavigate(); // Hook điều hướng
+  const navigate = useNavigate();
   const [book, setBook] = useState(null);
-  const [chapters, setChapters] = useState([]); // Separate state for chapters
-  const [searchTerm, setSearchTerm] = useState(""); // State tìm kiếm
-  const [sortOrder, setSortOrder] = useState("desc"); // State sắp xếp: "desc" (mới -> cũ), "asc" (cũ -> mới)
+  const [chapters, setChapters] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const email = localStorage.getItem("email");
+  const token = localStorage.getItem("token");
 
   // Hàm fetch dữ liệu sách
   const fetchBookData = useCallback(() => {
     axios
-      .get(`https://api.it-ebook.io.vn/api/books/${id}`)
+      .get(`${API_BASE_URL}/api/books/${id}`)
       .then((response) => setBook(response.data))
       .catch((error) => console.error("Error fetching book data:", error));
   }, [id]);
 
-  // Hàm fetch dữ liệu chapters
+  // Hàm fetch danh sách chapters
   const fetchChapters = useCallback(() => {
     axios
-      .get(`https://api.it-ebook.io.vn/api/chapters?bookId=${id}`)
+      .get(`${API_BASE_URL}/api/chapters?bookId=${id}`)
       .then((response) => {
         console.log("Chapters data for book ID:", id, response.data);
-        // Filter to ensure only chapters for this book are shown
-        const filteredChapters = response.data.filter(chapter => chapter.bookId === id);
+        const filteredChapters = response.data.filter(
+          (chapter) => chapter.bookId === id
+        );
         setChapters(filteredChapters);
       })
       .catch((error) => console.error("Error fetching chapters:", error));
@@ -37,12 +45,12 @@ const Chapter = () => {
 
   useEffect(() => {
     fetchBookData();
-    fetchChapters(); // Fetch chapters separately
+    fetchChapters();
 
     const handleChapterUpdate = (event) => {
       if (event.detail.bookId === id) {
         fetchBookData();
-        fetchChapters(); // Refresh chapters on update
+        fetchChapters();
       }
     };
 
@@ -54,7 +62,6 @@ const Chapter = () => {
 
   if (!book) return <p>Loading data...</p>;
 
-  // Lọc và sắp xếp danh sách chapter
   const filteredChapters = chapters
     ?.filter((chapter) =>
       chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,43 +72,65 @@ const Chapter = () => {
         : new Date(a.createdAt) - new Date(b.createdAt)
     );
 
+  // Hàm lưu lịch sử đọc khi người dùng chọn chương
+  const handleChapterClick = async (chapter) => {
+    try {
+      // Sử dụng endpoint đúng: UPDATE_READING_PROGRESS từ apiConfig.js
+      await axios.post(
+        `${API_BASE_URL}${API_ENDPOINTS.UPDATE_READING_PROGRESS}`,
+        {
+          email,
+          // Nếu có userId trong localStorage, thêm vào payload
+          userId: localStorage.getItem("userId"),
+          bookId: id,
+          chapterId: chapter.id,
+          // Nếu backend yêu cầu thêm progress hoặc timeSpent, có thể thêm:
+          progress: 0,
+          timeSpent: 0,
+          lastReadAt: new Date().toISOString(),
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Lưu lịch sử đọc thành công!");
+    } catch (error) {
+      console.error("Lỗi khi lưu lịch sử đọc:", error.response?.data || error.message);
+    }
+    // Điều hướng đến trang đọc chương
+    navigate(
+      ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(":chapterId", chapter.id)
+    );
+  };
+
   return (
     <div className="chapter-list">
       <h3>List Chapters</h3>
 
       <div className="search-sort-container">
-      <input
-        type="text"
-        placeholder="Search chapters..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="search-input"
-      />
+        <input
+          type="text"
+          placeholder="Search chapters..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
 
-      <button
-        onClick={() =>
-          setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"))
-        }
-        className="sort-button"
-      >
-        {sortOrder === "desc" ? <FaSortAmountDown /> : <FaSortAmountUp />}
-      </button>
+        <button
+          onClick={() =>
+            setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"))
+          }
+          className="sort-button"
+        >
+          {sortOrder === "desc" ? <FaSortAmountDown /> : <FaSortAmountUp />}
+        </button>
       </div>
 
       <ul className="chapter-items">
         {Array.isArray(filteredChapters) && filteredChapters.length > 0 ? (
-          filteredChapters.map((chapter, index) => (
+          filteredChapters.map((chapter) => (
             <li
-              key={chapter.id} // Use chapter.id instead of index for better React performance
+              key={chapter.id}
               className="chapter-item"
-              onClick={() =>
-                navigate(
-                  ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(
-                    ":chapterId",
-                    chapter.id
-                  )
-                )
-              }
+              onClick={() => handleChapterClick(chapter)}
               style={{ cursor: "pointer" }}
             >
               <span className="chapter-title">{chapter.title}</span>

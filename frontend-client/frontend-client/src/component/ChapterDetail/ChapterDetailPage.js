@@ -116,6 +116,21 @@ const ChapterDetail = () => {
         </select>
       </div>
       <div className="chapter-content">
+        {/* Display chapter images if available */}
+        {currentChapter.images && currentChapter.images.length > 0 && (
+          <div className="chapter-images">
+            {currentChapter.images.map((imageUrl, index) => (
+              <img 
+                key={index} 
+                src={imageUrl} 
+                alt={`${currentChapter.title} - Image ${index + 1}`} 
+                className="chapter-image"
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Display chapter text content */}
         {currentChapter.content?.split("\n").map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}

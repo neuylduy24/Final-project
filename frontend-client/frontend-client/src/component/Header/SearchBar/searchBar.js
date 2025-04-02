@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaPhone } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../../pages/user/theme/header/style.scss";
+import "../../../pages/user/theme/header/style.scss";
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");

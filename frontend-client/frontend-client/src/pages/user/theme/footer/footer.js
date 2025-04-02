@@ -2,16 +2,12 @@ import { memo } from 'react';
 import './footer.scss';
 import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram } from 'react-icons/fa6';
-import { ROUTERS } from 'utils/path';
 const Footer = () => {
   return <footer className="footer">
     <div className="container">
       <div className="row">
         <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 col-xl-12">
           <div className="footer__about">
-            <Link to={ROUTERS.USER.HOME}>
-                <img src="https://ezequiel-santalla.github.io/bookstore/img/logo/logo.png" alt="footer__about_logo" />
-              </Link>
             <ul>
               <li>Address: Số 1 Trịnh Văn Bô</li>
               <li>Phone: 0987654321</li>

@@ -1,37 +1,28 @@
-import { useEffect, useState, memo, useCallback } from "react";
+import { memo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./navigationChapter.scss";
 import { ROUTERS } from "utils/path";
+import "./navigationChapter.scss";
 
-const NavigationChapter = () => {
-  const { id, chapterId } = useParams(); // Lấy ID sách & chương từ URL
+const NavigationChapter = ({ chapterList }) => {
+  const { id, chapterId } = useParams();
   const navigate = useNavigate();
-  const [book, setBook] = useState(null);
-  const [currentChapter, setCurrentChapter] = useState(null);
-  const [chapterIndex, setChapterIndex] = useState(0);
 
-  const fetchBookData = useCallback(() => {
-    axios
-      .get(`https://api.it-ebook.io.vn/api/books/${id}`)
-      .then((response) => {
-        setBook(response.data);
-        const foundIndex = response.data.chapters?.findIndex(
-          (ch) => ch.id === chapterId
-        );
-        setChapterIndex(foundIndex);
-        setCurrentChapter(response.data.chapters?.[foundIndex] || null);
-      })
-      .catch((error) => console.error("Error fetching book data:", error));
-  }, [id, chapterId]);
+  // Kiểm tra nếu danh sách chương chưa có dữ liệu
+  if (!chapterList || chapterList.length === 0) {
+    return <p>Loading navigation...</p>;
+  }
 
-  useEffect(() => {
-    fetchBookData();
-  }, [fetchBookData]);
+  // Tìm vị trí của chương hiện tại trong danh sách
+  const chapterIndex = chapterList.findIndex((chap) => chap.id === chapterId);
+
+  // Nếu chương hiện tại không tìm thấy, hiển thị lỗi
+  if (chapterIndex === -1) {
+    return <p>Chapter not found!</p>;
+  }
 
   const handlePrevChapter = () => {
     if (chapterIndex > 0) {
-      const prevChapter = book.chapters[chapterIndex - 1];
+      const prevChapter = chapterList[chapterIndex - 1];
       navigate(
         ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(
           ":chapterId",
@@ -42,8 +33,8 @@ const NavigationChapter = () => {
   };
 
   const handleNextChapter = () => {
-    if (chapterIndex < book.chapters.length - 1) {
-      const nextChapter = book.chapters[chapterIndex + 1];
+    if (chapterIndex < chapterList.length - 1) {
+      const nextChapter = chapterList[chapterIndex + 1];
       navigate(
         ROUTERS.USER.CHAPTERDETAIL.replace(":id", id).replace(
           ":chapterId",
@@ -52,8 +43,6 @@ const NavigationChapter = () => {
       );
     }
   };
-
-  if (!currentChapter) return <p>Loading chapter content...</p>;
 
   return (
     <div className="chapter-navigation">
@@ -67,12 +56,12 @@ const NavigationChapter = () => {
       <input
         className="chapter-input"
         type="text"
-        value={currentChapter.title}
+        value={chapterList[chapterIndex].title}
         readOnly
       />
       <button
         onClick={handleNextChapter}
-        disabled={chapterIndex === book.chapters.length - 1}
+        disabled={chapterIndex === chapterList.length - 1}
         className="nav-button next-button"
       >
         →

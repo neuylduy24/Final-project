@@ -14,10 +14,12 @@ const FeaturedBooks = ({ books, navigate }) => (
       <div className="row featured-list">
         {books.map((book) => (
           <BookCard
-          key={book.id}
-          book={book}
-          onClick={() => navigate(`/book/${book.id}`, { state: { name: book.title } })}
-        />
+            key={book.id}
+            book={book}
+            onClick={() =>
+              navigate(`/${book.bookId}`, { state: { name: book.title } })
+            }
+          />
         ))}
       </div>
     </TabPanel>

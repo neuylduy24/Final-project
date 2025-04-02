@@ -9,6 +9,107 @@
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
+
+  .comment-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 30px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+
+    .comment-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #21afda;
+      border-bottom: 2px solid #21afda;
+      padding-bottom: 5px;
+    }
+
+    .no-comments {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+      padding: 12px;
+      font-size: 1rem;
+    }
+
+    .comment-list {
+      list-style: none;
+      padding: 0;
+
+      .comment-item {
+        position: relative;
+        background: #f9f9f9;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .comment-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between; // Căn email và tiêu đề chương xa nhau
+        }
+
+        .chapter-title {
+          position: absolute;
+          top: 0;
+          right: 0;
+          font-size: 12px;
+          color: #262626;
+          font-weight: normal;
+          background: #f0f0f0;
+          padding: 3px 8px;
+          border-radius: 4px;
+        }
+
+
+        .email {
+          font-size: 1rem;
+          font-weight: 600;
+          margin-bottom: 10px;
+          word-wrap: break-word;
+          word-break: break-word;
+          max-width: 100%;
+          overflow-wrap: break-word;
+        }
+
+        .comment-content {
+          font-size: 1rem;
+          color: #222222;
+          line-height: 1.8;
+          background: #e4e4e4;
+          padding: 10px;
+          border-radius: 8px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          border-left: 4px solid #007bff;
+          margin-bottom: 10px;
+          word-wrap: break-word;
+          word-break: break-word;
+          max-width: 100%;
+          overflow-wrap: break-word;
+        }
+
+        .comment-date {
+          font-size: 0.85rem;
+          color: #777;
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+
   h2 {
     text-align: center;
     font-style: italic;
@@ -50,12 +151,22 @@
   .chapter-content {
     padding: 20px;
     font-size: 18px;
-    line-height: 1.8;
+    line-height: 1.6;
     text-align: justify;
     background: #fff;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-top: 15px;
+
+    p {
+      margin-bottom: 1.5em;
+    }
+
+    &:hover {
+      background: #ffffff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease-in-out;
+    }
 
     @include Responsive($TABLET_DEVICE) {
       font-size: 17px;
@@ -104,5 +215,19 @@
         box-shadow: 0 0 5px rgba(0, 91, 187, 0.5);
       }
     }
+  }
+}
+
+.chapter-images {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  .chapter-image {
+    max-width: 100%;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 }

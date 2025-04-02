@@ -30,8 +30,9 @@ const BookCard = ({ book, onClick }) => {
       className="col-lg-2 col-md-4 col-sm-6 col-xs-12"
       key={book.id}
       onClick={() =>
-        navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.id)}`)
+        navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.bookId || book.id)}`)
       }
+      
       style={{ cursor: "pointer" }}
     >
       <div className="book-card">

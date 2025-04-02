@@ -10,10 +10,11 @@ const Chapter = () => {
   const { id } = useParams(); // Lấy id sách từ URL
   const navigate = useNavigate(); // Hook điều hướng
   const [book, setBook] = useState(null);
+  const [chapters, setChapters] = useState([]); // Separate state for chapters
   const [searchTerm, setSearchTerm] = useState(""); // State tìm kiếm
   const [sortOrder, setSortOrder] = useState("desc"); // State sắp xếp: "desc" (mới -> cũ), "asc" (cũ -> mới)
 
-  // Hàm fetch dữ liệu sách (bao gồm danh sách chương)
+  // Hàm fetch dữ liệu sách
   const fetchBookData = useCallback(() => {
     axios
       .get(`https://api.it-ebook.io.vn/api/books/${id}`)
@@ -21,12 +22,27 @@ const Chapter = () => {
       .catch((error) => console.error("Error fetching book data:", error));
   }, [id]);
 
+  // Hàm fetch dữ liệu chapters
+  const fetchChapters = useCallback(() => {
+    axios
+      .get(`https://api.it-ebook.io.vn/api/chapters?bookId=${id}`)
+      .then((response) => {
+        console.log("Chapters data for book ID:", id, response.data);
+        // Filter to ensure only chapters for this book are shown
+        const filteredChapters = response.data.filter(chapter => chapter.bookId === id);
+        setChapters(filteredChapters);
+      })
+      .catch((error) => console.error("Error fetching chapters:", error));
+  }, [id]);
+
   useEffect(() => {
     fetchBookData();
+    fetchChapters(); // Fetch chapters separately
 
     const handleChapterUpdate = (event) => {
       if (event.detail.bookId === id) {
         fetchBookData();
+        fetchChapters(); // Refresh chapters on update
       }
     };
 
@@ -34,12 +50,12 @@ const Chapter = () => {
     return () => {
       window.removeEventListener("chapterUpdated", handleChapterUpdate);
     };
-  }, [id, fetchBookData]);
+  }, [id, fetchBookData, fetchChapters]);
 
   if (!book) return <p>Loading data...</p>;
 
   // Lọc và sắp xếp danh sách chapter
-  const filteredChapters = book.chapters
+  const filteredChapters = chapters
     ?.filter((chapter) =>
       chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -76,7 +92,7 @@ const Chapter = () => {
         {Array.isArray(filteredChapters) && filteredChapters.length > 0 ? (
           filteredChapters.map((chapter, index) => (
             <li
-              key={index}
+              key={chapter.id} // Use chapter.id instead of index for better React performance
               className="chapter-item"
               onClick={() =>
                 navigate(

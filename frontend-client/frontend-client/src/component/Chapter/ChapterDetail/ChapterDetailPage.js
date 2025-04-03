@@ -1,10 +1,11 @@
 import { useEffect, useState, memo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./chapterDetail.scss";
 import { ROUTERS } from "utils/path";
-import NavigationChapter from "component/NavigationChapter/NavigationChapter";
-import Comment from "component/Comment/comment";
+import NavigationChapter from "component/Chapter/NavigationChapter/NavigationChapter";
+import Comment from "component/Action/Comment/comment";
+import BreadCrumb from "../../../pages/theme/breadCrumb/breadCrumb";
 
 const ChapterDetail = () => {
   const { id, chapterId } = useParams();
@@ -13,7 +14,8 @@ const ChapterDetail = () => {
   const [currentChapter, setCurrentChapter] = useState(null);
   const [chapterList, setChapterList] = useState([]);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
   const token = localStorage.getItem("token");
 
   const fetchBookData = useCallback(async () => {
@@ -89,10 +91,15 @@ const ChapterDetail = () => {
   const getRandomColor = () =>
     emailColors[Math.floor(Math.random() * emailColors.length)];
 
-  if (!currentChapter) return <p>Chapter not found!!!</p>;
+  if (!currentChapter) return <p>Loading </p>;
 
   return (
     <div className="chapter-detail">
+      <BreadCrumb
+        name={`${book?.title || "Loading..."} / ${
+          currentChapter?.title || "Loading..."
+        }`}
+      />
       {book && <h1>{book.title}</h1>}
       <h2>{currentChapter.title}</h2>
       <div className="chapter-dropdown">
@@ -119,15 +126,15 @@ const ChapterDetail = () => {
         {/* Display chapter images if available */}
         {currentChapter.images && currentChapter.images.length > 0 && (
           <div className="chapter-images">
-            {currentChapter.images.map((imageUrl, index) => (
-              <img 
-                key={index} 
-                src={imageUrl} 
-                alt={`${currentChapter.title} - Image ${index + 1}`} 
-                className="chapter-image"
-              />
-            ))}
-          </div>
+          {currentChapter.images.map((imageUrl, index) => (
+            <img 
+              key={index} 
+              src={imageUrl} 
+              alt={`${currentChapter.title} - ${index + 1}`} 
+              className="chapter-image"
+            />
+          ))}
+        </div>        
         )}
         
         {/* Display chapter text content */}

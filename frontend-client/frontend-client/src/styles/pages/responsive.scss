@@ -14,11 +14,11 @@ $SMALL_DEVICE: "SMALL_DEVICE";
             @content;
         }
     }@else if ($canvas == $TABLET_DEVICE){
-        @media  only screen and (min-width: 768px) and (max-width: 991px) {
+        @media  only screen and (min-width: 767px) and (max-width: 991px) {
             @content;
         }
     }@else if ($canvas == $WIDE_MOBILE){
-        @media  only screen and (max-width: 767px) {
+        @media  only screen and (max-width: 768px) {
             @content;
         }
     }@else if ($canvas == $SMALL_DEVICE){

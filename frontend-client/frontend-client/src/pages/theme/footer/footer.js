@@ -6,7 +6,7 @@ const Footer = () => {
   return <footer className="footer">
     <div className="container">
       <div className="row">
-        <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 col-xl-12">
+        <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
           <div className="footer__about">
             <ul>
               <li>Address: Số 1 Trịnh Văn Bô</li>

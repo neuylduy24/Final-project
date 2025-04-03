@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaStar, FaRegStar } from "react-icons/fa6";
 import { FaUser, FaBookOpen } from "react-icons/fa";
-import ButtonFollow from "component/ButtonFollow/buttonFollow";
+import ButtonFollow from "component/Action/ButtonFollow/buttonFollow";
 import chapterService from "service/chapterService";
 import "./bookinfor.scss";
 
@@ -34,10 +34,10 @@ const BookInfo = ({ book }) => {
         <p>
           <FaEye /> <b>View:</b> <span>{totalViews}</span>
         </p>
-          <p>
-            <FaStar /> <b>Rating:</b>{" "}
-            <span>{book.rating ? book.rating.toFixed(1) : "0.0"}/5</span>
-          </p>
+        <p>
+          <FaStar /> <b>Rating:</b>{" "}
+          <span>{book.rating ? book.rating.toFixed(1) : "0.0"}/5</span>
+        </p>
       </div>
 
       <div className="book-tags">

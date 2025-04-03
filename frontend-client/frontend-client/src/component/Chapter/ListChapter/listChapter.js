@@ -8,7 +8,7 @@ import { ROUTERS } from "utils/path";
 // Giả sử bạn đã import cấu hình API nếu cần
 
 
-import { API_BASE_URL, API_ENDPOINTS, AUTH_HEADERS } from "../../api/apiConfig";
+import { API_BASE_URL, API_ENDPOINTS } from "../../../api/apiConfig";
 
 
 const Chapter = () => {

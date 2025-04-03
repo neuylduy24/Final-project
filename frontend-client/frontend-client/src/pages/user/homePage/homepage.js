@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import BookCarousel from "../../../component/Carousel/BookCarousel";
-import FeaturedBooks from "../../../component/Featured/FeaturedBooks";
+import BookCarousel from "../../../component/Book/Carousel/BookCarousel";
+import FeaturedBooks from "../../../component/Book/Featured/FeaturedBooks";
 import "./home.scss";
 
 const API_URL = "https://api.it-ebook.io.vn/api/books";
@@ -30,10 +30,11 @@ const HomePage = () => {
           </div>
           <FeaturedBooks books={memoizedBooks} navigate={navigate} />
         </div>
-        <div className="see-more-container">
+        
+      </div>
+      <div className="see-more-container">
           <button className="see-more-button">See More</button>
         </div>
-      </div>
     </>
   );
 };

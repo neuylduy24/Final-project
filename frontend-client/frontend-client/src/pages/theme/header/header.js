@@ -1,4 +1,7 @@
 import { memo, useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
 import "./style.scss";
 import {
   FaInstagram,
@@ -10,13 +13,11 @@ import {
 } from "react-icons/fa6";
 import { SiFacebook } from "react-icons/si";
 import { MdEmail } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
-import { ROUTERS } from "utils/path";
-import SearchBar from "../../../../component/Header/SearchBar/searchBar";
-import logo from "../../../../assets/user/image/hero/logo.png";
-import axios from "axios";
-import UserMenu from "../../../../component/Header/userMenu/userMenuDropdown";
+import logo from "../../../assets/user/image/hero/logo.png";
+import UserMenu from "../../../component/Header/userMenu/userMenuDropdown";
 import MenuItem from "component/Header/MenuItem/menuItem";
+import SearchBar from "../../../component/Header/SearchBar/searchBar";
+import { ROUTERS } from "utils/path";
 
 const Header = () => {
   const location = useLocation();
@@ -24,6 +25,8 @@ const Header = () => {
   const [isHome, setIsHome] = useState(location.pathname.length <= 1);
   const [isShowCategories, setShowCategories] = useState(isHome);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [username, setUsername] = useState(""); // Thêm state để lưu username
+  const API_URL = "https://api.it-ebook.io.vn/api/users";
 
   const [menu, setMenu] = useState([
     {
@@ -73,14 +76,58 @@ const Header = () => {
     },
   ]);
   useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUsername(""); // Xóa username khi đăng xuất
+        return;
+      }
+
+      try {
+        const response = await axios.get(API_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200) {
+          const userData = response.data;
+          const userEmail = JSON.parse(atob(token.split(".")[1])).sub;
+          const user = userData.find((u) => u.email === userEmail);
+
+          if (user) {
+            setUsername(user.username);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        toast.error("Error fetching user data!");
+      }
+    };
+
+    fetchUser();
+
+    const handleStorageChange = (event) => {
+      if (event.key === "token") {
+        setIsLoggedIn(!!localStorage.getItem("token"));
+        fetchUser(); // Cập nhật lại username khi token thay đổi
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
           "https://api.it-ebook.io.vn/api/categories"
-        ); 
+        );
         const categories = response.data.map((category) => ({
           name: category.name,
-          path: `${ROUTERS.USER.BOOKLIST}?category=${category.id}`, 
+          path: `${ROUTERS.USER.BOOKLIST}?category=${category.id}`,
         }));
 
         setMenu((prevMenu) =>
@@ -110,19 +157,18 @@ const Header = () => {
     };
 
     window.addEventListener("storage", checkLoginStatus);
-
     checkLoginStatus();
 
     return () => {
       window.removeEventListener("storage", checkLoginStatus);
     };
   }, [location]);
-
   useEffect(() => {
     const isHome = location.pathname.length <= 1;
     setIsHome(isHome);
     setShowCategories(isHome);
   }, [location]);
+
   return (
     <>
       <div
@@ -132,14 +178,10 @@ const Header = () => {
       <button className="chatbox-button">
         <FaCommentDots />
       </button>
-
       <div className={`menu_wrapper ${isShowMenuWrapper ? "show" : ""}`}>
         <div className="header_logo">
           <Link to={ROUTERS.USER.HOME}>
-            <img
-              src={logo}
-              alt="Logo"
-            />
+            <img src={logo} alt="Logo" />
           </Link>
         </div>
         <div className="menu_wrapper_widget">
@@ -196,7 +238,9 @@ const Header = () => {
           <ul>
             <li>
               <MdEmail />
-              trongnnbh00676@gmail.com
+              {isLoggedIn
+                ? `Hello, ${username}`
+                : "Hello, welcome to BOOKSTORE"}
             </li>
             <li>Free reading book!!</li>
           </ul>
@@ -209,13 +253,13 @@ const Header = () => {
             <div className="col-6 header_top_left">
               <ul>
                 <Link to={ROUTERS.USER.HOME}>
-                  <img
-                    width="60px"
-                    src= {logo}
-                    alt="Logo"
-                  />
+                  <img width="60px" src={logo} alt="Logo" />
                 </Link>
-                <li>Hello welcome to BOOKSTORE</li>
+                <li>
+                  {isLoggedIn
+                    ? `Hello, ${username}`
+                    : "Hello, welcome to BOOKSTORE"}
+                </li>
               </ul>
             </div>
             <div className="col-6 header_top_right">
@@ -263,6 +307,7 @@ const Header = () => {
           </div>
         </div>
       </div>
+
       <div className="container">
         <div className="row hero_categories_container">
           <div className="col-lg-3 col-md-12 col-sm-12 col-xs-12 hero_categories">
@@ -291,4 +336,5 @@ const Header = () => {
     </>
   );
 };
+
 export default memo(Header);

@@ -362,89 +362,6 @@
     }
 }
 
-.hero-search-container {
-
-    .hero-search-form {
-        width: 600px;
-        height: 5px;
-        float: left;
-        padding-left: 15px;
-        margin-bottom: 60px;
-
-        form {
-            display: flex;
-            align-items: center;
-        }
-
-        input {
-            border: none;
-            height: 48px;
-            font-size: 16px;
-            color: #b2b2b2;
-            padding-left: 20px;
-            border: 1px solid #e5e5e5;
-            width: 70%;
-
-            :focus {
-                outline: none;
-                border: none;
-            }
-        }
-
-        button {
-            font-size: 14px;
-            color: white;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: inline-block;
-            padding: 15px 30px 15px;
-            cursor: pointer;
-            background: map.get($theme-colors, "main");
-            border: none;
-            border-radius: 4px;
-
-            &:hover {
-                background: #1d83a2;
-                transition: background 0.3s;
-            }
-        }
-    }
-
-    .hero-search-phone {
-        display: flex;
-        align-items: center;
-
-        .hero-search-phone-icon {
-            font-size: 25px;
-            padding: 10px;
-            background: #f5f5f5;
-            line-height: 50px;
-            text-align: center;
-            border-radius: 50%;
-            float: left;
-            margin-right: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: map.get($theme-colors, "main");
-        }
-
-        .hero-search-phone-text {
-            display: inline-block;
-
-            p {
-                color: map.get($theme-colors, "normal-text");
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-
-            span {
-                font-size: 14px;
-                color: #636161;
-            }
-        }
-    }
-}
 
 .menu_wrapper,
 .menu_open {
@@ -455,7 +372,7 @@
 
 @include Responsive($MEDIUM_DEVICE) {
     .hero-search-form {
-        width: 550px !important;
+        width: 510px !important;
     }
 }
 
@@ -475,15 +392,6 @@
         width: max-content;
     }
 
-    .hero-search-form {
-        width: 565px !important;
-
-    }
-
-    .hero-search-phone {
-        margin-bottom: 30px;
-    }
-
     .hero-item {
         margin-left: unset !important;
     }
@@ -491,21 +399,7 @@
 }
 
 @include Responsive($SMALL_DEVICE) {
-
-    .hero-search-form {
-        width: 350px !important;
-
-        input {
-            width: 60% !important;
-            font-size: 14px !important;
-        }
-
-        button {
-            font-size: 12px !important;
-        }
-    }
-
     .footer {
-        width: 530px !important;
+        width: 630px !important;
     }
 }

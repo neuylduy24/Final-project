@@ -8,7 +8,6 @@
 
     .hero-search-form {
         padding-left: unset !important;
-        width: 530px !important;
     }
 
     .header_top,
@@ -50,7 +49,8 @@
         }
 
         .header_logo {
-            text-align: center;
+            display: flex;
+            margin-left: 90px;
 
             img {
                 width: 150px;

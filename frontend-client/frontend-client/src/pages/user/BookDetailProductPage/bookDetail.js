@@ -3,9 +3,9 @@ import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import "./bookDetail.scss";
 import { Chapter } from "component";
-import BreadCrumb from "../theme/breadCrumb/breadCrumb";
-import Comment from "component/Comment/comment";
-import BookInfo from "../../../component/BookInfor/Bookinfor";
+import BreadCrumb from "../../theme/breadCrumb/breadCrumb";
+import Comment from "component/Action/Comment/comment";
+import BookInfo from "../../../component/Book/BookInfor/Bookinfor";
 
 const BookDetailProductPage = () => {
   const { id: bookId } = useParams();

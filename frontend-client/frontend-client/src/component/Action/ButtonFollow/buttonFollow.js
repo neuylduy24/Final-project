@@ -33,7 +33,6 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
       const response = await axios.get(
         `https://api.it-ebook.io.vn/api/follow-books/user/${email}/book/${bookId}`,
         { headers: { Authorization: `Bearer ${token}` },
-      validateStatus: (status) => status === 200 || status === 404, 
       }
       );
 

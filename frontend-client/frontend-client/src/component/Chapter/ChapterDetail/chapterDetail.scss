@@ -115,6 +115,7 @@
     font-style: italic;
     color: #1e1d1d;
     margin-bottom: 10px;
+    font-size: 16px;
 
     @include Responsive($TABLET_DEVICE) {
       font-size: 22px;
@@ -225,7 +226,7 @@
   margin-bottom: 20px;
   
   .chapter-image {
-    max-width: 100%;
+    max-width: 30%;
     margin-bottom: 15px;
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

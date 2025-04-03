@@ -27,7 +27,7 @@ const BookCard = ({ book, onClick }) => {
 
   return (
     <div
-      className="col-lg-2 col-md-4 col-sm-6 col-xs-12"
+      className="col-lg-2 col-md-4 col-sm-6 col-xs-6"
       key={book.id}
       onClick={() =>
         navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.bookId || book.id)}`)

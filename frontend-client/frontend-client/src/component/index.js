@@ -1,5 +1,5 @@
-import {default as Chapter} from './Chapter/chapter';
-import {default as Comment} from './Comment/comment';
-import {default as ButtonFollow} from './ButtonFollow/buttonFollow';
+import {default as Chapter} from './Chapter/ListChapter/listChapter';
+import {default as Comment} from './Action/Comment/comment';
+import {default as ButtonFollow} from './Action/ButtonFollow/buttonFollow';
 
 export {Chapter, ButtonFollow, Comment};

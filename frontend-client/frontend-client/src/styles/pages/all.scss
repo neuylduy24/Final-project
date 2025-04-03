@@ -166,7 +166,7 @@ textarea {
     }
 
     .col-sm-6 {
-        flex: 0 0 50%;
+        flex: 0 0 25%;
         max-width: 50%;
     }
 
@@ -177,12 +177,12 @@ textarea {
 }
 
 @include Responsive($SMALL_DEVICE) {
-    .container {
-        max-width: 350px !important;
+    .col-md-4 {
+        flex: 0 0 25%;
+        max-width: 50%;
     }
-
-    .col-xs-12 {
-        flex: 0 0 100%;
-        max-width: 100%;
+    .col-sm-6 {
+        flex: 0 0 40%;
+        max-width: 50%;
     }
 }

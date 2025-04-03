@@ -2,45 +2,69 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../../../component/ProfileUser/SideBar/sideBar";
 import "../ProfileUserPage/ProfileUserPage.scss";
 import axios from "axios";
-import BookCard from "../../../component/Card/bookDetailCard";
+import BookCard from "../../../component/Book/Card/bookDetailCard";
+import { API_BASE_URL } from "../../../api/apiConfig"; // Dùng API_BASE_URL
 
 const BookHistoriesPage = () => {
   const [historyBooks, setHistoryBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const email = localStorage.getItem("email");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const controller = new AbortController();
     const fetchHistoryBooks = async () => {
       try {
-        const response = await axios.get(
-          "https://api.it-ebook.io.vn/api/books",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            signal: controller.signal,
-          }
+        console.log(`Fetching: ${API_BASE_URL}/api/reading-history/${email}`);
+
+        const response = await axios.get(`${API_BASE_URL}/api/reading-history/${email}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("API Response:", response.data);
+
+        if (!response.data || response.data.length === 0) {
+          setError("No reading history found.");
+          setHistoryBooks([]);
+          return;
+        }
+
+        // Fetch chi tiết sách nếu chỉ có bookId
+        const booksWithDetails = await Promise.all(
+          response.data.map(async (history) => {
+            try {
+              const bookResponse = await axios.get(`${API_BASE_URL}/api/books/${history.bookId}`);
+              return { ...history, book: bookResponse.data };
+            } catch (err) {
+              console.error(`Failed to fetch book ${history.bookId}:`, err);
+              return { ...history, book: null };
+            }
+          })
         );
-        setHistoryBooks(response.data);
+
+        setHistoryBooks(booksWithDetails);
       } catch (err) {
-        if (axios.isCancel(err)) return;
-        setError("Unable to load reading history list.");
-        console.error("Error fetching history books:", err);
+        console.error("Error fetching reading history:", err.response?.data || err);
+        setError("Unable to load reading history.");
       } finally {
         setLoading(false);
       }
     };
-    fetchHistoryBooks();
 
-    return () => controller.abort();
-  }, []);
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (email && token) {
+      fetchHistoryBooks();
+    } else {
+      setLoading(false);
+      setError("Please log in to view your reading history.");
+    }
+  }, [email, token]);
 
   return (
     <div className="profile-page">
       <Sidebar />
       <div className="profile-content">
-        <h2>Book History</h2>
+        <h2>Reading History</h2>
 
         {loading && <p>Loading list...</p>}
         {error && <p className="error">{error}</p>}
@@ -50,8 +74,8 @@ const BookHistoriesPage = () => {
 
         {!loading && !error && historyBooks.length > 0 && (
           <div className="book-list">
-            {historyBooks.map((book) => (
-              <BookCard key={book.id} book={book} />
+            {historyBooks.map((history) => (
+              <BookCard key={history.bookId} book={history.book} />
             ))}
           </div>
         )}

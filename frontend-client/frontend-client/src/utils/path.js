@@ -15,6 +15,7 @@ export const ROUTERS = {
         BOOKRANK: `${USER_PATH}/truyen-hot`,
         BOOKHISTORY: `${USER_PATH}/lich-su-doc-truyen`,
         COMMENT: `${USER_PATH}/binh-luan`,
+        SEARCHBOOK: `${USER_PATH}/search-results`,
         CHAPTERDETAIL: `${USER_PATH}/chi-tiet-truyen/:id/chap/:chapterId`,
     },
     ADMIN: {

@@ -2,18 +2,19 @@ import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { ROUTERS, USER_PATH } from "./utils/path";
 
-import MasterLayout from "./pages/user/theme/masterLayout/masterLayout";
+import MasterLayout from "./pages/theme/masterLayout/masterLayout";
 import HomePage from "./pages/user/homePage/homepage";
 import BookDetailProductPage from "./pages/user/BookDetailProductPage/bookDetail";
 import LoginPage from "./pages/user/loginForm/login";
 import RegisterPage from "./pages/user/loginForm/register";
-import ChapterDetailPage from "component/ChapterDetail/ChapterDetailPage";
+import ChapterDetailPage from "component/Chapter/ChapterDetail/ChapterDetailPage";
 import ForgotPasswordPage from "pages/user/loginForm/forgotPassword";
 import ProfileUserPage from "pages/user/ProfileUserPage/ProfileUserPage";
 import ResetPasswordPage from "pages/user/ResetPasswordPage/ResetPasswordPage";
 import BookHistoriesPage from "pages/user/BookHistoriesPage/BookHistoriesPage";
 import BookFollowPage from "pages/user/FollowedBooksPage/FollowedBooks";
 import UserComments from "pages/user/CommentPage/commentPage";
+import SearchPage from "pages/user/BookSearchPage/SearchPage";
 
 const RouterCustom = () => {
     const location = useLocation();
@@ -42,6 +43,7 @@ const RouterCustom = () => {
                             <Route path={ROUTERS.USER.BOOKHISTORY} element={<BookHistoriesPage />} />
                             <Route path={ROUTERS.USER.BOOKFOLLOW} element={<BookFollowPage />} />
                             <Route path={ROUTERS.USER.COMMENT} element={<UserComments />} />
+                            <Route path={ROUTERS.USER.SEARCHBOOK} element={<SearchPage />} />
                         </Routes>
                     </MasterLayout>
                 }

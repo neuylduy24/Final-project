@@ -3,19 +3,24 @@ import "./avt.scss";
 import { useNavigate } from "react-router-dom";
 import { ROUTERS } from "utils/path";
 import axios from "axios";
+
 const AvatarUploader = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({ username: "", email: "", avatar: "" });
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return navigate(ROUTERS.USER.LOGIN);
 
-        const response = await axios.get("https://api.it-ebook.io.vn/api/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          "https://api.it-ebook.io.vn/api/users",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         const allUsers = response.data;
         const email = localStorage.getItem("email");
@@ -37,11 +42,20 @@ const AvatarUploader = () => {
 
     fetchUserData();
   }, [navigate]);
+
   return (
     <div className="avatar-uploader">
-      <div className="avatar-img">{user.roles}</div>
+      {/* Hiển thị avatar nếu có */}
+      <div className="avatar-img">
+        {user.avatar ? (
+          <img src={user.avatar} alt="User Avatar" width="100" height="100" />
+        ) : (
+          <p>No avatar</p> // Hiển thị thông báo nếu không có avatar
+        )}
+      </div>
       <button className="upload-btn">Upload Avatar</button>
     </div>
   );
 };
+
 export default AvatarUploader;

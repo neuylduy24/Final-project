@@ -1,0 +1,84 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+
+$primary-color: #21afda;
+$secondary-color: #064e9a;
+$hot-badge-color: red;
+$rating-color: #f39c12;
+$text-color: #333;
+$white: #ffffff;
+$box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+@mixin button-style($bg-color, $text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
+
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+  }
+}
+
+
+.see-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.see-more-button {
+  @include button-style($primary-color, #fff);
+}
+
+@include Responsive($MEDIUM_DEVICE) {
+  .container {
+    width: 100% !important;
+    padding: 0 20px;
+  }
+}
+
+@include Responsive($TABLET_DEVICE) {
+  .container {
+    width: 100% !important;
+    padding: 0 15px;
+  }
+
+  .featured-list {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@include Responsive($WIDE_MOBILE) {
+  .container {
+    width: 100% !important;
+    padding: 0 10px;
+  }
+
+  .featured-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .product-card {
+    max-width: 150px;
+  }
+  
+}

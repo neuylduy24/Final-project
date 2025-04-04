@@ -1,0 +1,107 @@
+@use "sass:map";
+@import "styles/pages/theme";
+@import "styles/pages/all";
+@import "styles/pages/responsive";
+
+
+.profile-info {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  // width: 100%;
+  max-width: 600px;
+  height: fit-content;
+  margin: 0 auto;
+  flex: 1;
+
+  h2 {
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  input {
+    width: 98%;
+    padding: 10px;
+    border: 1px solid #bdbdbd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    background: #eae9e9;
+    color: #1f1f1f;
+  }
+
+  .group-btn {
+    display: flex;
+    gap: 10px;
+
+    .update-btn {
+      background: #21afda;
+      color: #ffffff;
+      padding: 8px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        background: #236e84;
+      }
+    }
+
+    .logout-btn {
+      background: #ff4d4d;
+      color: #ffffff;
+      padding: 8px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        background: #932323;
+      }
+    }
+  }
+}
+
+@include Responsive($TABLET_DEVICE) {
+  .profile-info {
+    width: 90% !important;
+
+    input{
+      width: 95%;
+    }
+  }
+}
+
+@include Responsive($SMALL_DEVICE) {
+  .profile-info {
+    width: 230px !important;
+
+    input {
+      width: 200px !important;
+      padding: 10px;
+      border: 1px solid #356f99;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      background: #eae9e9;
+      color: #1f1f1f;
+    }
+  }
+}

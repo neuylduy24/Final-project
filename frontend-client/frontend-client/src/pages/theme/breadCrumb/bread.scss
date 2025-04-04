@@ -1,0 +1,60 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+.breadCrumb {
+    background-color: #f8f9fa; 
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  
+    .breadCrumb_text {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      color: #333;
+  
+      .breadCrumb_option {
+        ul {
+          display: flex;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+  
+          li {
+            display: flex;
+            align-items: center;
+            color: #555;
+            font-size: 16px;
+  
+            &:not(:last-child)::after {
+              content: ">";
+              margin: 0 8px;
+              color: #aaa;
+            }
+  
+            a {
+              text-decoration: none;
+              color: #007bff;
+              transition: color 0.3s;
+  
+              &:hover {
+                color: #0056b3;
+              }
+            }
+          }
+  
+          .link {
+            font-weight: bold;
+          }
+  
+          .book-title {
+            font-weight: 600;
+            a {
+              color: #ff6f00;
+            }
+          }
+        }
+      }
+    }
+  }
+  

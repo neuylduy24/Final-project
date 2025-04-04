@@ -18,7 +18,6 @@ const BreadCrumb = ({ name }) => {
       );
       setChapterList(filteredChapters);
     } catch (error) {
-      console.error("Error fetching chapters:", error);
     }
   }, [id, setChapterList]);
 

@@ -48,6 +48,7 @@ body {
 .row {
     display: flex;
     flex-wrap: wrap;
+    margin-left: 10px;
 }
 
 .col-6 {
@@ -153,7 +154,6 @@ textarea {
         flex: 0 0 25%;
         max-width: 25%;
     }
-
     .col-xl-12 {
         flex: 0 0 100%;
         max-width: 100%;

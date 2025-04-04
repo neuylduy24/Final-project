@@ -21,10 +21,20 @@ const BookInfo = ({ book }) => {
         .then((total) => setTotalViews(total))
         .catch((error) => console.error("Error fetching total views:", error));
     }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
     // Fetch average rating
     fetchAverageRating();
     
+=======
+    fetchAverageRating();
+
+>>>>>>> Stashed changes
+=======
+    fetchAverageRating();
+
+>>>>>>> Stashed changes
     // Fetch user's previous rating if logged in
     if (token) {
       fetchUserRating();
@@ -51,6 +61,8 @@ const BookInfo = ({ book }) => {
         `https://api.it-ebook.io.vn/api/feedbacks/ratings/${book.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       
       // Get user email from token (assuming you have a function to decode JWT)
       const userEmail = getUserEmailFromToken(token);
@@ -58,6 +70,22 @@ const BookInfo = ({ book }) => {
       // Find the user's rating from the returned list by matching userId (email)
       if (response.data && response.data.length > 0) {
         const userRatingData = response.data.find(rating => rating.userId === userEmail);
+=======
+=======
+>>>>>>> Stashed changes
+
+      // Get user email from token (assuming you have a function to decode JWT)
+      const userEmail = getUserEmailFromToken(token);
+
+      // Find the user's rating from the returned list by matching userId (email)
+      if (response.data && response.data.length > 0) {
+        const userRatingData = response.data.find(
+          (rating) => rating.userId === userEmail
+        );
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         if (userRatingData) {
           setUserRating(userRatingData.rating);
           setUserRatingId(userRatingData.id);
@@ -72,12 +100,32 @@ const BookInfo = ({ book }) => {
   const getUserEmailFromToken = (token) => {
     try {
       // Simple JWT decode (base64)
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
       
+=======
+=======
+>>>>>>> Stashed changes
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       const payload = JSON.parse(jsonPayload);
       return payload.sub || payload.email; // Depending on your JWT structure
     } catch (error) {
@@ -105,11 +153,25 @@ const BookInfo = ({ book }) => {
         // Create new rating
         const response = await axios.post(
           "https://api.it-ebook.io.vn/api/feedbacks",
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
           { 
             bookId: book.id, 
             rating: rating, 
             type: "RATING",
             content: null  // API requires content field
+=======
+=======
+>>>>>>> Stashed changes
+          {
+            bookId: book.id,
+            rating: rating,
+            type: "RATING",
+            content: null, // API requires content field
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -119,9 +181,21 @@ const BookInfo = ({ book }) => {
         }
         toast.success("Rating submitted successfully!");
       }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
       
       setUserRating(rating);
       
+=======
+
+      setUserRating(rating);
+
+>>>>>>> Stashed changes
+=======
+
+      setUserRating(rating);
+
+>>>>>>> Stashed changes
       // Refresh average rating
       fetchAverageRating();
     } catch (error) {
@@ -148,7 +222,15 @@ const BookInfo = ({ book }) => {
           <FaEye /> <b>View:</b> <span>{totalViews}</span>
         </p>
         <p>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <FaStar /> <b>Rating:</b>{" "}
+=======
+          <FaStar /> <b>Rating Average:</b>{" "}
+>>>>>>> Stashed changes
+=======
+          <FaStar /> <b>Rating Average:</b>{" "}
+>>>>>>> Stashed changes
           <span>{averageRating ? averageRating.toFixed(1) : "0.0"}/5</span>
         </p>
       </div>
@@ -164,7 +246,13 @@ const BookInfo = ({ book }) => {
       </div>
 
       <div className="book-rating">
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <p className="rating-label">Rate this book:</p>
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         <div className="star-rating">
           {[...Array(5)].map((_, i) => (
             <span
@@ -182,9 +270,15 @@ const BookInfo = ({ book }) => {
             </span>
           ))}
         </div>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div className="average-rating">
           {userRating > 0 && <p className="user-rating">Your rating: {userRating}/5</p>}
         </div>
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       </div>
       <ButtonFollow bookId={book.id} />
     </div>

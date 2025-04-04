@@ -379,6 +379,15 @@
 @include Responsive($TABLET_DEVICE) {
     @include header.header-small-device;
 }
+@media (max-width: 1024px) {
+    .header_top{
+        width: 111% !important;
+    }
+    .footer{
+        width: 108% !important;
+    }
+  }
+  
 
 @include Responsive($WIDE_MOBILE) {
     @include header.header-small-device;

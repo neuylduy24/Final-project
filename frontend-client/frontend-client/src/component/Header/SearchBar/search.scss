@@ -140,6 +140,10 @@
 
 @include Responsive($SMALL_DEVICE) {
   .hero-search-container {
+    input {
+      width: 46% !important;
+      margin-bottom: 10px;
+    }
     .hero-search-results {
       position: absolute;
       top: 25%;
@@ -272,7 +276,7 @@
     margin-bottom: 10px;
 
     input {
-      width: 67% !important;
+      width: 65% !important;
       margin-bottom: 10px;
     }
   }
@@ -317,7 +321,6 @@
 
       .search-results-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 20px;
 
         .search-item {
@@ -533,16 +536,16 @@
 
 @media only screen and (max-width: 425px) {
   .hero-search-form input {
-      width: 47.5% !important;
+      width: 49.5% !important;
   }
 }
-@media only screen and (max-width: 375px) {
+@media only screen and (max-width: 425px) {
   .hero-search-form input {
-      width: 39% !important;
+      width: 37.5% !important;
   }
 }
 @media only screen and (max-width: 320px) {
   .hero-search-form input {
-      width: 30% !important;
+      width: 28% !important;
   }
 }

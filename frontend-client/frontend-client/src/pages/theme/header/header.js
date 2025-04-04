@@ -9,7 +9,6 @@ import {
   FaListUl,
   FaCircleChevronUp,
   FaCircleChevronDown,
-  FaCommentDots,
 } from "react-icons/fa6";
 import { SiFacebook } from "react-icons/si";
 import { MdEmail } from "react-icons/md";
@@ -18,6 +17,7 @@ import UserMenu from "../../../component/Header/userMenu/userMenuDropdown";
 import MenuItem from "component/Header/MenuItem/menuItem";
 import SearchBar from "../../../component/Header/SearchBar/searchBar";
 import { ROUTERS } from "utils/path";
+import ChatboxButton from "component/Action/ChatboxButton/chatboxButton";
 
 const Header = () => {
   const location = useLocation();
@@ -175,9 +175,9 @@ const Header = () => {
         className={`menu_wrapper_overlay ${isShowMenuWrapper ? "active" : ""}`}
         onClick={() => setShowMenuWrapper(false)}
       />
-      <button className="chatbox-button">
-        <FaCommentDots />
-      </button>
+      <div className="chat-box">
+      <ChatboxButton/>
+      </div>
       <div className={`menu_wrapper ${isShowMenuWrapper ? "show" : ""}`}>
         <div className="header_logo">
           <Link to={ROUTERS.USER.HOME}>

@@ -20,7 +20,7 @@ public class Feedback {
     private String userId;
     private String bookId;
     private String content;  // Comment content (optional)
-    private int rating;      // Star rating (1-5)
+    private double rating;      // Star rating (1-5)
     private LocalDateTime createdAt;
 
 }

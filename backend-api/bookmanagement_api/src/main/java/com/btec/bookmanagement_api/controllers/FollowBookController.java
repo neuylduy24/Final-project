@@ -27,11 +27,11 @@ public class FollowBookController {
 
 
 
-    // Thay đổi từ userId sang email trong các endpoint
-    @GetMapping("/user/{email}")
-    public List<FollowBook> getFollowBooksByEmail(@PathVariable String email) {
-        return followBookService.getFollowBooksByEmail(email);
-    }
+//    // Thay đổi từ userId sang email trong các endpoint
+//    @GetMapping("/user/{email}")
+//    public List<FollowBook> getFollowBooksByEmail(@PathVariable String email) {
+//        return followBookService.getFollowBooksByEmail(email);
+//    }
 
 
     // Lấy danh sách sách đang theo dõi theo email người dùng

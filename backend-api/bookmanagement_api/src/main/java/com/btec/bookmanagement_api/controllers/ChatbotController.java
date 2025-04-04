@@ -13,11 +13,12 @@ import java.util.Optional;
 @RequestMapping("/api/chatbot")
 public class ChatbotController {
 
+
     @Autowired
     private BookRepository bookRepository;
 
     private final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-    private final String API_KEY = "YOUR_OPENAI_API_KEY"; // Thay bằng API Key thật
+    private final String API_KEY = "OPENAI_API_KEY"; // Thay bằng API Key thật
 
     // ✅ 1. Hỏi chatbot về nội dung sách
     @PostMapping("/ask")
@@ -71,6 +72,7 @@ public class ChatbotController {
         }
     }
 
+    // 🔍 API tìm sách theo từ khóa
     @GetMapping("/search-book")
     public List<Book> searchBook(@RequestParam String query) {
         return bookRepository.searchBooks(query);

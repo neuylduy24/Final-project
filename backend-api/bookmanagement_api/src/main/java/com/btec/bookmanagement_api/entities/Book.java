@@ -22,9 +22,7 @@ public class Book {
     private String id;
     @NotBlank(message = "Title is required")
     private String title;
-
-    @NotBlank(message = "Author name is required")
-    private String author;
+    private String authorId;
 
     @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format")
     private String image;

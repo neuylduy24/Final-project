@@ -67,6 +67,15 @@
             }
         }
 
+        .result-search {
+            display: flex;
+            color: red;
+            font-style: italic;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         .book-list {
             display: flex;
             flex-wrap: wrap;

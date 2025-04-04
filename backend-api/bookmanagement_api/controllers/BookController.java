@@ -26,6 +26,8 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable String id) {
         return bookService.getBookById(id)
@@ -58,6 +60,13 @@ public class BookController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/sorted/by-date-desc")
+    public ResponseEntity<List<Book>> getBooksSortedByCreatedDateDesc() {
+        List<Book> books = bookService.getBooksSortedByCreatedDateDesc();
+        return ResponseEntity.ok(books);
+    }
+
+
 
     @PostMapping("/{id}/upload-image")
     public ResponseEntity<String> uploadImage(@PathVariable String id,

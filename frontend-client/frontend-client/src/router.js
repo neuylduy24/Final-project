@@ -15,6 +15,8 @@ import BookHistoriesPage from "pages/user/BookHistoriesPage/BookHistoriesPage";
 import BookFollowPage from "pages/user/FollowedBooksPage/FollowedBooks";
 import UserComments from "pages/user/CommentPage/commentPage";
 import SearchPage from "pages/user/BookSearchPage/SearchPage";
+import TopBooksPage from "pages/user/TopBookPage/topBook";
+import BookNew from "pages/user/BookNewPage/bookNew";
 
 const RouterCustom = () => {
     const location = useLocation();
@@ -44,6 +46,8 @@ const RouterCustom = () => {
                             <Route path={ROUTERS.USER.BOOKFOLLOW} element={<BookFollowPage />} />
                             <Route path={ROUTERS.USER.COMMENT} element={<UserComments />} />
                             <Route path={ROUTERS.USER.SEARCHBOOK} element={<SearchPage />} />
+                            <Route path={ROUTERS.USER.BOOKRANK} element={<TopBooksPage />} />
+                            <Route path={ROUTERS.USER.BOOKNEW} element={<BookNew />} />
                         </Routes>
                     </MasterLayout>
                 }

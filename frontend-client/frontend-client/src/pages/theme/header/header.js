@@ -50,19 +50,15 @@ const Header = () => {
       child: [
         {
           name: "Top day",
-          path: "#",
+          path: ROUTERS.USER.TOPDAY,
         },
         {
           name: "Top week",
-          path: "#",
+          path: ROUTERS.USER.TOPWEEK,
         },
         {
           name: "Top month",
-          path: "#",
-        },
-        {
-          name: "Update new",
-          path: "#",
+          path: ROUTERS.USER.TOPMONTH,
         },
       ],
     },

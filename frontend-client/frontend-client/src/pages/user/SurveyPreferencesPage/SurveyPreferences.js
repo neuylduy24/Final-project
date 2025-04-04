@@ -11,11 +11,11 @@ export default function SurveyPreferences({ onComplete }) {
   const [selectedAuthors, setSelectedAuthors] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/categories")
+    fetch("https://api.it-ebook.io.vn/api/categories")
       .then((res) => res.json())
       .then((data) => setGenres(data));
 
-    fetch("http://localhost:8080/api/authors")
+    fetch("https://api.it-ebook.io.vn/api/authors")
       .then((res) => res.json())
       .then((data) => setAuthors(data));
   }, []);

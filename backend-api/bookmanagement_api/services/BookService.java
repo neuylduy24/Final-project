@@ -5,6 +5,7 @@ import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,10 @@ public class BookService {
 
     public List<Book> getBooksByAuthorId(String authorId) {
         return bookRepository.findByAuthorId(authorId);
+    }
+
+    public List<Book> getBooksSortedByCreatedDateDesc() {
+        return bookRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public Book createBook(Book book) {

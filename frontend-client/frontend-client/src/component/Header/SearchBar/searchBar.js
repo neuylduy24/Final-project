@@ -3,17 +3,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./search.scss";
 import { FaPhone } from "react-icons/fa6";
-import BookCard from "../../Book/Card/bookDetailCard"; // Import BookCard
+import BookCard from "../../Book/Card/bookDetailCard";
 import { ROUTERS } from "utils/path";
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
+  const [allChapters, setAllChapters] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false); // Track search state
-  const searchBarRef = useRef(null); // Reference to the SearchBar container
-  const navigate = useNavigate(); // Hook for navigation
+  const [isSearching, setIsSearching] = useState(false);
+  const searchBarRef = useRef(null);
+  const [showResultGrid, setShowResultGrid] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllBooks = async () => {
@@ -32,56 +34,77 @@ const SearchBar = () => {
 
     fetchAllBooks();
   }, []);
+  useEffect(() => {
+    const fetchAllChapters = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.it-ebook.io.vn/api/chapters"
+        );
+        setAllChapters(response.data);
+      } catch (error) {
+        console.error("Error fetching chapters", error);
+      }
+    };
 
+    fetchAllChapters();
+  }, []);
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
       return;
     }
 
-    // Filter books based on title, description, and chapters
-    const filteredResults = allBooks.filter((book) => {
-      // Check if book title or description matches the query
+    const lowerQuery = query.toLowerCase();
+
+    const filteredBooks = allBooks.filter((book) => {
       const isBookMatch =
-        book.title.toLowerCase().includes(query.toLowerCase()) ||
+        book.title.toLowerCase().includes(lowerQuery) ||
         (book.description &&
-          book.description.toLowerCase().includes(query.toLowerCase()));
+          book.description.toLowerCase().includes(lowerQuery));
 
-      // Check if any chapter title or description matches the query
-      const isChapterMatch =
-        book.chapters &&
-        book.chapters.some(
-          (chapter) =>
-            chapter.title.toLowerCase().includes(query.toLowerCase()) ||
-            (chapter.description &&
-              chapter.description.toLowerCase().includes(query.toLowerCase()))
-        );
+      // Lọc tất cả chapters thuộc book đó
+      const chaptersOfBook = allChapters.filter(
+        (chap) => chap.bookId === book.id
+      );
 
-      // Return books that match either title/description or any chapter's title/description
-      return isBookMatch || isChapterMatch;
+      const matchedChapter = chaptersOfBook.find(
+        (chap) =>
+          chap.title?.toLowerCase().includes(lowerQuery) ||
+          chap.description?.toLowerCase().includes(lowerQuery) ||
+          chap.content?.toLowerCase().includes(lowerQuery)
+      );
+
+      if (matchedChapter) {
+        book.matchedChapterSnippet = matchedChapter.content
+          ?.split("\n")
+          .find((p) => p.toLowerCase().includes(lowerQuery));
+      }
+
+      return isBookMatch || !!matchedChapter;
     });
 
-    setResults(filteredResults);
-  }, [query, allBooks]);
+    setResults(filteredBooks);
+  }, [query, allBooks, allChapters]);
 
   const handleSearch = () => {
     if (query.trim()) {
+      setShowResultGrid(false); // Ẩn khi nhấn nút
       navigate(ROUTERS.USER.SEARCHBOOK + `?query=${query}`);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
+      setShowResultGrid(false); // Ẩn khi nhấn Enter
       handleSearch();
-      setResults([]);
-      setIsSearching(false); // Hide search results
     }
   };
 
   const handleBookClick = (bookId) => {
     navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", bookId)}`);
     setResults([]);
-    setIsSearching(false); // Hide search results
+    setIsSearching(false);
   };
 
   useEffect(() => {
@@ -91,15 +114,13 @@ const SearchBar = () => {
         !searchBarRef.current.contains(event.target)
       ) {
         setResults([]);
-        setIsSearching(false); // Hide search results
+        setIsSearching(false);
       }
     };
 
     document.addEventListener("mousedown", handleMouseDownOutside);
-
-    return () => {
+    return () =>
       document.removeEventListener("mousedown", handleMouseDownOutside);
-    };
   }, []);
 
   return (
@@ -114,7 +135,8 @@ const SearchBar = () => {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            setIsSearching(true); // Enable search results
+            setIsSearching(true);
+            setShowResultGrid(true); // Gõ là hiện lại
           }}
           onKeyDown={handleKeyPress}
         />
@@ -123,7 +145,7 @@ const SearchBar = () => {
         </button>
       </div>
 
-      {isSearching && query.trim() && (
+      {isSearching && query.trim() && showResultGrid && (
         <div className="hero-search-results">
           {loading ? (
             <p>Loading...</p>
@@ -134,7 +156,13 @@ const SearchBar = () => {
                   key={book.id}
                   onClick={() => handleBookClick(book.bookId || book.id)}
                 >
-                  <BookCard book={book} />
+                  <BookCard
+                    book={book}
+                    onChapterClick={() => {
+                      setResults([]);
+                      setIsSearching(false);
+                    }}
+                  />
                 </div>
               ))}
             </div>

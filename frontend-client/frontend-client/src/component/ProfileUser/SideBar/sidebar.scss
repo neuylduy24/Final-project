@@ -1,0 +1,72 @@
+@use "sass:map";
+@import "styles/pages/theme";
+@import "styles/pages/all";
+@import "styles/pages/responsive";
+
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #afaeae;
+
+  .menu-list {
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 6px;
+      font-size: 16px;
+      text-decoration: none;
+      border-bottom: 1px solid #a8a8a8;
+      color: #333;
+
+      &:hover {
+        background: #cecfd0;
+        color: #21afda;
+      }
+
+      .menu-icon {
+        margin-right: 12px;
+        font-size: 18px;
+      }
+
+      .menu-label {
+        flex-grow: 1;
+      }
+
+      &.active {
+        background: #21afda;
+        color: #fff;
+
+        .menu-icon {
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+// Responsive cho các thiết bị khác nhau
+@include Responsive($MEDIUM_DEVICE) {
+  .sidebar {
+    width: 250px !important;
+  }
+}
+
+@include Responsive($TABLET_DEVICE) {
+  .sidebar {
+    width: 200px !important;
+  }
+}
+
+
+@include Responsive($SMALL_DEVICE) {
+  .sidebar {
+    width: 200px !important;
+  }
+}

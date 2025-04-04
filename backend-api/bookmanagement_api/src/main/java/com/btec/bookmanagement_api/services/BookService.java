@@ -60,4 +60,20 @@ public class BookService {
     public void deleteBook(String id) {
         bookRepository.deleteById(id);
     }
+
+    public boolean updateBookImage(String bookId, byte[] imageData) {
+        Optional<Book> bookOpt = bookRepository.findById(bookId);
+        if (bookOpt.isPresent()) {
+            Book book = bookOpt.get();
+            book.setImageData(imageData);
+            bookRepository.save(book);
+            return true;
+        }
+        return false;
+    }
+
+    public Optional<byte[]> getBookImage(String bookId) {
+        return bookRepository.findById(bookId)
+                .map(Book::getImageData);
+    }
 }

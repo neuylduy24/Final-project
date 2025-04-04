@@ -8,7 +8,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +56,31 @@ public class BookController {
             return ResponseEntity.ok(bookService.createBook(book));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/upload-image")
+    public ResponseEntity<String> uploadImage(@PathVariable String id,
+                                              @RequestParam("file") MultipartFile file) {
+        try {
+            byte[] imageData = file.getBytes();
+            boolean success = bookService.updateBookImage(id, imageData);
+            return success ? ResponseEntity.ok("Image uploaded successfully")
+                    : ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to upload image");
+        }
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getBookImage(@PathVariable String id) {
+        Optional<byte[]> imageData = bookService.getBookImage(id);
+        if (imageData.isPresent()) {
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/jpeg")
+                    .body(imageData.get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 

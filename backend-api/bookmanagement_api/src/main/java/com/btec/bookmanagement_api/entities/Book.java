@@ -30,6 +30,7 @@ public class Book {
     private List<Chapter> chapters;
     private List<Category> categories;
     private int views = 0 ;
+    private byte[] imageData;
     @Transient  // Không lưu vào MongoDB
     private List<Feedback> feedbacks;
 

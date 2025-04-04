@@ -159,7 +159,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
         formDataUpload.append("image", imageFile);
         
         // Replace with your actual image upload API here
-        const uploadResponse = await axios.post("http://150.95.105.147:8080/api/upload", formDataUpload);
+        const uploadResponse = await axios.post("https://api.it-ebook.io.vn/api/upload", formDataUpload);
         updatedFormData.image = uploadResponse.data.imageUrl;
       } catch (error) {
         toast.error("Error uploading image. Please try again.");

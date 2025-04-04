@@ -83,18 +83,58 @@
     }
   }
 
+  // Add these styles to your existing bookinfor.scss file
+  
   .book-rating {
     display: flex;
-    gap: 6px;
-    font-size: 22px;
-    margin-top: 12px;
-
-    svg {
-      color: gold;
-      transition: transform 0.2s ease-in-out;
-
-      &:hover {
-        transform: scale(1.2);
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    
+    .rating-label {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      font-size: 24px;
+      
+      .rating-star {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.2);
+        }
+        
+        .star-filled {
+          color: gold;
+        }
+        
+        .star-empty {
+          color: #ccc;
+        }
+      }
+    }
+    
+    .average-rating {
+      margin-top: 10px;
+      
+      p {
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+      
+      .stars-display {
+        display: flex;
+        gap: 5px;
+        font-size: 18px;
+        
+        svg {
+          color: gold;
+        }
       }
     }
   }

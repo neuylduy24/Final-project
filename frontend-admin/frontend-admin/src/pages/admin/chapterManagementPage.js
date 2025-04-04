@@ -25,7 +25,7 @@ const ChapterManagementPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedBookId, setSelectedBookId] = useState("all");
-  const itemsPerPage = 10;
+  const itemsPerPage = 4;
 
   // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -197,7 +197,7 @@ const ChapterManagementPage = () => {
         )}
 
         <ChapterTable
-          chapters={chapters}
+          chapters={currentChapters}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           setShowForm={setShowForm}
@@ -209,7 +209,7 @@ const ChapterManagementPage = () => {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
           />
         )}
       </div>

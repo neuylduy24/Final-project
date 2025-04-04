@@ -26,7 +26,7 @@ const HeaderAd = ({ ...props }) => {
         }
 
         const response = await axios.get(
-          "http://150.95.105.147:8080/api/users",
+          "https://api.it-ebook.io.vn/api/users",
           {
             headers: {
               Authorization: `Bearer ${token}`,

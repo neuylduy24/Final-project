@@ -65,7 +65,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://150.95.105.147:8080/api/books/${id}`);
+      await axios.delete(`https://api.it-ebook.io.vn/api/books/${id}`);
       fetchBooks();
       toast.warning("🗑️ Book deleted successfully!");
     } catch (error) {

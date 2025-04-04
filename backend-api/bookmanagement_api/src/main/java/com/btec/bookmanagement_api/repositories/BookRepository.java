@@ -11,7 +11,8 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends MongoRepository<Book, String> {
     Optional<Book> findByTitle(String title);
-    List<Book> findByAuthor(String author);
+    List<Book> findByAuthorId(String authorId);
     @Query("{ $text: { $search: ?0 } }")
     List<Book> searchBooks(String keyword);
+    List<Book> findByTitleContainingIgnoreCase(String title);
 }

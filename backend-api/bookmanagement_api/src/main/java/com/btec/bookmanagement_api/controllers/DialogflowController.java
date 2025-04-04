@@ -37,7 +37,7 @@ public class DialogflowController {
 
         StringBuilder responseText = new StringBuilder("Tôi tìm thấy một số sách về " + bookTopic + ":\n");
         for (Book book : books) {
-            responseText.append("- ").append(book.getTitle()).append(" của ").append(book.getAuthor()).append("\n");
+            responseText.append("- ").append(book.getTitle()).append(" của ").append(book.getAuthorId()).append("\n");
         }
 
         return Map.of("fulfillmentText", responseText.toString());

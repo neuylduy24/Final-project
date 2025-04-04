@@ -38,9 +38,14 @@ public class BookController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/author/{author}")
-    public List<Book> getBooksByAuthor(@PathVariable String author) {
-        return bookService.getBooksByAuthor(author);
+    @GetMapping("/search")
+    public List<Book> searchBooksByTitle(@RequestParam String title) {
+        return bookService.searchBooksByTitle(title);
+    }
+
+    @GetMapping("/author/{authorId}")
+    public List<Book> getBooksByAuthorId(@PathVariable String authorId) {
+        return bookService.getBooksByAuthorId(authorId);
     }
 
     @PostMapping

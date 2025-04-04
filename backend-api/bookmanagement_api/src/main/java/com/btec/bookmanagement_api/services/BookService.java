@@ -29,8 +29,12 @@ public class BookService {
         return bookRepository.findByTitle(title);
     }
 
-    public List<Book> getBooksByAuthor(String author) {
-        return bookRepository.findByAuthor(author);
+    public List<Book> searchBooksByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    public List<Book> getBooksByAuthorId(String authorId) {
+        return bookRepository.findByAuthorId(authorId);
     }
 
     public Book createBook(Book book) {
@@ -43,11 +47,12 @@ public class BookService {
     public Book updateBook(String id, Book bookDetails) {
         return bookRepository.findById(id).map(book -> {
             book.setTitle(bookDetails.getTitle());
-            book.setAuthor(bookDetails.getAuthor());
+            book.setAuthorId(bookDetails.getAuthorId());
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
             book.setChapters(bookDetails.getChapters());
             book.setCategories(bookDetails.getCategories());
+            book.setViews(bookDetails.getViews());
             return bookRepository.save(book);
         }).orElseThrow(() -> new RuntimeException("Book not found with id " + id));
     }

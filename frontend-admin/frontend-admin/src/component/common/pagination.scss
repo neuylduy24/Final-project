@@ -1,0 +1,39 @@
+@use "sass:map";
+@import "../../styles/pages/all.scss";
+@import "../../styles/pages/responsive.scss";
+
+.footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .page-button {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: #ddd;
+            }
+
+            &.page-button-active {
+                background-color: #007bff;
+                color: white;
+                border-color: #007bff;
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+        }
+    }
+}

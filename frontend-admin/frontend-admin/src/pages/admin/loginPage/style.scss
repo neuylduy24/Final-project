@@ -1,216 +1,275 @@
 @use "sass:map";
+@import "../../../styles/pages/theme";
 @import "../../../styles/pages/all";
-
-.error-message {
-    color: red;
-    font-weight: bold;
-    margin-top: 5px;
-}
-
-.success-message {
-    color: green;
-    font-weight: bold;
-    margin-top: 5px;
-}
+@import "../../../styles/pages/responsive";
 
 .login {
-    width: 90%;
-    height: 90vh; /* Changed from min-height to fixed height */
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
-    padding: 20px;
-    overflow: hidden; /* Added to prevent scrolling */
+    height: 90vh;
+    background: #f4f7f9;
 
     .login-container {
-        background: #ffffff;
         display: flex;
-        height: auto; /* Changed from 100% to auto */
-        width: 900px;
-        max-width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        animation: fadeIn 0.5s ease-in-out;
+        max-width: 900px;
+        width: 100%;
     }
 
     .login-left {
-        width: 50%;
+        flex: 1;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 40px;
-        text-align: center;
-        background-color: #f9f3e6;
-
-        img {
-            width: 70%;
-            max-width: 180px;
-            transition: transform 0.3s ease;
-            
-            &:hover {
-                transform: scale(1.05);
-            }
-        }
-    }
-
-    .footer__about_logo {
-        width: 180px;
-        margin-bottom: 20px;
-    }
-
-    .login-title {
-        font-weight: 700;
-        color: map.get($theme-colors, "normal-text");
-        margin-top: 20px;
-        font-size: 24px;
-    }
-    
-    .login-subtitle {
-        color: #666;
-        margin-top: 10px;
-        font-size: 16px;
+        background: #e0eaff;
+        padding: 20px;
     }
 
     .login-right {
-        width: 50%;
+        flex: 1;
         padding: 40px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-    }
-    
-    .form-title {
-        font-size: 22px;
-        font-weight: 600;
-        color: map.get($theme-colors, "normal-text");
-        margin-bottom: 25px;
-        text-align: center;
     }
 
     .login-form {
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        width: 100%;
+        gap: 15px;
 
-        .login-form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+    }
+
+    .login-form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
         }
 
         input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            color: map.get($theme-colors, "normal-text");
-            transition: all 0.3s;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #333;
+            font-size: 16px;
+            height: 57px;
+            outline: none;
+            transition: border 0.3s;
 
             &:focus {
-                border-color: map.get($theme-colors, "button-submit");
-                box-shadow: 0 0 0 2px rgba(60, 60, 217, 0.1);
-                outline: none;
-            }
-        }
-
-        .login-button {
-            height: 48px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-            background: map.get($theme-colors, "button-submit");
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-
-            &:hover {
-                background: darken(map.get($theme-colors, "button-submit"), 10%);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            
-            &:disabled {
-                opacity: 0.7;
-                cursor: not-allowed;
-                transform: none;
-                box-shadow: none;
+                border-color: #007bff;
             }
         }
     }
 
-    .login-label {
-        font-size: 15px;
-        font-weight: 500;
-        color: map.get($theme-colors, "normal-text");
+    .login-button {
+        background: #007bff;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        width: 95%;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+            background: #0056b3;
+        }
+
+        &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
     }
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-// Responsive styles
-@include Responsive($TABLET_DEVICE) {
-    .login {
-        .login-container {
-            flex-direction: column;
+@include Responsive($DESKTOP) {
+    .login-container {
+        flex-direction: row;
+    }
+
+    .login-left {
+        img {
             width: 90%;
-            max-width: 500px;
+        }
+    }
+
+    .login {
+        margin-left: -180px;
+    }
+
+    .input-email {
+        width: 95%;
+    }
+}
+
+@include Responsive($TABLET_DEVICE) {
+    .login-container {
+        flex-direction: row;
+    }
+
+    .login {
+        margin-left: -180px;
+    }
+
+    .login-left {
+        img {
+            width: 90%;
+        }
+    }
+
+    .login-form-group {
+        .input-email {
+            width: 94%;
+            padding: 10px;
         }
 
-        .login-left, .login-right {
-            width: 100%;
-            padding: 30px;
+        .input-email {
+            width: 95%;
+            padding: 10px;
         }
-        
-        .login-left {
-            padding-bottom: 20px;
+    }
+}
+
+@include Responsive($MEDIUM_DEVICE) {
+    .login-container {
+        flex-direction: row;
+    }
+
+    .login-left {
+        img {
+            width: 90%;
+        }
+    }
+
+    .login {
+        margin-left: -180px;
+    }
+
+    .login-form-group {
+        .input-email {
+            width: 95%;
+            padding: 10px;
+        }
+
+        .input-email {
+            width: 95%;
+            padding: 10px;
         }
     }
 }
 
 @include Responsive($WIDE_MOBILE) {
+    .login-container {
+        flex-direction: row;
+    }
+
+    .login-left {
+        img {
+            width: 90%;
+        }
+    }
+
     .login {
-        padding: 15px;
-        
-        .login-container {
-            width: 100%;
+        margin-left: -180px;
+    }
+
+    .login-form-group {
+        .input-email {
+            width: 93%;
+            padding: 10px;
         }
-        
-        .login-left, .login-right {
-            padding: 25px 20px;
-        }
-        
-        .login-title {
-            font-size: 20px;
-        }
-        
-        .form-title {
-            font-size: 20px;
-            margin-bottom: 20px;
+
+        .input-email {
+            width: 95%;
+            padding: 10px;
         }
     }
 }
 
-// Add this to the end of the file to prevent body scrolling
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    height: 100%;
+@include Responsive($SMALL_DEVICE) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left {
+        img {
+            width: 90%;
+        }
+    }
+
+    .login {
+        margin-left: -180px;
+    }
+
+    .login-form-group {
+        .input-email {
+            width: 90.2975%;
+            padding: 10px;
+        }
+    }
+}
+
+@media only screen and (max-width: 425px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left {
+        img {
+            width: 50%;
+        }
+    }
+
+    .login {
+        margin-left: -190px;
+    }
+
+    .login-form-group {
+        .input-email {
+            font-size: 14px !important;
+            width: 95.1%;
+            padding: 10px;
+        }
+    }
+}
+
+@media only screen and (max-width: 375px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left {
+        img {
+            width: 50%;
+        }
+    }
+
+    .login {
+        margin-left: -190px;
+    }
+
+    .login-form-group {
+        .input-email {
+            width: 95.1%;
+            font-size: 14px !important;
+            padding: 10px;
+        }
+    }
 }

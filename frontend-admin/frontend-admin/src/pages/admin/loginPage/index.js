@@ -1,7 +1,8 @@
 import { memo, useState } from "react";
 import "./style.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ROUTERS } from "../../../utils/router";
+import logologin from "../../../assets/user/image/hero/logo.png";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,17 +21,27 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://api.it-ebook.io.vn/api/auth/sign-in", formData);
+      const response = await axios.post(
+        "https://api.it-ebook.io.vn/api/auth/sign-in",
+        formData
+      );
 
-      if (response.status === 200 && response.data.token) {
-        localStorage.setItem("token", response.data.token);
+      const { token, user } = response.data;
+      console.log("User data:", user);
+      const roles = user?.roles || [];
+
+      if (response.status === 200 && token && roles.includes("ADMIN")) {
+        localStorage.setItem("token", token);
         localStorage.setItem("email", formData.email);
+        localStorage.setItem("roles", "ADMIN");
 
         toast.success("✅ Login successful!", { autoClose: 1000 });
 
         setTimeout(() => {
           navigate(ROUTERS.ADMIN.STATISTICS);
         }, 2000);
+      } else if (!roles.includes("ADMIN")) {
+        toast.error("❌ You do not have permission to access the admin page!");
       } else {
         toast.error("❌ Email or password is incorrect!");
       }
@@ -40,7 +51,10 @@ const LoginPage = () => {
       } else if (err.response.status === 401) {
         toast.error("❌ Email or password is incorrect!");
       } else {
-        toast.error(err.response?.data?.message || "❌ An error occurred, please try again!");
+        toast.error(
+          err.response?.data?.message ||
+            "❌ An error occurred, please try again!"
+        );
       }
     } finally {
       setLoading(false);
@@ -50,29 +64,19 @@ const LoginPage = () => {
   return (
     <div className="login">
       <ToastContainer position="top-right" autoClose={3000} />
-
       <div className="login-container">
         <div className="login-left">
-          <Link to={ROUTERS.USER.HOME}>
-            <img
-              className="footer__about_logo"
-              src="/logo.png"
-              alt="Book Store Logo"
-            />
-          </Link>
-          <h2 className="login-title">Welcome to BookStore Admin!</h2>
-          <p className="login-subtitle">Please sign in to continue</p>
+          <img src={logologin} alt="Login Illustration" />
         </div>
 
         <div className="login-right">
-          <h3 className="form-title">Sign In</h3>
           <form className="login-form" onSubmit={handleSubmit}>
+            <h2>Sign In</h2>
             <div className="login-form-group">
-              <label htmlFor="email" className="login-label">
-                Email:
-              </label>
+              <label htmlFor="email">Email:</label>
               <input
                 type="email"
+                className="input-email"
                 id="email"
                 name="email"
                 value={formData.email}
@@ -81,12 +85,11 @@ const LoginPage = () => {
                 required
               />
             </div>
-            <div className="login-form-group">
-              <label htmlFor="password" className="login-label">
-                Password:
-              </label>
+            <div className="login-form-group password-group">
+              <label htmlFor="password">Password:</label>
               <input
                 type="password"
+                className="input-email"
                 id="password"
                 name="password"
                 value={formData.password}

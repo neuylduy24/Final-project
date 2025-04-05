@@ -90,12 +90,18 @@ public class AuthController {
         String roles = String.join(",", user.getRoles());
         String token = JwtUtil.generateToken(user.getEmail(), roles);
 
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("email", user.getEmail());
+        userInfo.put("username", user.getUsername());
+        userInfo.put("roles", user.getRoles());
+
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
-        response.put("roles", user.getRoles());
+        response.put("user", userInfo); // 👈 Trả về dưới key "user"
 
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
         Map<String, String> response = new HashMap<>();

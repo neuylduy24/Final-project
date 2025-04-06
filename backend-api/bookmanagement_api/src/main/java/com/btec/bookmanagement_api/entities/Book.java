@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public class Book {
     private List<Category> categories;
     private int views = 0 ;
     private byte[] imageData;
+    @Indexed
+    private String imageHash;
     @Transient  // Không lưu vào MongoDB
     private List<Feedback> feedbacks;
     @CreatedDate

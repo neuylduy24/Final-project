@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.entities.Feedback;
+import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.FeedbackService;
 import jakarta.validation.Valid;
@@ -19,7 +20,10 @@ import java.util.Optional;
 public class BookController {
     @Autowired
     private BookService bookService;
+    @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private BookRepository bookRepository;
 
     @GetMapping
     public List<Book> getAllBooks() {
@@ -73,13 +77,20 @@ public class BookController {
                                               @RequestParam("file") MultipartFile file) {
         try {
             byte[] imageData = file.getBytes();
+
+            // Cập nhật ảnh cho sách
             boolean success = bookService.updateBookImage(id, imageData);
-            return success ? ResponseEntity.ok("Image uploaded successfully")
-                    : ResponseEntity.notFound().build();
+
+            if (success) {
+                return ResponseEntity.ok("Image uploaded successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Image already used in another book.");
+            }
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload image");
         }
     }
+
 
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getBookImage(@PathVariable String id) {

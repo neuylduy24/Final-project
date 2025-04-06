@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,7 @@ public class BookService {
             book.setDescription(bookDetails.getDescription());
             book.setChapters(bookDetails.getChapters());
             book.setCategories(bookDetails.getCategories());
+            book.setImageData(bookDetails.getImageData());
             book.setViews(bookDetails.getViews());
             return bookRepository.save(book);
         }).orElseThrow(() -> new RuntimeException("Book not found with id " + id));
@@ -98,7 +100,7 @@ public class BookService {
     }
 
     // Phương thức tính toán hash ảnh
-    public String calculateImageHash(byte[] imageData) throws Exception {
+    public String calculateImageHash(byte[] imageData) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(imageData);
         return Base64.getEncoder().encodeToString(hash);

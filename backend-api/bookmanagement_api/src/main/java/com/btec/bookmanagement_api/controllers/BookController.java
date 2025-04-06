@@ -2,15 +2,18 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.entities.Feedback;
+import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.FeedbackService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +22,10 @@ import java.util.Optional;
 public class BookController {
     @Autowired
     private BookService bookService;
+    @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private BookRepository bookRepository;
 
     @GetMapping
     public List<Book> getAllBooks() {
@@ -71,13 +77,44 @@ public class BookController {
     @PostMapping("/{id}/upload-image")
     public ResponseEntity<String> uploadImage(@PathVariable String id,
                                               @RequestParam("file") MultipartFile file) {
+        Optional<Book> bookOpt = bookRepository.findById(id);
+
+        if (bookOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Book not found with id " + id);
+        }
+
+        Book book = bookOpt.get();
+
+        // Kiểm tra xem sách đã có ảnh bằng URL chưa
+        if (book.getImage() != null && !book.getImage().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("This book already has an image URL. You cannot upload a new image.");
+        }
+
+        // Tiến hành xử lý ảnh upload
         try {
             byte[] imageData = file.getBytes();
-            boolean success = bookService.updateBookImage(id, imageData);
-            return success ? ResponseEntity.ok("Image uploaded successfully")
-                    : ResponseEntity.notFound().build();
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to upload image");
+
+            // Kiểm tra trùng ảnh (dùng hàm hash ảnh nếu có)
+            String imageHash = bookService.calculateImageHash(imageData);  // Gọi phương thức calculateImageHash
+            Optional<Book> duplicateImageBook = bookRepository.findByImageHash(imageHash);
+
+            if (duplicateImageBook.isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("This image is already used by another book.");
+            }
+
+            // Cập nhật ảnh cho sách
+            book.setImageData(imageData);
+            book.setImageHash(imageHash); // Lưu hash của ảnh vào sách
+            bookRepository.save(book);
+
+            return ResponseEntity.ok("Image uploaded successfully");
+
+        } catch (IOException | NoSuchAlgorithmException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload image");
         }
     }
 

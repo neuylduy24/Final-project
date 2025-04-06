@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +42,8 @@ public class BookService {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
-    public List<Book> getBooksByAuthorId(String authorId) {
-        return bookRepository.findByAuthorId(authorId);
+    public List<Book> getBooksByAuthorId(String author) {
+        return bookRepository.findByAuthor(author);
     }
 
     public List<Book> getBooksSortedByCreatedDateDesc() {
@@ -57,11 +60,12 @@ public class BookService {
     public Book updateBook(String id, Book bookDetails) {
         return bookRepository.findById(id).map(book -> {
             book.setTitle(bookDetails.getTitle());
-            book.setAuthorId(bookDetails.getAuthorId());
+            book.setAuthor(bookDetails.getAuthor());
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
             book.setChapters(bookDetails.getChapters());
             book.setCategories(bookDetails.getCategories());
+            book.setImageData(bookDetails.getImageData());
             book.setViews(bookDetails.getViews());
             return bookRepository.save(book);
         }).orElseThrow(() -> new RuntimeException("Book not found with id " + id));
@@ -71,16 +75,39 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-
     public boolean updateBookImage(String bookId, byte[] imageData) {
-        Optional<Book> bookOpt = bookRepository.findById(bookId);
-        if (bookOpt.isPresent()) {
-            Book book = bookOpt.get();
-            book.setImageData(imageData);
-            bookRepository.save(book);
-            return true;
+        try {
+            // Tính toán hash ảnh
+            String imageHash = calculateImageHash(imageData);
+
+            // Kiểm tra xem có sách nào đã sử dụng ảnh này chưa (trừ chính sách đang cập nhật)
+            Optional<Book> duplicateImageBook = bookRepository.findByImageHash(imageHash)
+                    .filter(book -> !book.getId().equals(bookId));
+
+            if (duplicateImageBook.isPresent()) {
+                return false; // Nếu có sách trùng ảnh, không cho phép cập nhật
+            }
+
+            Optional<Book> bookOpt = bookRepository.findById(bookId);
+            if (bookOpt.isPresent()) {
+                Book book = bookOpt.get();
+                book.setImageData(imageData);
+                book.setImageHash(imageHash); // Cập nhật hash ảnh vào sách
+                bookRepository.save(book);
+                return true;
+            }
+        } catch (Exception e) {
+            // Nếu có lỗi xảy ra trong việc tính toán hash ảnh
+            return false;
         }
         return false;
+    }
+
+    // Phương thức tính toán hash ảnh
+    public String calculateImageHash(byte[] imageData) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(imageData);
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     public Optional<byte[]> getBookImage(String bookId) {

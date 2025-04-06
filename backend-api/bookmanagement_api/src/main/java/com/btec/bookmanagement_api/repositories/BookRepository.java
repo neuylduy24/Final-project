@@ -11,12 +11,15 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends MongoRepository<Book, String> {
     Optional<Book> findByTitle(String title);
-    List<Book> findByAuthorId(String authorId);
+    List<Book> findByAuthor(String author);
     @Query("{ $text: { $search: ?0 } }")
     List<Book> searchBooks(String keyword);
 
     List<Book> findByTitleContainingIgnoreCase(String title);
+    List<Book> findByDescriptionContainingIgnoreCase(String title);
+    Optional<Book> findByImageHash(String imageHash);
     List<Book> findAllByOrderByCreatedAtDesc();
+
 
 
     List<Book> findByTitleIn(List<String> titles);

@@ -10,9 +10,18 @@ import java.util.Optional;
 @Repository
 public interface ReadingHistoryRepository extends MongoRepository<ReadingHistory, String> {
 
-    // 🔹 Lấy danh sách lịch sử đọc của một người dùng
+    // 🔹 Find reading history by user email, ordered by the last reading timestamp
     List<ReadingHistory> findByEmailOrderByLastReadAtDesc(String email);
 
-    // 🔹 Lấy lịch sử đọc mới nhất của một cuốn sách
+    // 🔹 Find the latest reading session for a user and a specific book
     Optional<ReadingHistory> findTopByEmailAndBookIdOrderByLastReadAtDesc(String email, String bookId);
+
+    // 🔹 Find the latest reading session for a user, a specific book, and chapter
+    Optional<ReadingHistory> findTopByEmailAndBookIdAndChapterIdOrderByLastReadAtDesc(String email, String bookId, String chapterId);
+
+    // 🔹 Find all reading history entries for a specific book
+    List<ReadingHistory> findByBookId(String bookId);
+
+    // 🔹 Find all reading history entries for a specific chapter
+    List<ReadingHistory> findByChapterId(String chapterId);
 }

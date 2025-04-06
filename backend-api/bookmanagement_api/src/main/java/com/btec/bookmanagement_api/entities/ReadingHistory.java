@@ -1,5 +1,8 @@
 package com.btec.bookmanagement_api.entities;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -23,11 +26,15 @@ public class ReadingHistory {
     @Field(name = "email")
     private String email;  // 🔹 Email là định danh chính của người dùng
 
-    @Field(name = "user_id")
-    private String userId;  // 🔹 Giữ userId để tham chiếu
+    @Field(name = "userId")
+    private String userId;
 
     @Indexed
-    @Field(name = "book_id")
+    @Field(name = "chapterId")
+    private String chapterId;
+
+    @Indexed
+    @Field(name = "bookId")
     private String bookId;
 
     @Field(name = "session_id")
@@ -54,8 +61,16 @@ public class ReadingHistory {
     @Field(name = "updated_at")
     private Instant updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY) // Many ReadingHistories can reference the same Book
+    @JoinColumn(name = "book_id", referencedColumnName = "id", insertable = false, updatable = false) // Foreign key relationship
+    private Book book; // The actual Book object
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many ReadingHistories can reference the same Chapter
+    @JoinColumn(name = "chapter_id", referencedColumnName = "id", insertable = false, updatable = false) // Foreign key relationship
+    private Chapter chapter; // The chapter the user is currently reading
+
     // 🔹 Bắt đầu một session mới
-    public static ReadingHistory startNewSession(String email, String userId, String bookId) {
+    public static ReadingHistory startNewSession(String email, String userId, String bookId, String chapterId) {
         return ReadingHistory.builder()
                 .id(UUID.randomUUID().toString()) // Tạo ID duy nhất
                 .email(email)
@@ -68,15 +83,17 @@ public class ReadingHistory {
                 .lastReadAt(Instant.now())
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
+                .chapterId(chapterId)  // Set the chapter being read
                 .build();
     }
 
     // 🔹 Cập nhật tiến trình đọc
-    public void updateProgress(int newProgress, long additionalTimeSpent) {
+    public void updateProgress(int newProgress, long additionalTimeSpent, String chapterId) {
         this.progress = Math.max(this.progress, newProgress); // Lấy giá trị cao nhất
         this.timeSpent += additionalTimeSpent;
         this.lastReadAt = Instant.now();
         this.updatedAt = Instant.now();
+        this.chapterId = chapterId;  // Update the chapter if it changes
     }
 
     // 🔹 Kết thúc session đọc

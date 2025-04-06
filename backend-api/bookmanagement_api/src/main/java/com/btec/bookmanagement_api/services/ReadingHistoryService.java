@@ -21,27 +21,32 @@ public class ReadingHistoryService {
     }
 
     // 🔹 Bắt đầu hoặc tiếp tục đọc sách
-    public ReadingHistory startOrUpdateReading(String email, String userId, String bookId, int progress, long timeSpent) {
-        Optional<ReadingHistory> existingHistory = readingHistoryRepository.findTopByEmailAndBookIdOrderByLastReadAtDesc(email, bookId);
+    public ReadingHistory startOrUpdateReading(String email, String userId, String bookId, String chapterId, int progress, long timeSpent) {
+        Optional<ReadingHistory> existingHistory = readingHistoryRepository.findTopByEmailAndBookIdAndChapterIdOrderByLastReadAtDesc(email, bookId, chapterId);
 
         if (existingHistory.isPresent()) {
-            // 🔹 Nếu đã có lịch sử, cập nhật tiến trình đọc
+            // If there's an existing history, update the progress
             ReadingHistory history = existingHistory.get();
-            history.updateProgress(progress, timeSpent);
+            history.updateProgress(progress, timeSpent, chapterId);
             return readingHistoryRepository.save(history);
         } else {
-            // 🔹 Nếu chưa có, tạo session mới
-            ReadingHistory newHistory = ReadingHistory.startNewSession(email, userId, bookId);
+            // If there's no existing history, start a new session for the given chapter
+            ReadingHistory newHistory = ReadingHistory.startNewSession(email, userId, bookId, chapterId);
             return readingHistoryRepository.save(newHistory);
         }
     }
 
+
     // 🔹 Kết thúc một phiên đọc
     public void endReadingSession(String id) {
         Optional<ReadingHistory> history = readingHistoryRepository.findById(id);
-        history.ifPresent(h -> {
-            h.endReadingSession();
-            readingHistoryRepository.save(h);
-        });
+        if (history.isPresent()) {
+            history.get().endReadingSession();
+            readingHistoryRepository.save(history.get());
+        } else {
+            // Log or throw exception
+            throw new IllegalArgumentException("Reading history not found for id: " + id);
+        }
     }
+
 }

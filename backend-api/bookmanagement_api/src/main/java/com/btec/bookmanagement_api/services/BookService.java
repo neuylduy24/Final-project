@@ -33,6 +33,11 @@ public class BookService {
         return bookRepository.findByTitle(title);
     }
 
+    public List<Book> getBooksByTitles(List<String> titles) {
+        return bookRepository.findByTitleIn(titles);
+    }
+
+
     public List<Book> searchBooksByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
@@ -70,7 +75,6 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    // Phương thức cập nhật ảnh cho sách và kiểm tra trùng lặp
     public boolean updateBookImage(String bookId, byte[] imageData) {
         try {
             // Tính toán hash ảnh
@@ -110,4 +114,8 @@ public class BookService {
         return bookRepository.findById(bookId)
                 .map(Book::getImageData);
     }
+        public List<Book> getBooksByViews () {
+            return bookRepository.findTop8ByOrderByViewsDesc();  // Lấy 8 sách có lượt xem nhiều nhất
+
+        }
 }

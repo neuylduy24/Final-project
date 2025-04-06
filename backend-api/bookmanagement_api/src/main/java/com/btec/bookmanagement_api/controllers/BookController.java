@@ -130,6 +130,13 @@ public class BookController {
         }
     }
 
+    @GetMapping("/most-viewed")
+    public ResponseEntity<List<Book>> getMostViewedBooks() {
+        List<Book> books = bookService.getBooksByViews();
+        return ResponseEntity.ok(books);
+    }
+
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody Book bookDetails) {
         try {

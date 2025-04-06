@@ -14,13 +14,13 @@ public interface BookRepository extends MongoRepository<Book, String> {
     List<Book> findByAuthorId(String authorId);
     @Query("{ $text: { $search: ?0 } }")
     List<Book> searchBooks(String keyword);
-<<<<<<< Updated upstream
+
     List<Book> findByTitleContainingIgnoreCase(String title);
     List<Book> findAllByOrderByCreatedAtDesc();
 
-=======
+
     List<Book> findByTitleIn(List<String> titles);
     // Lấy 8 sách có lượt xem nhiều nhất
     List<Book> findTop8ByOrderByViewsDesc();
->>>>>>> Stashed changes
+
 }

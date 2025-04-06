@@ -36,8 +36,8 @@ public class BookService {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
-    public List<Book> getBooksByAuthorId(String authorId) {
-        return bookRepository.findByAuthorId(authorId);
+    public List<Book> getBooksByAuthorId(String author) {
+        return bookRepository.findByAuthor(author);
     }
 
     public List<Book> getBooksSortedByCreatedDateDesc() {
@@ -54,7 +54,7 @@ public class BookService {
     public Book updateBook(String id, Book bookDetails) {
         return bookRepository.findById(id).map(book -> {
             book.setTitle(bookDetails.getTitle());
-            book.setAuthorId(bookDetails.getAuthorId());
+            book.setAuthor(bookDetails.getAuthor());
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
             book.setChapters(bookDetails.getChapters());

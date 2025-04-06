@@ -25,7 +25,7 @@ public class Book {
     private String id;
     @NotBlank(message = "Title is required")
     private String title;
-    private String authorId;
+    private String author;
 
     @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format")
     private String image;

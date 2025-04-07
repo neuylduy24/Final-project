@@ -42,7 +42,7 @@ public class BookService {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
-    public List<Book> getBooksByAuthorId(String author) {
+    public List<Book> getBooksByAuthor(String author) {
         return bookRepository.findByAuthor(author);
     }
 

@@ -29,13 +29,13 @@ public class Book {
 
     @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format")
     private String image;
+    private byte[] imageData;
+    @Indexed
+    private String imageHash;
     private String description;
     private List<Chapter> chapters;
     private List<Category> categories;
     private int views = 0 ;
-    private byte[] imageData;
-    @Indexed
-    private String imageHash;
     @Transient  // Không lưu vào MongoDB
     private List<Feedback> feedbacks;
     @CreatedDate

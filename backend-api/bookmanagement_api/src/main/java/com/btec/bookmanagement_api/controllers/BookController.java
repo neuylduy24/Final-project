@@ -53,9 +53,9 @@ public class BookController {
         return bookService.searchBooksByTitle(title);
     }
 
-    @GetMapping("/author/{authorId}")
-    public List<Book> getBooksByAuthorId(@PathVariable String authorId) {
-        return bookService.getBooksByAuthorId(authorId);
+    @GetMapping("/author")
+    public List<Book> getBooksByAuthor(@PathVariable String author) {
+        return bookService.getBooksByAuthor(author);
     }
 
     @PostMapping

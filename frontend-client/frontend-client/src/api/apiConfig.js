@@ -2,14 +2,11 @@ import axios from "axios";
 
 export const API_BASE_URL = "https://api.it-ebook.io.vn"; // 🔹 URL API chính xác
 
-
-export default API_BASE_URL; // ✅ Export mặc định
-
+export default API_BASE_URL;
 
 export const API_ENDPOINTS = {
-  // Nếu dùng để GET lịch sử đọc theo email, có thể giữ nguyên:
   GET_USER_READING_HISTORY: "/api/reading-history",
-  
+
   // Endpoint dùng để lưu lịch sử đọc, phải đúng với backend
   UPDATE_READING_PROGRESS: "/api/reading-history/start",
 

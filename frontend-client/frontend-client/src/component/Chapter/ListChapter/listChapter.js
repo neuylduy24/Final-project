@@ -81,7 +81,7 @@ const Chapter = () => {
         {
           email,
           // Nếu có userId trong localStorage, thêm vào payload
-          userId: localStorage.getItem("userId"),
+          userId: localStorage.getItem("email"),
           bookId: id,
           chapterId: chapter.id,
           // Nếu backend yêu cầu thêm progress hoặc timeSpent, có thể thêm:

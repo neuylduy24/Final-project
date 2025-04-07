@@ -45,7 +45,7 @@ const Header = () => {
     },
     {
       name: "Ranking",
-      path: "",
+      path: ROUTERS.USER.BOOKRANK,
       isShowSubmenu: false,
       child: [
         {

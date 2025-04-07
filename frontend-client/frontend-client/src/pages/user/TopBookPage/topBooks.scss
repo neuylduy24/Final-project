@@ -1,29 +1,41 @@
 .top-books-page {
     padding: 20px;
-  
-    .filter-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-  
-      button {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 8px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-  
-        &:hover {
-          background-color: #0056b3;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .page-title {
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+    }
+
+    .ranking-tabs {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #e0e0e0;
+
+        .MuiTab-root {
+            text-transform: none;
+            font-weight: 500;
+            min-width: 120px;
         }
-      }
     }
-  
-    .top-books-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
+
+    .book-list-container {
+        min-height: 400px;
     }
-  }
+
+    .book-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .loading-message,
+    .no-books-message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+}
   

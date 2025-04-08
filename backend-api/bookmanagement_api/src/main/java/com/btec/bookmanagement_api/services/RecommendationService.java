@@ -54,7 +54,6 @@ public class RecommendationService {
         // Bước 1: Lấy danh sách lịch sử đọc của người dùng theo email
         List<ReadingHistory> historyList = readingHistoryService.getUserReadingHistory(email);
 
-
         // Bước 2: Lấy danh sách bookId từ historyList
         List<String> bookIds = historyList.stream()
                 .map(ReadingHistory::getBookId)         // Lấy bookId
@@ -63,14 +62,9 @@ public class RecommendationService {
                 .collect(Collectors.toList());
 
         // Bước 3: Truy vấn DB để lấy Book dựa trên danh sách bookId
-
-        Set<String> bookIds = historyList.stream()
-                .map(ReadingHistory::getBookId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
         return bookRepository.findAllById(bookIds);
     }
+
 
 
 

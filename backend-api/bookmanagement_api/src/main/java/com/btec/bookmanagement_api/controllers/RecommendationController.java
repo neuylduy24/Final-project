@@ -6,6 +6,7 @@ import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.PersonalizedRecommendationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 public class RecommendationController {
 
     private final PersonalizedRecommendationService personalizedRecommendationService;
-    private BookService bookService;
+    private final BookService bookService;
 
     @GetMapping("/personalized")
     public List<Book> getPersonalizedBooks(HttpServletRequest request) {

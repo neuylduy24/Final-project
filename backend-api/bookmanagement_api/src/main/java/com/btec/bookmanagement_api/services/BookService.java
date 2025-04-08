@@ -7,14 +7,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.btec.bookmanagement_api.dto.FollowCountDto;
+import com.btec.bookmanagement_api.entities.Book;
+import com.btec.bookmanagement_api.repositories.BookRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class BookService {
+
+
+    private final MongoTemplate mongoTemplate;
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -130,8 +153,56 @@ public class BookService {
         return bookRepository.findById(bookId)
                 .map(Book::getImageData);
     }
-        public List<Book> getBooksByViews () {
-            return bookRepository.findTop8ByOrderByViewsDesc();  // Lấy 8 sách có lượt xem nhiều nhất
+    public List<Book> getBooksByViews () {
+        return bookRepository.findTop8ByOrderByViewsDesc();  // Lấy 8 sách có lượt xem nhiều nhất
 
-        }
+    }
+
+    // ✅ Lấy tất cả sách theo follow giảm dần
+    @Cacheable(value = "bookFollowCounts", key = "'allBooksByFollow'")
+    public List<Book> getBooksSortedByFollowCount() {
+        Aggregation agg = newAggregation(
+                group("bookId").count().as("totalFollows")
+        );
+
+        AggregationResults<FollowCountDto> results = mongoTemplate.aggregate(
+                agg, "followbooks", FollowCountDto.class
+        );
+
+        Map<String, Long> followCountMap = results.getMappedResults().stream()
+                .collect(Collectors.toMap(FollowCountDto::getBookId, FollowCountDto::getTotalFollows));
+
+        List<Book> books = bookRepository.findAll();
+        books.forEach(book -> {
+            long count = followCountMap.getOrDefault(book.getId(), 0L);
+            book.setTotalFollows(count);
+        });
+
+        return books.stream()
+                .sorted((b1, b2) -> Long.compare(b2.getTotalFollows(), b1.getTotalFollows()))
+                .collect(Collectors.toList());
+    }
+
+    // ✅ Lấy top 10 sách theo follow
+    public List<Book> getTop10BooksByFollowCount() {
+        return getBooksSortedByFollowCount().stream().limit(10).collect(Collectors.toList());
+    }
+
+    // 🕒 Xóa cache mỗi giờ
+    @CacheEvict(value = "bookFollowCounts", allEntries = true)
+    @Scheduled(fixedRate = 3600000)
+    public void refreshBookFollowCache() {
+        // xóa cache -> lần sau request sẽ tính lại
+    }
+
+    // Top 10 truyện có lượt view cao nhất
+    public List<Book> getTop10BooksByViews() {
+        return bookRepository.findTop10ByOrderByViewsDesc();
+    }
+
+    // Lấy toàn bộ truyện theo view giảm dần
+    public List<Book> getAllBooksByViewsDesc() {
+        return bookRepository.findAllByOrderByViewsDesc();
+    }
+
 }

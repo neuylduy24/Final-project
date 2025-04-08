@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import com.btec.bookmanagement_api.entities.User;
+import com.btec.bookmanagement_api.entities.Category;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -106,4 +108,20 @@ public class UserService {
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
+
+    public List<String> getFavoriteGenres(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty() || optionalUser.get().getFavoriteCategories() == null) {
+            return List.of();
+        }
+
+        return optionalUser.get().getFavoriteCategories().stream()
+                .filter(Objects::nonNull) // 🔒 tránh null trong danh sách
+                .map(Category::getName)
+                .filter(name -> name != null && !name.isBlank()) // 🔒 lọc tên null hoặc trống
+                .collect(Collectors.toList());
+    }
+
+
 }

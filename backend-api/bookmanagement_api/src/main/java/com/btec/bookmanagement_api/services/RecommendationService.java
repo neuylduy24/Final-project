@@ -1,12 +1,14 @@
 package com.btec.bookmanagement_api.services;
 
 import com.btec.bookmanagement_api.entities.Book;
+import com.btec.bookmanagement_api.entities.FollowBook;
 import com.btec.bookmanagement_api.entities.ReadingHistory;
 import com.btec.bookmanagement_api.repositories.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,49 +17,92 @@ public class RecommendationService {
 
     private final BookRepository bookRepository;
     private final OpenAiService openAiService;
-    private ReadingHistoryService readingHistoryService;
+    private final ReadingHistoryService readingHistoryService;
+    private final FollowBookService followBookService;
+    private final UserService userService;
 
-    public List<Book> recommendBooks(String userId) {
-        // Lấy danh sách các truyện đã đọc của người dùng từ cơ sở dữ liệu
-        List<Book> readBooks = getBooksUserRead(userId);
-        if (readBooks.isEmpty()) {
-            return List.of(); // Trả về danh sách rỗng nếu không có truyện đã đọc
+    @Transactional(readOnly = true)
+    public List<Book> recommendBooks(String email) {
+        List<Book> readBooks = getBooksUserRead(email);
+        List<FollowBook> followedBooks = followBookService.getFollowBooksByEmail(email);
+        List<String> favoriteGenres = userService.getFavoriteGenres(email);
+
+        boolean hasNoData = readBooks.isEmpty() && followedBooks.isEmpty() && favoriteGenres.isEmpty();
+        if (hasNoData) {
+            return bookRepository.findRandomBooks(10);
         }
 
-        // Tạo prompt cho OpenAI dựa trên danh sách truyện đã đọc
-        String prompt = createPromptFromReadBooks(readBooks);
+        String prompt = createPrompt(readBooks, followedBooks, favoriteGenres);
+        System.out.println("📌 Prompt gửi cho OpenAI:\n" + prompt); // log để debug
 
-        // Gửi yêu cầu đến OpenAI để nhận gợi ý truyện
         String aiResponse = openAiService.getRecommendation(prompt);
 
-        // Xử lý phản hồi từ OpenAI và lấy danh sách các truyện gợi ý
-        List<String> recommendedBookTitles = parseAiResponse(aiResponse);
+        List<String> titles = parseAiResponse(aiResponse)
+                .stream()
+                .limit(10)
+                .collect(Collectors.toList());
 
-        // Truy vấn các truyện gợi ý từ cơ sở dữ liệu dựa trên tiêu đề
-        return bookRepository.findByTitleIn(recommendedBookTitles);
+        if (titles.isEmpty()) {
+            // Nếu AI không trả về kết quả nào hợp lệ → fallback
+            return bookRepository.findRandomBooks(10);
+        }
+
+        return bookRepository.findByTitleIn(titles);
     }
 
     private List<Book> getBooksUserRead(String email) {
-        // Lấy danh sách lịch sử đọc của người dùng từ service ReadingHistoryService
         List<ReadingHistory> historyList = readingHistoryService.getUserReadingHistory(email);
-
-        // Lấy danh sách các sách đã đọc từ lịch sử đọc
         return historyList.stream()
-                .map(ReadingHistory::getBook)  // Trả về sách từ lịch sử đọc
-                .collect(Collectors.toList()); // Chuyển thành danh sách các đối tượng Book
+                .map(ReadingHistory::getBook)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
+    private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteGenres) {
+        StringBuilder prompt = new StringBuilder("Tôi cần gợi ý sách cho người dùng dựa trên các dữ liệu sau:\n");
 
-    private String createPromptFromReadBooks(List<Book> readBooks) {
-        // Tạo prompt dựa trên tiêu đề các truyện đã đọc
-        String bookTitles = readBooks.stream()
-                .map(Book::getTitle)
-                .collect(Collectors.joining(", "));
-        return "Dựa trên các truyện sau: " + bookTitles + ". Hãy gợi ý những truyện tương tự mà người dùng có thể thích.";
+        if (!readBooks.isEmpty()) {
+            String readTitles = readBooks.stream()
+                    .map(Book::getTitle)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(", "));
+            prompt.append("- Đã đọc: ").append(readTitles).append("\n");
+        }
+
+        if (!followedBooks.isEmpty()) {
+            List<String> bookIds = followedBooks.stream()
+                    .map(FollowBook::getBookId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            List<Book> followedBookList = bookRepository.findAllById(bookIds);
+
+            String followTitles = followedBookList.stream()
+                    .map(Book::getTitle)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(", "));
+            prompt.append("- Đã theo dõi: ").append(followTitles).append("\n");
+        }
+
+        if (!favoriteGenres.isEmpty()) {
+            String genres = String.join(", ", favoriteGenres);
+            prompt.append("- Thể loại yêu thích: ").append(genres).append("\n");
+        }
+
+        prompt.append("Hãy gợi ý tối đa 10 truyện phù hợp nhất. Trả về mỗi truyện trên 1 dòng, chỉ bao gồm tên truyện.");
+        return prompt.toString();
     }
 
     private List<String> parseAiResponse(String aiResponse) {
-        // TODO: Xử lý phản hồi từ OpenAI và trích xuất danh sách tiêu đề truyện gợi ý
-        return List.of(); // Tạm thời trả về danh sách rỗng
+        if (aiResponse == null || aiResponse.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(aiResponse.split("\n"))
+                .map(line -> line.replaceAll("^[-•\\d.\\s]+", "").trim()) // Xóa ký tự đầu dòng như "1. ", "- "
+                .filter(title -> !title.isBlank())
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

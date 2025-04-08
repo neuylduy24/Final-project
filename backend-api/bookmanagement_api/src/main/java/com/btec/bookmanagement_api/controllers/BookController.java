@@ -213,4 +213,28 @@ public class BookController {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    // ✅ API: Get all books sorted by follow count
+    @GetMapping("/by-follow")
+    public ResponseEntity<List<Book>> getBooksByFollowCount() {
+        return ResponseEntity.ok(bookService.getBooksSortedByFollowCount());
+    }
+
+    // ✅ API: Get top 10 books with most follows
+    @GetMapping("/by-follow/top10")
+    public ResponseEntity<List<Book>> getTop10BooksByFollow() {
+        return ResponseEntity.ok(bookService.getTop10BooksByFollowCount());
+    }
+
+    // Top 10 theo view
+    @GetMapping("/top-views")
+    public ResponseEntity<List<Book>> getTop10BooksByViews() {
+        return ResponseEntity.ok(bookService.getTop10BooksByViews());
+    }
+
+    // Tất cả theo view giảm dần
+    @GetMapping("/by-views")
+    public ResponseEntity<List<Book>> getAllBooksByViewsDesc() {
+        return ResponseEntity.ok(bookService.getAllBooksByViewsDesc());
+    }
 }

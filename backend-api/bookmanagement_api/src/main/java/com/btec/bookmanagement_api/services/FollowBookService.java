@@ -44,4 +44,7 @@ public class FollowBookService {
     public void deleteFollowBookByEmailAndBook(String email, String bookId) {
         followBookRepository.deleteByEmailAndBookId(email, bookId);
     }
+    public long countFollowersByBookId(String bookId) {
+        return followBookRepository.countByBookId(bookId);
+    }
 }

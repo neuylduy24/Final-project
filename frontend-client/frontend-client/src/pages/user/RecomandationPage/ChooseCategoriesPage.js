@@ -31,12 +31,12 @@ const ChooseCategoriesPage = () => {
       toast.error("Bạn cần đăng nhập để lưu thể loại.");
       return;
     }
-  
+
     if (selectedCategoryIds.length === 0) {
       toast.warning("Vui lòng chọn ít nhất một thể loại.");
       return;
     }
-  
+
     // Gửi trực tiếp mảng các id mà không cần tên
     axios
       .post(
@@ -56,34 +56,35 @@ const ChooseCategoriesPage = () => {
       })
       .catch((error) => {
         const msg =
-          error.response?.data?.message || "Lỗi không xác định khi lưu thể loại.";
+          error.response?.data?.message ||
+          "Lỗi không xác định khi lưu thể loại.";
         toast.error("Lỗi: " + msg);
       });
   };
-  
-  
-  
 
   return (
     <div className="choose-categories-page">
-      <h2>Chọn thể loại bạn yêu thích</h2>
-      <div className="categories-grid">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className={`category-card ${
-              selectedCategoryIds.includes(cat.id) ? "selected" : ""
-            }`}
-            onClick={() => toggleCategory(cat.name)}
-          >
-            {cat.name}
-          </div>
-        ))}
+  <h2 className="question-title">What categories do you like best?</h2>
+  <div className="categories-grid">
+    {categories.map((cat) => (
+      <div
+        key={cat.id}
+        className={`category-card ${
+          selectedCategoryIds.includes(cat.name) ? "selected active" : ""
+        }`}
+        onClick={() => toggleCategory(cat.name)}
+      >
+        <span>{cat.name}</span>
       </div>
-      <button onClick={handleSubmit} className="submit-button">
-        Xác nhận
-      </button>
-    </div>
+    ))}
+  </div>
+  <div className="submit-section">
+    <button onClick={handleSubmit} className="submit-button">
+      Submit
+    </button>
+  </div>
+</div>
+
   );
 };
 

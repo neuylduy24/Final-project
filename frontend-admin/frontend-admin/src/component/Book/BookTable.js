@@ -7,83 +7,68 @@ import "react-toastify/dist/ReactToastify.css";
 
 const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
   const [books, setBooks] = useState([]);
-  const [selectedBook, setSelectedBook] = useState(null);
   const [filteredBooks, setFilteredBooks] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Hàm chuyển đổi có dấu thành không dấu
-  const removeAccents = (str) => {
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "D");
-  };
 
   useEffect(() => {
     fetchBooks();
   }, []);
 
   useEffect(() => {
+    filterBooks();
+  }, [searchTerm, books]);
+
+  const fetchBooks = async () => {
+    try {
+      const res = await axios.get("https://api.it-ebook.io.vn/api/books");
+      setBooks(res.data);
+    } catch (err) {
+      toast.error("❌ Failed to fetch books");
+    }
+  };
+
+  const removeAccents = (str) =>
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D");
+
+  const filterBooks = () => {
     setCurrentPage(1);
+    const keyword = removeAccents(searchTerm.toLowerCase());
+
     const filtered = books.filter((book) => {
-      const searchLower = removeAccents(searchTerm.toLowerCase());
-  
       const titleMatch = book.title
-        ? removeAccents(book.title.toLowerCase()).includes(searchLower)
+        ? removeAccents(book.title.toLowerCase()).includes(keyword)
         : false;
-  
       const authorMatch = book.author
-        ? removeAccents(book.author.toLowerCase()).includes(searchLower)
+        ? removeAccents(book.author.toLowerCase()).includes(keyword)
         : false;
-  
-      let categoriesMatch = false;
-      if (book.categories && Array.isArray(book.categories)) {
-        categoriesMatch = book.categories.some(
-          (cat) =>
-            cat?.name &&
-            removeAccents(cat.name.toLowerCase()).includes(searchLower)
+
+      let categoryMatch = false;
+      if (Array.isArray(book.categories)) {
+        categoryMatch = book.categories.some((cat) =>
+          removeAccents(cat?.name?.toLowerCase() || "").includes(keyword)
         );
       } else if (Array.isArray(book.category)) {
-        categoriesMatch = book.category.some(
-          (cat) =>
-            cat?.name &&
-            removeAccents(cat.name.toLowerCase()).includes(searchLower)
+        categoryMatch = book.category.some((cat) =>
+          removeAccents(cat?.name?.toLowerCase() || "").includes(keyword)
         );
       } else if (typeof book.category === "string") {
-        categoriesMatch = removeAccents(book.category.toLowerCase()).includes(
-          searchLower
+        categoryMatch = removeAccents(book.category.toLowerCase()).includes(
+          keyword
         );
       }
-  
-      return titleMatch || authorMatch || categoriesMatch;
-    });
-    setFilteredBooks(filtered);
-  }, [searchTerm, books, setCurrentPage]);
-  
 
-  async function fetchBooks() {
-    try {
-      const response = await axios.get("https://api.it-ebook.io.vn/api/books");
-      setBooks(response.data);
-    } catch (error) {
-      toast.error("❌ Error fetching books!");
-    }
-  }
+      return titleMatch || authorMatch || categoryMatch;
+    });
+
+    setFilteredBooks(filtered);
+  };
 
   const handleEdit = (book) => {
     setSelectedBook(book);
@@ -94,70 +79,61 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
   const handleSave = async (book) => {
     try {
       let response;
-      if (!isEditing) {
-        // Create new book
-        const bookData = {
-          title: book.title,
-          author: book.author,
-          categories: book.categories || [],
-          category: book.category || "",
-          image: book.image || "",
-          createdAt: new Date().toISOString(),
-        };
 
-        console.log("Sending book data:", bookData);
-        response = await axios.post(
-          "https://api.it-ebook.io.vn/api/books",
-          bookData
-        );
-      } else {
-        // Update existing book
-        const bookData = {
-          title: book.title,
-          author: book.author,
-          categories: book.categories || [],
-          // category: book.category || "",
-          image: book.image || "",
-        };
-        console.log("Sending book dataa:", bookData);
+      const bookData = {
+        title: book.title,
+        author: book.author,
+        categories: book.categories || [],
+        category: book.category || "",
+      };
+      if (book.image) {
+        bookData.image = book.image; // nếu là image URL
+      }
+      console.log("BOOK DATA TO SEND:", bookData);
 
-        console.log("Updating book data:", bookData);
+      if (isEditing) {
         response = await axios.put(
           `https://api.it-ebook.io.vn/api/books/${book.id}`,
           bookData
         );
-      }
-
-      // Refresh the book list
-      fetchBooks();
-
-      // Return the saved book data
-      return response.data;
-    } catch (error) {
-      console.error("Error saving book:", error);
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        toast.error(`❌ Error saving book: ${error.response.data}`);
       } else {
-        toast.error("❌ Error saving book!");
+        bookData.createdAt = new Date().toISOString();
+        response = await axios.post(
+          "https://api.it-ebook.io.vn/api/books",
+          bookData
+        );
       }
-      throw error;
-    }
+
+      fetchBooks();
+      toast.success("✅ Book saved successfully!");
+      return response.data;
+    } catch {}
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`https://api.it-ebook.io.vn/api/books/${id}`);
       fetchBooks();
-      toast.warning("🗑️ Book deleted successfully!");
-    } catch (error) {
-      toast.error("❌ Error deleting book!");
+      toast.warning("🗑️ Book deleted");
+    } catch (err) {
+      toast.error("❌ Failed to delete book");
     }
   };
 
-  const indexOfLastBook = currentPage * booksPerPage;
-  const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const indexOfLast = currentPage * booksPerPage;
+  const indexOfFirst = indexOfLast - booksPerPage;
+  const currentBooks = filteredBooks.slice(indexOfFirst, indexOfLast);
 
   return (
     <div>
@@ -195,7 +171,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Cover Image</th>
+            <th>Cover</th>
             <th>Title</th>
             <th>Author</th>
             <th>Categories</th>
@@ -208,33 +184,53 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             currentBooks.map((book) => (
               <tr key={book.id}>
                 <td>{book.id}</td>
-                <td className="book-image-cell">
+                <td>
                   {book.image ? (
                     <img
                       src={book.image}
-                      alt={book.title}
+                      alt="cover"
                       style={{
-                        width: "50px",
-                        height: "75px",
+                        width: 50,
+                        height: 75,
                         objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  ) : book.imageData ? (
+                    <img
+                      src={`data:image/jpeg;base64,${book.imageData}`}
+                      alt="cover"
+                      style={{
+                        width: 50,
+                        height: 75,
+                        objectFit: "cover",
+                        borderRadius: "4px",
                       }}
                     />
                   ) : (
-                    <div className="no-image-placeholder">No image</div>
+                    <img
+                      src={`https://api.it-ebook.io.vn/api/books/${book.id}/image`}
+                      alt="cover"
+                      style={{
+                        width: 50,
+                        height: 75,
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
                   )}
                 </td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>
-                  {book.categories && Array.isArray(book.categories)
+                  {book.categories
                     ? book.categories.map((cat) => cat.name).join(", ")
-                    : Array.isArray(book.category)
-                    ? book.category.map((cat) => cat.name).join(", ")
-                    : book.category || ""}
+                    : book.category}
                 </td>
                 <td>{formatDate(book.createdAt)}</td>
                 <td>
                   <div className="action-buttons">
+                    {" "}
                     <button
                       className="btn-edit"
                       onClick={() => handleEdit(book)}
@@ -254,7 +250,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           ) : (
             <tr>
               <td colSpan="7" style={{ textAlign: "center" }}>
-                {searchTerm ? "No matching books found" : "No books yet"}
+                {searchTerm ? "No matching books found" : "No books available"}
               </td>
             </tr>
           )}

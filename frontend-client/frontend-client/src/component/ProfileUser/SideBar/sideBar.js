@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaUser, FaLock, FaHistory, FaBookmark, FaComments} from "react-icons/fa";
+import { FaUser, FaLock, FaHistory, FaBookmark} from "react-icons/fa";
 import "./sidebar.scss";
 import { ROUTERS } from "utils/path";
 
@@ -11,7 +11,6 @@ const Sidebar = () => {
     { icon: <FaLock />, label: "Reset Password", path: ROUTERS.USER.RESETPASSWORD },
     { icon: <FaHistory />, label: "Book History", path: ROUTERS.USER.BOOKHISTORY },
     { icon: <FaBookmark />, label: "Book Follow", path: ROUTERS.USER.BOOKFOLLOW },
-    { icon: <FaComments />, label: "Comment", path: ROUTERS.USER.COMMENT },
   ];
 
   return (

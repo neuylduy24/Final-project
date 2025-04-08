@@ -18,6 +18,7 @@ public class ReadingHistoryService {
         return readingHistoryRepository.findByEmailOrderByLastReadAtDesc(email);
     }
 
+
     public ReadingHistory startOrUpdateReading(String email, String userId, String bookId, String chapterId, int progress, long timeSpent) {
         Optional<ReadingHistory> existingHistory =
                 readingHistoryRepository.findTopByEmailAndBookIdAndChapterIdOrderByLastReadAtDesc(email, bookId, chapterId);

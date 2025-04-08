@@ -5,9 +5,13 @@ import com.btec.bookmanagement_api.entities.User;
 import com.btec.bookmanagement_api.repositories.UserRepository;
 import com.btec.bookmanagement_api.security.JwtUtil;
 import com.btec.bookmanagement_api.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,7 +92,25 @@ public class UserController {
     }
 
 
+    @PostMapping("/favorite-categories")
+    public ResponseEntity<?> saveFavoriteCategories(
+            @RequestBody FavoriteCategoryRequest request,
+            HttpServletRequest httpRequest) {
 
+        String token = httpRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            String email = JwtUtil.extractEmail(token.substring(7));
+            userService.saveFavoriteCategories(email, request.getFavoriteCategories());
+            return ResponseEntity.ok("Saved successfully");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+    }
+
+    @Getter
+    @Setter
+    public static class FavoriteCategoryRequest {
+        private List<String> favoriteCategories;
+    }
 
 
     @GetMapping("/validate-token")

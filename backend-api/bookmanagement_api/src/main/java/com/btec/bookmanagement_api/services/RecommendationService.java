@@ -25,14 +25,14 @@ public class RecommendationService {
     public List<Book> recommendBooks(String email) {
         List<Book> readBooks = getBooksUserRead(email);
         List<FollowBook> followedBooks = followBookService.getFollowBooksByEmail(email);
-        List<String> favoriteGenres = userService.getFavoriteGenres(email);
+        List<String> favoriteCategories = userService.getFavoriteCategories(email);
 
-        boolean hasNoData = readBooks.isEmpty() && followedBooks.isEmpty() && favoriteGenres.isEmpty();
+        boolean hasNoData = readBooks.isEmpty() && followedBooks.isEmpty() && favoriteCategories.isEmpty();
         if (hasNoData) {
             return bookRepository.findRandomBooks(10);
         }
 
-        String prompt = createPrompt(readBooks, followedBooks, favoriteGenres);
+        String prompt = createPrompt(readBooks, followedBooks, favoriteCategories);
         System.out.println("📌 Prompt gửi cho OpenAI:\n" + prompt); // log để debug
 
         String aiResponse = openAiService.getRecommendation(prompt);
@@ -58,7 +58,7 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
-    private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteGenres) {
+    private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteCategories) {
         StringBuilder prompt = new StringBuilder("Tôi cần gợi ý sách cho người dùng dựa trên các dữ liệu sau:\n");
 
         if (!readBooks.isEmpty()) {
@@ -85,9 +85,9 @@ public class RecommendationService {
             prompt.append("- Đã theo dõi: ").append(followTitles).append("\n");
         }
 
-        if (!favoriteGenres.isEmpty()) {
-            String genres = String.join(", ", favoriteGenres);
-            prompt.append("- Thể loại yêu thích: ").append(genres).append("\n");
+        if (!favoriteCategories.isEmpty()) {
+            String categories = String.join(", ", favoriteCategories);
+            prompt.append("- Thể loại yêu thích: ").append(categories).append("\n");
         }
 
         prompt.append("Hãy gợi ý tối đa 10 truyện phù hợp nhất. Trả về mỗi truyện trên 1 dòng, chỉ bao gồm tên truyện.");

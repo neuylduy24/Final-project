@@ -8,7 +8,9 @@ const FeaturedBooks = ({ books, navigate }) => (
   <Tabs>
     <TabList>
       <Tab>All</Tab>
-      <Tab>History</Tab>
+      <Tab>Top Day</Tab>
+      <Tab>Top Week</Tab>
+      <Tab>Top Month</Tab>
     </TabList>
     <TabPanel>
       <div className="row featured-list">

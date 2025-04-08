@@ -109,7 +109,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public List<String> getFavoriteGenres(String email) {
+    public List<String> getFavoriteCategories(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty() || optionalUser.get().getFavoriteCategories() == null) {
@@ -123,5 +123,28 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getSearchHistory(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty() || optionalUser.get().getSearchHistory() == null) {
+            return List.of();
+        }
+
+        return optionalUser.get().getSearchHistory().stream()
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.toList());
+    }
+
+    public void saveFavoriteCategories(String email, List<String> categoryNames) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Category> categories = categoryNames.stream()
+                .map(name -> new Category(null, name)) // Giả sử Category chỉ có name
+                .collect(Collectors.toList());
+
+        user.setFavoriteCategories(categories);
+        userRepository.save(user);
+    }
 
 }

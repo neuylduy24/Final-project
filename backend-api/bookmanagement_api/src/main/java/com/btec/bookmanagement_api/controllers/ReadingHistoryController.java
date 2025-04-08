@@ -1,9 +1,9 @@
 package com.btec.bookmanagement_api.controllers;
 
+import com.btec.bookmanagement_api.dto.ReadingHistoryRequest;
 import com.btec.bookmanagement_api.entities.ReadingHistory;
 import com.btec.bookmanagement_api.services.ReadingHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,39 +12,36 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reading-history")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ReadingHistoryController {
 
     private final ReadingHistoryService readingHistoryService;
 
-    // 🔹 Lấy lịch sử đọc của người dùng
     @GetMapping("/user/{email}")
     public ResponseEntity<List<ReadingHistory>> getUserReadingHistory(@PathVariable String email) {
-        List<ReadingHistory> readingHistories = readingHistoryService.getUserReadingHistory(email);
-        return new ResponseEntity<>(readingHistories, HttpStatus.OK);
+        return ResponseEntity.ok(readingHistoryService.getUserReadingHistory(email));
     }
 
-    // 🔹 Bắt đầu hoặc tiếp tục đọc sách
     @PostMapping("/start-or-update")
-    public ResponseEntity<ReadingHistory> startOrUpdateReading(
-            @RequestParam String email,
-            @RequestParam String userId,
-            @RequestParam String bookId,
-            @RequestParam String chapterId,
-            @RequestParam int progress,
-            @RequestParam long timeSpent) {
-
-        ReadingHistory updatedHistory = readingHistoryService.startOrUpdateReading(email, userId, bookId, chapterId, progress, timeSpent);
-        return new ResponseEntity<>(updatedHistory, HttpStatus.OK);
+    public ResponseEntity<ReadingHistory> startOrUpdateReading(@RequestBody ReadingHistoryRequest request) {
+        ReadingHistory result = readingHistoryService.startOrUpdateReading(
+                request.getEmail(),
+                request.getUserId(),
+                request.getBookId(),
+                request.getChapterId(),
+                request.getProgress(),
+                request.getTimeSpent()
+        );
+        return ResponseEntity.ok(result);
     }
 
-    // 🔹 Kết thúc một phiên đọc
     @PostMapping("/end/{id}")
     public ResponseEntity<String> endReadingSession(@PathVariable String id) {
         try {
             readingHistoryService.endReadingSession(id);
-            return new ResponseEntity<>("Reading session ended successfully.", HttpStatus.OK);
-        } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok("Reading session ended successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 }

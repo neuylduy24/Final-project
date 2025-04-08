@@ -2,6 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.security.JwtUtil;
+import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.PersonalizedRecommendationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 public class RecommendationController {
 
     private final PersonalizedRecommendationService personalizedRecommendationService;
+    private BookService bookService;
 
     @GetMapping("/personalized")
     public List<Book> getPersonalizedBooks(HttpServletRequest request) {
@@ -27,10 +29,10 @@ public class RecommendationController {
                 return personalizedRecommendationService.recommendBooks(email);
             } catch (Exception e) {
                 // Token lỗi → trả về rỗng hoặc có thể fallback
-                return List.of();
+                return bookService.getBooksByViews();
             }
         }
 
-        return List.of(); // Không có token → không gợi ý
+        return bookService.getBooksByViews(); // Không có token → không gợi ý
     }
 }

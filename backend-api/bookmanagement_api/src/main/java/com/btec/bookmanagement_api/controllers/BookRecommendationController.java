@@ -48,11 +48,16 @@ public class BookRecommendationController {
         // 2. Thể loại từ truyện đọc gần đây nhất
         List<ReadingHistory> historyList = readingHistoryService.getUserReadingHistory(email);
         historyList.stream()
-                .sorted((a, b) -> b.getLastReadAt().compareTo(a.getLastReadAt())) // mới nhất
+                .sorted((a, b) -> b.getLastReadAt().compareTo(a.getLastReadAt()))
+                .map(ReadingHistory::getBookId)
+                .filter(Objects::nonNull)
+                .map(bookRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .findFirst()
-                .ifPresent(recent -> {
-                    if (recent.getBook() != null && recent.getBook().getCategories() != null) {
-                        recent.getBook().getCategories().forEach(cat -> categoryNames.add(cat.getName()));
+                .ifPresent(recentBook -> {
+                    if (recentBook.getCategories() != null) {
+                        recentBook.getCategories().forEach(cat -> categoryNames.add(cat.getName()));
                     }
                 });
 

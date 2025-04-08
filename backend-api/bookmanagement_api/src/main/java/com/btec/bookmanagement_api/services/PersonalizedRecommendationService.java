@@ -26,14 +26,20 @@ public class PersonalizedRecommendationService {
 
         // 🔹 Lấy thể loại từ lịch sử đọc
         List<ReadingHistory> readingHistory = readingHistoryService.getUserReadingHistory(email);
+
         List<String> historyCategories = readingHistory.stream()
-                .map(ReadingHistory::getBook)
+                .map(ReadingHistory::getBookId)
+                .filter(Objects::nonNull)
+                .map(bookRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .filter(Objects::nonNull)
                 .flatMap(book -> book.getCategories().stream())
                 .filter(Objects::nonNull)
                 .map(c -> c.getName())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
         allCategoryNames.addAll(historyCategories);
 
         // 🔹 Lấy thể loại từ lịch sử tìm kiếm

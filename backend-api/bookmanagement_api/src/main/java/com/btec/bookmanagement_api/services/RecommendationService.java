@@ -52,11 +52,15 @@ public class RecommendationService {
 
     private List<Book> getBooksUserRead(String email) {
         List<ReadingHistory> historyList = readingHistoryService.getUserReadingHistory(email);
-        return historyList.stream()
-                .map(ReadingHistory::getBook)
+
+        Set<String> bookIds = historyList.stream()
+                .map(ReadingHistory::getBookId)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+
+        return bookRepository.findAllById(bookIds);
     }
+
 
     private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteCategories) {
         StringBuilder prompt = new StringBuilder("Tôi cần gợi ý sách cho người dùng dựa trên các dữ liệu sau:\n");

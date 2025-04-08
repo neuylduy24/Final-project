@@ -109,7 +109,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public List<String> getFavoriteGenres(String email) {
+    public List<String> getFavoriteCategories(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty() || optionalUser.get().getFavoriteCategories() == null) {

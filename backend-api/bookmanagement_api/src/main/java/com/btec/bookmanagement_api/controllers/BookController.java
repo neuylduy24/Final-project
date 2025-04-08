@@ -166,6 +166,61 @@ public class BookController {
         }
     }
 
+    @PutMapping("/{id}/update-with-image")
+    public ResponseEntity<?> updateBookWithImage(
+            @PathVariable String id,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) MultipartFile file
+    ) {
+        Optional<Book> existingBookOpt = bookService.getBookById(id);
+        if (existingBookOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Book book = existingBookOpt.get();
+
+            if (title != null) book.setTitle(title);
+            if (author != null) book.setAuthor(author);
+            if (description != null) book.setDescription(description);
+
+            if (category != null && !category.isBlank()) {
+                Category cat = new Category();
+                cat.setName(category);
+                book.setCategories(List.of(cat));
+            }
+
+            // Nếu có file ảnh mới
+            if (file != null && !file.isEmpty()) {
+                byte[] imageData = file.getBytes();
+                String imageHash = bookService.calculateImageHash(imageData);
+
+                // Kiểm tra trùng ảnh với sách khác
+                Optional<Book> duplicate = bookRepository.findByImageHash(imageHash);
+                if (duplicate.isPresent() && !duplicate.get().getId().equals(id)) {
+                    return ResponseEntity.badRequest().body("This image is already used by another book.");
+                }
+
+                book.setImageData(imageData);
+                book.setImageHash(imageHash);
+                book.setImage(null); // xóa image URL nếu có
+            } else if (imageUrl != null && !imageUrl.isBlank()) {
+                book.setImage(imageUrl);
+                book.setImageData(null); // xóa imageData nếu có
+                book.setImageHash(null);
+            }
+
+            Book updated = bookService.updateBook(id, book);
+            return ResponseEntity.ok(updated);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update book: " + e.getMessage());
+        }
+    }
 
 
     @GetMapping("/{id}/image")

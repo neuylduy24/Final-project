@@ -25,12 +25,6 @@ public class FollowBookController {
         return ResponseEntity.ok(followBooks);
     }
 
-
-
-
-
-
-
     // Lấy danh sách sách đang theo dõi theo email người dùng
     @GetMapping("/user/{email}")
     public ResponseEntity<List<FollowBook>> getFollowBooksByEmail(@PathVariable String email) {
@@ -42,7 +36,6 @@ public class FollowBookController {
     }
 
     // Lấy thông tin theo dõi sách theo email và bookId
-
     @GetMapping("/user/{email}/book/{bookId}")
     public ResponseEntity<FollowBook> getFollowBookByEmailAndBook(@PathVariable String email, @PathVariable String bookId) {
         Optional<FollowBook> followBook = followBookService.getFollowBookByEmailAndBook(email, bookId);
@@ -63,15 +56,16 @@ public class FollowBookController {
         return ResponseEntity.noContent().build();
     }
 
-
-
-    // Thay đổi từ userId sang email
-
     // Xóa theo dõi sách theo email và bookId
-
     @DeleteMapping("/user/{email}/book/{bookId}")
     public ResponseEntity<Void> deleteFollowBookByEmailAndBook(@PathVariable String email, @PathVariable String bookId) {
         followBookService.deleteFollowBookByEmailAndBook(email, bookId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/book/{bookId}/count")
+    public ResponseEntity<Long> countFollowers(@PathVariable String bookId) {
+        long count = followBookService.countFollowersByBookId(bookId);
+        return ResponseEntity.ok(count);
     }
 }

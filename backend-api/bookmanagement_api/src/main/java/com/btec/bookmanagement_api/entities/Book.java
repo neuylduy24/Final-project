@@ -43,6 +43,8 @@ public class Book {
 
     @Transient
     private double averageRating;
+    @Transient
+    private long totalFollows;
 
 }
 

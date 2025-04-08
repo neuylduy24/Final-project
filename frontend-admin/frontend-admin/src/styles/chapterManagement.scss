@@ -7,6 +7,34 @@
   margin-bottom: 30px;
 }
 
+.btn-add {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 57px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
+
+  &:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+  }
+
+  &:before {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
 .container-management h2 {
   color: #333;
   margin-bottom: 25px;
@@ -24,14 +52,15 @@
   align-items: center;
   margin-bottom: 20px;
   padding: 15px;
+  gap: 10px;
   background-color: #f8f9fa;
   border-radius: 6px;
-}
 
-.filter-container label {
-  font-weight: 500;
-  margin-right: 10px;
-  color: #444;
+  label {
+    font-weight: 500;
+    margin-right: 10px;
+    color: #444;
+  }
 }
 
 .book-filter {
@@ -43,22 +72,6 @@
   background-color: white;
 }
 
-.add-button {
-  background-color: #6c5ce7;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-  display: flex;
-  align-items: center;
-}
-
-.add-button:hover {
-  background-color: #5649c0;
-}
 
 /* Chapter Table Styles */
 .chapter-table-container {
@@ -140,19 +153,6 @@
   background-color: #27ae60;
 }
 
-/* Form Overlay */
-.form-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
 .form-container {
   background-color: white;
@@ -235,7 +235,8 @@
   flex: 1;
 }
 
-.add-url, .remove-url {
+.add-url,
+.remove-url {
   background-color: #6c5ce7;
   color: white;
   border: none;
@@ -362,26 +363,49 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .filter-container {
-    flex-direction: column;
     gap: 15px;
   }
-  
+
   .book-filter {
-    width: 100%;
+    width: 30px;
   }
-  
-  .add-button {
-    width: 100%;
+
+  .btn-add {
+    width: 80%;
     justify-content: center;
   }
-  
-  .chapter-table th, 
+
+  .chapter-table th,
   .chapter-table td {
     padding: 8px;
   }
-  
+
   .form-container {
-    width: 95%;
-    padding: 15px;
+    width: 100%;
+    padding: 25px;
+  }
+}
+@media (max-width: 425px) {
+  .filter-container {
+    gap: 15px;
+  }
+
+  .book-filter {
+    width: 30px;
+  }
+
+  .btn-add {
+    width: 80%;
+    justify-content: center;
+  }
+
+  .chapter-table th,
+  .chapter-table td {
+    padding: 8px;
+  }
+
+  .form-container {
+    width: 100%;
+    padding: 25px;
   }
 }

@@ -16,7 +16,15 @@ const SearchBar = () => {
   const searchBarRef = useRef(null);
   const [showResultGrid, setShowResultGrid] = useState(true);
   const navigate = useNavigate();
-
+  const removeAccents = (str) => {
+    return str
+      .normalize("NFD") // Tách chữ và dấu
+      .replace(/[\u0300-\u036f]/g, "") // Xóa dấu
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase();
+  };
+  
   useEffect(() => {
     const fetchAllBooks = async () => {
       setLoading(true);
@@ -53,38 +61,38 @@ const SearchBar = () => {
       setResults([]);
       return;
     }
-
-    const lowerQuery = query.toLowerCase();
-
+  
+    const normalizedQuery = removeAccents(query);
+  
     const filteredBooks = allBooks.filter((book) => {
       const isBookMatch =
-        book.title.toLowerCase().includes(lowerQuery) ||
+        removeAccents(book.title).includes(normalizedQuery) ||
         (book.description &&
-          book.description.toLowerCase().includes(lowerQuery));
-
-      // Lọc tất cả chapters thuộc book đó
+          removeAccents(book.description).includes(normalizedQuery));
+  
       const chaptersOfBook = allChapters.filter(
         (chap) => chap.bookId === book.id
       );
-
+  
       const matchedChapter = chaptersOfBook.find(
         (chap) =>
-          chap.title?.toLowerCase().includes(lowerQuery) ||
-          chap.description?.toLowerCase().includes(lowerQuery) ||
-          chap.content?.toLowerCase().includes(lowerQuery)
+          removeAccents(chap.title || "").includes(normalizedQuery) ||
+          removeAccents(chap.description || "").includes(normalizedQuery) ||
+          removeAccents(chap.content || "").includes(normalizedQuery)
       );
-
+  
       if (matchedChapter) {
         book.matchedChapterSnippet = matchedChapter.content
           ?.split("\n")
-          .find((p) => p.toLowerCase().includes(lowerQuery));
+          .find((p) => removeAccents(p).includes(normalizedQuery));
       }
-
+  
       return isBookMatch || !!matchedChapter;
     });
-
+  
     setResults(filteredBooks);
   }, [query, allBooks, allChapters]);
+  
 
   const handleSearch = () => {
     if (query.trim()) {

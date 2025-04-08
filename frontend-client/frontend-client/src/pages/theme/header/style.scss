@@ -238,7 +238,7 @@
             position: absolute;
             width: max-content;
             top: 20px;
-            z-index: 9;
+            z-index: 999999999;
             transition: all 0.3s;
             opacity: 0;
             visibility: hidden;

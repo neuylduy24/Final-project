@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/roles';
+const API_URL = 'https://api.it-ebook.io.vn/api/roles';
 
 const roleService = {
     // Lấy tất cả vai trò

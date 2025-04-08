@@ -3,7 +3,11 @@ import UserForm from "../../component/User/UserForm";
 import UserTable from "../../component/User/UserTable";
 import Pagination from "../../component/common/Pagination";
 import userService from "../../service/userService";
-import "../../styles/userManagement.css";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../../styles/userManagement.scss";
+import "../../styles/chapterManagement.scss";
+
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +16,7 @@ const UserManagementPage = () => {
     email: "",
     password: "",
     roles: [],
-    avatar: ""
+    avatar: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -33,6 +37,7 @@ const UserManagementPage = () => {
       setError(null);
     } catch (err) {
       setError("Unable to load user list. Please try again later.");
+      toast.error("Error loading user list");
       console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
@@ -43,67 +48,69 @@ const UserManagementPage = () => {
     e.preventDefault();
     try {
       const formToSubmit = updatedForm || form;
-      
-      // If not editing, ensure role is reader
+
       if (!isEditing) {
-        formToSubmit.roles = [2]; // Assuming 2 is the ID for reader role, adjust if needed
+        formToSubmit.roles = [2];
       }
-      
+
       if (isEditing) {
-        // When editing, keep current roles
         await userService.updateUser(formToSubmit.id, formToSubmit);
-        setUsers(users.map((user) => (user.id === formToSubmit.id ? formToSubmit : user)));
+        setUsers(
+          users.map((user) =>
+            user.id === formToSubmit.id ? formToSubmit : user
+          )
+        );
       } else {
         const newUser = await userService.createUser(formToSubmit);
-        
-        // Ensure createdAt field exists
-        const userWithDate = newUser.createdAt 
-          ? newUser 
+        const userWithDate = newUser.createdAt
+          ? newUser
           : { ...newUser, createdAt: new Date().toISOString() };
-        
+
         setUsers([...users, userWithDate]);
       }
-      
+
       setForm({
         username: "",
         email: "",
         password: "",
         roles: [],
-        avatar: ""
+        avatar: "",
       });
       setIsEditing(false);
       setShowForm(false);
       setError(null);
     } catch (err) {
       setError(isEditing ? "Unable to update user" : "Unable to add new user");
+      toast.error(isEditing ? "Error updating user" : "Error adding user");
       console.error("Error submitting user:", err);
     }
   };
 
   const handleEdit = (user) => {
-    // Chuẩn bị form cho việc chỉnh sửa
     setForm({
       id: user.id,
       username: user.username,
       email: user.email,
-      roles: user.roles.map(role => typeof role === 'string' ? role : role.id),
+      roles: user.roles.map((role) =>
+        typeof role === "string" ? role : role.id
+      ),
       avatar: user.avatar,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     });
     setIsEditing(true);
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await userService.deleteUser(id);
-        setUsers(users.filter((user) => user.id !== id));
-        setError(null);
-      } catch (err) {
-        setError("Unable to delete user");
-        console.error("Error deleting user:", err);
-      }
+    try {
+      await userService.deleteUser(id);
+      setUsers(users.filter((user) => user.id !== id));
+      setError(null);
+      toast.success("🗑️ User deleted successfully");
+    } catch (err) {
+      setError("Unable to delete user");
+      toast.error("Error deleting user");
+      console.error("Error deleting user:", err);
     }
   };
 
@@ -118,6 +125,13 @@ const UserManagementPage = () => {
 
   return (
     <div className="container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        closeOnClick={false}
+        pauseOnHover={true}
+        draggable={true}
+      />
       <div className="container-management">
         <h2>User Management</h2>
 

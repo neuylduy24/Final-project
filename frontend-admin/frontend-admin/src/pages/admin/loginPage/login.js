@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import "./style.scss";
+import "./login.scss";
 import { useNavigate } from "react-router-dom";
 import { ROUTERS } from "../../../utils/router";
 import logologin from "../../../assets/user/image/hero/logo.png";

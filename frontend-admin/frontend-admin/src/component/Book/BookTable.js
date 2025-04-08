@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookForm from "./BookForm";
 import { FaSearch } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
@@ -13,17 +13,68 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Hàm chuyển đổi có dấu thành không dấu
+  const removeAccents = (str) => {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D");
+  };
+
   useEffect(() => {
     fetchBooks();
   }, []);
 
   useEffect(() => {
     setCurrentPage(1);
-    const filtered = books.filter((book) =>
-      book.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = books.filter((book) => {
+      const searchLower = removeAccents(searchTerm.toLowerCase());
+  
+      const titleMatch = book.title
+        ? removeAccents(book.title.toLowerCase()).includes(searchLower)
+        : false;
+  
+      const authorMatch = book.author
+        ? removeAccents(book.author.toLowerCase()).includes(searchLower)
+        : false;
+  
+      let categoriesMatch = false;
+      if (book.categories && Array.isArray(book.categories)) {
+        categoriesMatch = book.categories.some(
+          (cat) =>
+            cat?.name &&
+            removeAccents(cat.name.toLowerCase()).includes(searchLower)
+        );
+      } else if (Array.isArray(book.category)) {
+        categoriesMatch = book.category.some(
+          (cat) =>
+            cat?.name &&
+            removeAccents(cat.name.toLowerCase()).includes(searchLower)
+        );
+      } else if (typeof book.category === "string") {
+        categoriesMatch = removeAccents(book.category.toLowerCase()).includes(
+          searchLower
+        );
+      }
+  
+      return titleMatch || authorMatch || categoriesMatch;
+    });
     setFilteredBooks(filtered);
   }, [searchTerm, books, setCurrentPage]);
+  
 
   async function fetchBooks() {
     try {
@@ -42,24 +93,55 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 
   const handleSave = async (book) => {
     try {
+      let response;
       if (!isEditing) {
-        const newBook = {
-          ...book,
+        // Create new book
+        const bookData = {
+          title: book.title,
+          author: book.author,
+          categories: book.categories || [],
+          category: book.category || "",
+          image: book.image || "",
           createdAt: new Date().toISOString(),
         };
-        await axios.post("https://api.it-ebook.io.vn/api/books", newBook);
-        toast.success("📖 Book added successfully!");
-      } else {
-        await axios.put(
-          `https://api.it-ebook.io.vn/api/books/${book.id}`,
-          book
+
+        console.log("Sending book data:", bookData);
+        response = await axios.post(
+          "https://api.it-ebook.io.vn/api/books",
+          bookData
         );
-        toast.info("✏️ Book updated successfully!");
+      } else {
+        // Update existing book
+        const bookData = {
+          title: book.title,
+          author: book.author,
+          categories: book.categories || [],
+          // category: book.category || "",
+          image: book.image || "",
+        };
+        console.log("Sending book dataa:", bookData);
+
+        console.log("Updating book data:", bookData);
+        response = await axios.put(
+          `https://api.it-ebook.io.vn/api/books/${book.id}`,
+          bookData
+        );
       }
+
+      // Refresh the book list
       fetchBooks();
-      setShowForm(false);
+
+      // Return the saved book data
+      return response.data;
     } catch (error) {
-      toast.error("❌ Error saving book!");
+      console.error("Error saving book:", error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        toast.error(`❌ Error saving book: ${error.response.data}`);
+      } else {
+        toast.error("❌ Error saving book!");
+      }
+      throw error;
     }
   };
 
@@ -79,8 +161,6 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
 
   return (
     <div>
-      <ToastContainer position="top-right" autoClose={2000} />
-
       {showForm && (
         <BookForm
           book={selectedBook}
@@ -100,14 +180,14 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          className="add-button"
+          className="btn-add"
           onClick={() => {
             setSelectedBook(null);
             setShowForm(true);
             setIsEditing(false);
           }}
         >
-          Add
+          Add New Book
         </button>
       </div>
 
@@ -119,6 +199,7 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
             <th>Title</th>
             <th>Author</th>
             <th>Categories</th>
+            <th>Created At</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -129,47 +210,51 @@ const BookTable = ({ currentPage, booksPerPage, setCurrentPage }) => {
                 <td>{book.id}</td>
                 <td className="book-image-cell">
                   {book.image ? (
-                    <img 
-                      src={book.image} 
-                      alt={book.title} 
-                      style={{ width: "50px", height: "75px", objectFit: "cover" }} 
+                    <img
+                      src={book.image}
+                      alt={book.title}
+                      style={{
+                        width: "50px",
+                        height: "75px",
+                        objectFit: "cover",
+                      }}
                     />
                   ) : (
-                    <div className="no-image-placeholder">
-                      No image
-                    </div>
+                    <div className="no-image-placeholder">No image</div>
                   )}
                 </td>
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>
-                  {book.categories && Array.isArray(book.categories) 
+                  {book.categories && Array.isArray(book.categories)
                     ? book.categories.map((cat) => cat.name).join(", ")
                     : Array.isArray(book.category)
-                      ? book.category.map((cat) => cat.name).join(", ")
-                      : book.category || ""}
+                    ? book.category.map((cat) => cat.name).join(", ")
+                    : book.category || ""}
                 </td>
-
-                <td className="button-group">
-                  <button
-                    className="edit-button"
-                    onClick={() => handleEdit(book)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    Delete
-                  </button>
+                <td>{formatDate(book.createdAt)}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEdit(book)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(book.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
-                No books found
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                {searchTerm ? "No matching books found" : "No books yet"}
               </td>
             </tr>
           )}

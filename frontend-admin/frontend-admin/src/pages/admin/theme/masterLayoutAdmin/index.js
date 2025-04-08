@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useLocation } from 'react-router-dom';
-import Header from '../header';
+import Header from '../header/SideBar';
 import { ROUTERS } from '../../../../utils/router';
 import './style.scss';
 

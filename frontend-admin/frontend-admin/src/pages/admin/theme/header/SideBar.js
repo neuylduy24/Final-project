@@ -1,8 +1,8 @@
-import { memo, useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { memo, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { IoLogOut } from "react-icons/io5";
 import { ROUTERS } from "../../../../utils/router";
-import "./style.scss";
+import "./sidebar.scss";
 import {
   FaCircleChevronDown,
   FaCircleChevronUp,
@@ -53,7 +53,6 @@ const HeaderAd = ({ ...props }) => {
         { label: "Book Management", path: ROUTERS.ADMIN.BOOKS },
         { label: "Category Management", path: ROUTERS.ADMIN.BOOKSCATEGORIES },
         { label: "Chapter Management", path: ROUTERS.ADMIN.CHAPTERBOOKS },
-        // { label: "Bookmark Management", path: ROUTERS.ADMIN.BOOKS },
       ],
     },
     { label: "User Management", path: ROUTERS.ADMIN.USERS },

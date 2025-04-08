@@ -7,7 +7,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 const API_URL = "https://api.it-ebook.io.vn/api/categories";
 
-const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
+const CategoriesTable = ({
+  currentPage,
+  categoriesPerPage,
+  setCurrentPage,
+}) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -80,13 +84,13 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
       toast.error("❌ Cannot delete category due to invalid ID!");
       return;
     }
-  
+
     const categoryToDelete = categories.find((c) => c.id === id);
     if (!categoryToDelete) {
       toast.error("❌ Category not found!");
       return;
     }
-  
+
     try {
       await axios.delete(`${API_URL}/${id}`);
       setCategories((prevCategories) =>
@@ -108,7 +112,10 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
 
   const indexOfLastBook = currentPage * categoriesPerPage;
   const indexOfFirstBook = indexOfLastBook - categoriesPerPage;
-  const currentCategories = filteredCategories.slice(indexOfFirstBook, indexOfLastBook);
+  const currentCategories = filteredCategories.slice(
+    indexOfFirstBook,
+    indexOfLastBook
+  );
 
   return (
     <div>
@@ -132,8 +139,8 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button className="add-button" onClick={handleAddCategory}>
-          ➕ Add
+        <button className="btn-add" onClick={handleAddCategory}>
+          Add New Categories
         </button>
       </div>
 
@@ -148,31 +155,32 @@ const CategoriesTable = ({currentPage, categoriesPerPage, setCurrentPage}) => {
         </thead>
         <tbody>
           {currentCategories.length > 0 ? (
-            currentCategories
-              .map((category) => (
-                <tr key={category.id}>
-                  <td>{category.id}</td>
-                  <td>{category.name}</td>
-                  <td className="button-group">
+            currentCategories.map((category) => (
+              <tr key={category.id}>
+                <td>{category.id}</td>
+                <td>{category.name}</td>
+                <td>
+                  <div className="action-buttons">
                     <button
-                      className="edit-button"
+                      className="btn-edit"
                       onClick={() => {
                         setSelectedCategory(category);
                         setShowForm(true);
                         setIsEditing(true);
                       }}
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
-                      className="delete-button"
+                      className="btn-delete"
                       onClick={() => handleDelete(category.id)}
                     >
-                      🗑️ Delete
+                      Delete
                     </button>
-                  </td>
-                </tr>
-              ))
+                  </div>
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
               <td colSpan="3" style={{ textAlign: "center" }}>

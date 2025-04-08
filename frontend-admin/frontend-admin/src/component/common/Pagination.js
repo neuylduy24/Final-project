@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
-  const pageNumbers = [...Array(totalPages).keys()].map(i => i + 1);
-  
+  const pageNumbers = [...Array(totalPages).keys()].map((i) => i + 1);
+
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -22,7 +22,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
   // Display maximum 5 page buttons
   const getVisiblePageNumbers = () => {
     let startPage, endPage;
-    if (totalPages <= 5) {
+    if (totalPages <= 8) {
       startPage = 1;
       endPage = totalPages;
     } else {
@@ -44,27 +44,21 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
 
   return (
     <div className="pagination">
-      <button 
-        onClick={goToPrevPage} 
-        disabled={currentPage === 1}
-      >
+      <button onClick={goToPrevPage} disabled={currentPage === 1}>
         &laquo; Previous
       </button>
-      
-      {getVisiblePageNumbers().map(number => (
+
+      {getVisiblePageNumbers().map((number) => (
         <button
           key={number}
           onClick={() => goToPage(number)}
-          className={currentPage === number ? 'active' : ''}
+          className={currentPage === number ? "active" : ""}
         >
           {number}
         </button>
       ))}
-      
-      <button 
-        onClick={goToNextPage} 
-        disabled={currentPage === totalPages}
-      >
+
+      <button onClick={goToNextPage} disabled={currentPage === totalPages}>
         Next &raquo;
       </button>
     </div>

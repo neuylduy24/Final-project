@@ -51,12 +51,20 @@ public class RecommendationService {
     }
 
     private List<Book> getBooksUserRead(String email) {
+        // Bước 1: Lấy danh sách lịch sử đọc của người dùng theo email
         List<ReadingHistory> historyList = readingHistoryService.getUserReadingHistory(email);
-        return historyList.stream()
-                .map(ReadingHistory::getBook)
-                .filter(Objects::nonNull)
+
+        // Bước 2: Lấy danh sách bookId từ historyList
+        List<String> bookIds = historyList.stream()
+                .map(ReadingHistory::getBookId)         // Lấy bookId
+                .filter(Objects::nonNull)               // Bỏ bookId null
+                .distinct()                             // Loại bỏ trùng lặp
                 .collect(Collectors.toList());
+
+        // Bước 3: Truy vấn DB để lấy Book dựa trên danh sách bookId
+        return bookRepository.findAllById(bookIds);
     }
+
 
     private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteGenres) {
         StringBuilder prompt = new StringBuilder("Tôi cần gợi ý sách cho người dùng dựa trên các dữ liệu sau:\n");

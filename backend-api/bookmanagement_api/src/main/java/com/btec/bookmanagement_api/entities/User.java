@@ -38,7 +38,7 @@ public class User {
 
     private String avatar;
 
-    private List<String> favoriteCategories;
+    private List<Category> favoriteCategories;
 
     private List<String> searchHistory;
 

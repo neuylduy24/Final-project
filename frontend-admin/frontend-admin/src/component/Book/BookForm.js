@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const [formData, setFormData] = useState({
-    id: Date.now().toString(),
+    id: "",
     title: "",
     author: "",
     category: "",
@@ -27,7 +27,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
         setImagePreview(book.image);
         setImageInputType("url");
       }
-      
+
       // Set selected categories
       if (book.categories && Array.isArray(book.categories)) {
         setSelectedCategories(book.categories);
@@ -35,7 +35,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
         setSelectedCategories(book.category);
       } else if (book.category) {
         // If it's just a string, create a category object
-        setSelectedCategories([{ id: 'temp', name: book.category }]);
+        setSelectedCategories([{ id: "temp", name: book.category }]);
       }
     }
   }, [book, isEditing]);
@@ -46,7 +46,9 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("https://api.it-ebook.io.vn/api/categories");
+      const response = await axios.get(
+        "https://api.it-ebook.io.vn/api/categories"
+      );
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -55,7 +57,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    
+
     // Update preview when image URL changes
     if (e.target.name === "image") {
       setImagePreview(e.target.value);
@@ -63,13 +65,17 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   };
 
   const handleCategoryToggle = (category) => {
-    setSelectedCategories(prevSelected => {
+    setSelectedCategories((prevSelected) => {
       // Check if this category is already selected
-      const isSelected = prevSelected.some(cat => cat.id === category.id || cat.name === category.name);
-      
+      const isSelected = prevSelected.some(
+        (cat) => cat.id === category.id || cat.name === category.name
+      );
+
       if (isSelected) {
         // If selected, remove from selected list
-        return prevSelected.filter(cat => cat.id !== category.id && cat.name !== category.name);
+        return prevSelected.filter(
+          (cat) => cat.id !== category.id && cat.name !== category.name
+        );
       } else {
         // If not selected, add to selected list
         return [...prevSelected, category];
@@ -79,13 +85,13 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleCategoriesSave = () => {
     // Update formData with selected categories list
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       categories: selectedCategories,
       // For API compatibility, keep category field as comma-separated category names
-      category: selectedCategories.map(cat => cat.name).join(', ')
+      category: selectedCategories.map((cat) => cat.name).join(", "),
     }));
-    
+
     setShowCategoryModal(false);
   };
 
@@ -116,18 +122,18 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate required fields
     if (!formData.title.trim()) {
       toast.error("Please enter book title");
       return;
     }
-    
+
     if (!formData.author.trim()) {
       toast.error("Please enter book author");
       return;
     }
-    
+
     if (selectedCategories.length === 0) {
       toast.error("Please select at least one category");
       return;
@@ -143,31 +149,49 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
       toast.error("Please select an image file to upload");
       return;
     }
-    
+
     let updatedFormData = { ...formData };
-    
+
     // Ensure categories field exists
     if (selectedCategories.length > 0) {
       updatedFormData.categories = selectedCategories;
-      updatedFormData.category = selectedCategories.map(cat => cat.name).join(', ');
+      updatedFormData.category = selectedCategories
+        .map((cat) => cat.name)
+        .join(", ");
     }
-    
-    // If upload type is selected and there's an image file, upload image first
-    if (imageInputType === "upload" && imageFile) {
-      try {
-        const formDataUpload = new FormData();
-        formDataUpload.append("image", imageFile);
-        
-        // Replace with your actual image upload API here
-        const uploadResponse = await axios.post("https://api.it-ebook.io.vn/api/upload", formDataUpload);
-        updatedFormData.image = uploadResponse.data.imageUrl;
-      } catch (error) {
-        toast.error("Error uploading image. Please try again.");
-        return;
+
+    try {
+      // If upload type is selected and there's an image file, upload image first
+      if (imageInputType === "upload" && imageFile) {
+        try {
+          const formDataUpload = new FormData();
+          formDataUpload.append("image", imageFile);
+
+          // Replace with your actual image upload API here
+          const uploadResponse = await axios.post(
+            "https://api.it-ebook.io.vn/api/books/",
+            formDataUpload
+          );
+          updatedFormData.image = uploadResponse.data.imageUrl;
+        } catch (error) {
+          toast.error("Error uploading image. Please try again.");
+          return;
+        }
       }
+
+      await onSave(updatedFormData);
+
+      // Show success message
+      toast.success(
+        isEditing
+          ? "✏️ Book updated successfully"
+          : "📖 Book added successfully"
+      );
+
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving book:", error);
     }
-    
-    onSave(updatedFormData);
   };
 
   return (
@@ -198,11 +222,14 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
               <div className="category-tags">
                 {selectedCategories.length > 0 ? (
                   selectedCategories.map((cat, index) => (
-                    <span key={cat.id || `category-${index}`} className="category-tag">
+                    <span
+                      key={cat.id || `category-${index}`}
+                      className="category-tag"
+                    >
                       {cat.name}
-                      <button 
-                        type="button" 
-                        className="remove-category" 
+                      <button
+                        type="button"
+                        className="remove-category"
                         onClick={() => handleCategoryToggle(cat)}
                       >
                         ×
@@ -214,8 +241,8 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
                 )}
               </div>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="select-categories-button"
               onClick={() => setShowCategoryModal(true)}
             >
@@ -224,19 +251,25 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
           </div>
 
           {showCategoryModal && (
-            <div className="category-modal" onClick={(e) => {
-              if (e.target.className === 'category-modal') setShowCategoryModal(false);
-            }}>
+            <div
+              className="category-modal"
+              onClick={(e) => {
+                if (e.target.className === "category-modal")
+                  setShowCategoryModal(false);
+              }}
+            >
               <div className="category-modal-content">
                 <h4>Select Categories</h4>
                 <div className="category-list">
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <div key={category.id} className="category-checkbox-item">
                       <label>
                         <input
                           type="checkbox"
                           checked={selectedCategories.some(
-                            cat => cat.id === category.id || cat.name === category.name
+                            (cat) =>
+                              cat.id === category.id ||
+                              cat.name === category.name
                           )}
                           onChange={() => handleCategoryToggle(category)}
                         />
@@ -246,16 +279,16 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
                   ))}
                 </div>
                 <div className="modal-actions">
-                  <button 
-                    type="button" 
-                    className="save-categories" 
+                  <button
+                    type="button"
+                    className="save-categories"
                     onClick={handleCategoriesSave}
                   >
                     Confirm
                   </button>
-                  <button 
-                    type="button" 
-                    className="cancel" 
+                  <button
+                    type="button"
+                    className="cancel"
                     onClick={() => setShowCategoryModal(false)}
                   >
                     Cancel
@@ -297,11 +330,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
               onChange={handleChange}
             />
           ) : (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
+            <input type="file" accept="image/*" onChange={handleImageUpload} />
           )}
 
           {imagePreview && (
@@ -314,7 +343,11 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             <button type="submit" className="save">
               {isEditing ? "Update" : "Add"}
             </button>
-            <button type="button" className="cancel" onClick={() => setShowForm(false)}>
+            <button
+              type="button"
+              className="cancel"
+              onClick={() => setShowForm(false)}
+            >
               Cancel
             </button>
           </div>

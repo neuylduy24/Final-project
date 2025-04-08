@@ -27,16 +27,15 @@ public class SearchController {
     public List<Book> searchBooks(@RequestParam("q") String keyword) {
         Set<Book> resultSet = new HashSet<>();
 
-        // 1. Tìm sách theo tiêu đề
-        List<Book> booksByTitle = bookRepository.findByTitleContainingIgnoreCase(keyword);
-        resultSet.addAll(booksByTitle);
+        // Tìm theo tiêu đề
+        resultSet.addAll(bookRepository.findByTitleContainingIgnoreCase(keyword));
 
-        List<Book> booksByDescription = bookRepository.findByDescriptionContainingIgnoreCase(keyword);
-        resultSet.addAll(booksByDescription);
+        // Tìm theo mô tả
+        resultSet.addAll(bookRepository.findByDescriptionContainingIgnoreCase(keyword));
 
-        // 2. Tìm các chapter có chứa nội dung keyword
-        List<Chapter> chaptersWithKeyword = chapterRepository.findByContentContainingIgnoreCase(keyword);
-        for (Chapter chapter : chaptersWithKeyword) {
+        // Tìm theo nội dung chương
+        List<Chapter> matchedChapters = chapterRepository.findByContentContainingIgnoreCase(keyword);
+        for (Chapter chapter : matchedChapters) {
             if (chapter.getBookId() != null) {
                 bookRepository.findById(chapter.getBookId()).ifPresent(resultSet::add);
             }

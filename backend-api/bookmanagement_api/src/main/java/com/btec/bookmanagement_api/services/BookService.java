@@ -42,7 +42,7 @@ public class BookService {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
-    public List<Book> getBooksByAuthorId(String author) {
+    public List<Book> getBooksByAuthor(String author) {
         return bookRepository.findByAuthor(author);
     }
 
@@ -51,11 +51,28 @@ public class BookService {
     }
 
     public Book createBook(Book book) {
+        // Kiểm tra trùng tiêu đề
         if (bookRepository.findByTitle(book.getTitle()).isPresent()) {
             throw new RuntimeException("Book with title '" + book.getTitle() + "' already exists!");
         }
+
+        // Nếu có ảnh upload (dưới dạng byte[]), kiểm tra trùng hash
+        if (book.getImageData() != null && book.getImageData().length > 0) {
+            try {
+                String imageHash = calculateImageHash(book.getImageData());
+                Optional<Book> duplicate = bookRepository.findByImageHash(imageHash);
+                if (duplicate.isPresent()) {
+                    throw new RuntimeException("This image is already used by another book.");
+                }
+                book.setImageHash(imageHash);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("Failed to hash image");
+            }
+        }
+
         return bookRepository.save(book);
     }
+
 
     public Book updateBook(String id, Book bookDetails) {
         return bookRepository.findById(id).map(book -> {
@@ -63,7 +80,6 @@ public class BookService {
             book.setAuthor(bookDetails.getAuthor());
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
-            book.setChapters(bookDetails.getChapters());
             book.setCategories(bookDetails.getCategories());
             book.setImageData(bookDetails.getImageData());
             book.setViews(bookDetails.getViews());

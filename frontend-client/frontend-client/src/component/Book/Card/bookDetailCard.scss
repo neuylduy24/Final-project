@@ -10,99 +10,115 @@ $white: #ffffff;
 $box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
 
 .book-card {
-  background: $white;
+  position: relative;
+  margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: $box-shadow-light;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 220px;
-  min-height: 340px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 0 0 auto;
-  margin-right: 10px;
+  left: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  z-index: 99999;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+
+    .overlay {
+      opacity: 1;
+    }
   }
 
   .book-img {
-    width: 100%;
-    height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-size: cover;
     position: relative;
-    border-radius: 5px 5px 0 0;
+    width: 100%;
+    height: 280px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
-    .badge-time,
-    .badge-hot {
+
+    .book-stats {
       position: absolute;
-      top: 5px;
-      padding: 5px 8px;
-      font-size: 12px;
-      border-radius: 5px;
-      color: $white;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13px;
+      align-items: center;
+
+      span {
+        display: flex;
+        align-items: center;
+      }
     }
 
     .badge-time {
+      position: absolute;
+      top: 10px;
       left: 10px;
-      background: $primary-color;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
     }
 
     .badge-hot {
+      position: absolute;
+      top: 10px;
       right: 10px;
-      background: $hot-badge-color;
-      animation: pulse 1.5s infinite;
+      background: rgba(255, 59, 48, 0.9);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
     }
   }
 
   .book-info {
-    padding: 10px;
-    flex-grow: 1;
+    padding: 12px;
+    z-index: 999999;
+    background: white;
 
     h4 {
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 5px;
-      white-space: nowrap;
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: color 0.3s ease;
-
-      &:hover {
-        color: $primary-color;
-      }
+      white-space: nowrap;
     }
 
     p {
+      margin: 7px 0;
       font-size: 12px;
-      color: #666;
+      z-index: 999999;
+      color: #333;
       cursor: pointer;
-      min-height: 24px;
+
+      &.has-chapter:hover {
+        color: #1e3c5c;
+      }
 
       &.has-chapter {
-        font-size: 12px;
-        font-weight: 500;
-        color: #007bff;
-        z-index: 9999;
+        color: #007bff; // Màu nổi bật khi có chapter
+        z-index: 999999;
         text-decoration: underline;
-        transition: color 0.3s ease-in-out;
-
-        &:hover {
-          color: #0056b3;
-        }
       }
     }
 
+
     .rating {
+      color: #ffc107;
       font-size: 14px;
-      color: $rating-color;
+      font-weight: 500;
     }
+
   }
 }
 
@@ -260,6 +276,7 @@ $box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
 
       p {
         font-size: 12px;
+        z-index: 999999;
         color: #666;
         min-height: 24px;
       }
@@ -365,6 +382,8 @@ $box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     box-shadow: $box-shadow-light;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    left: 45px;
     width: 140px;
     min-height: 230px;
     cursor: pointer;

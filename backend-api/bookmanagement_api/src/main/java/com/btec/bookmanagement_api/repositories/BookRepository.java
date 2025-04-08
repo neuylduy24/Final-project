@@ -15,8 +15,8 @@ public interface BookRepository extends MongoRepository<Book, String> {
     @Query("{ $text: { $search: ?0 } }")
     List<Book> searchBooks(String keyword);
 
-    List<Book> findByTitleContainingIgnoreCase(String title);
-    List<Book> findByDescriptionContainingIgnoreCase(String title);
+    List<Book> findByTitleContainingIgnoreCase(String keyword);
+    List<Book> findByDescriptionContainingIgnoreCase(String keyword);
     Optional<Book> findByImageHash(String imageHash);
     List<Book> findAllByOrderByCreatedAtDesc();
 

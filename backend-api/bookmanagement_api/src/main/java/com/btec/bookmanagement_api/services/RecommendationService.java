@@ -97,6 +97,7 @@ public class RecommendationService {
         prompt.append("Hãy gợi ý tối đa 10 truyện phù hợp nhất. Trả về mỗi truyện trên 1 dòng, chỉ bao gồm tên truyện.");
         return prompt.toString();
     }
+    
 
     private List<String> parseAiResponse(String aiResponse) {
         if (aiResponse == null || aiResponse.isBlank()) {

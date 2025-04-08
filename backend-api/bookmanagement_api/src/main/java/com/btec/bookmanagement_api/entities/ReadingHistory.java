@@ -33,6 +33,8 @@ public class ReadingHistory {
     @Indexed
     @Field(name = "bookId")
     private String bookId;
+    private Book book;
+
 
     @Field(name = "session_id")
     private String sessionId;

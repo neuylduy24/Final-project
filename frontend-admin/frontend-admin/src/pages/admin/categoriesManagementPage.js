@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import CategoriesForm from "../../component/Categories/CategoriesForm";
 import CategoryTable from "../../component/Categories/CategoriesTable";
 import Pagination from "../../component/common/Pagination";
-import axios from "axios";
+import categoryService from "../../service/categoryService";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CategoriesManagementAdPage = () => {
   const [categories, setCategories] = useState([]);
@@ -10,69 +12,10 @@ const CategoriesManagementAdPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const categoriesPerPage = 4;
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(
-        "https://api.it-ebook.io.vn/api/categories"
-      );
-      setCategories(response.data);
-      setCurrentPage(1); // Reset to first page when data changes
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      setCategories(
-        categories.map((category) =>
-          category.id === form.id ? form : category
-        )
-      );
-    } else {
-      setCategories([
-        ...categories,
-        {
-          ...form,
-          id: Date.now(),
-          createdAt: new Date().toISOString().split("T")[0],
-        },
-      ]);
-    }
-    setForm({ id: "", name: "", createdAt: "" });
-    setIsEditing(false);
-    setShowForm(false);
-  };
-
-  const handleEdit = (category) => {
-    setForm(category);
-    setIsEditing(true);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id) => {
-    setCategories((prevCategories) => {
-      const updatedCategories = prevCategories.filter(
-        (category) => category.id !== id
-      );
-      const newTotalPages = Math.ceil(
-        updatedCategories.length / categoriesPerPage
-      );
-      if (currentPage > newTotalPages) {
-        setCurrentPage(newTotalPages || 1); // Keep page number valid after deletion
-      }
-      return updatedCategories;
-    });
-  };
-
-  // Determine category list for current page
+  // Calculate pagination
   const indexOfLastCategory = currentPage * categoriesPerPage;
   const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
   const currentCategories = categories.slice(
@@ -81,8 +24,88 @@ const CategoriesManagementAdPage = () => {
   );
   const totalPages = Math.ceil(categories.length / categoriesPerPage);
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Adjust current page when categories length changes
+  useEffect(() => {
+    const maxPage = Math.ceil(categories.length / categoriesPerPage);
+    if (currentPage > maxPage) {
+      setCurrentPage(Math.max(1, maxPage));
+    }
+  }, [categories.length, currentPage]);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await categoryService.getAllCategories();
+      const formattedData = Array.isArray(data) ? data : [];
+      setCategories(formattedData);
+    } catch (error) {
+      toast.error("Error fetching categories: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditing) {
+        const updatedCategory = await categoryService.updateCategory(form.id, form);
+        setCategories(prevCategories =>
+          prevCategories.map(category =>
+            category.id === updatedCategory.id ? updatedCategory : category
+          )
+        );
+      } else {
+        const newCategory = await categoryService.createCategory({
+          ...form,
+          createdAt: new Date().toISOString()
+        });
+        setCategories(prevCategories => [...prevCategories, newCategory]);
+        // Set to last page when adding new category
+        const newTotalPages = Math.ceil((categories.length + 1) / categoriesPerPage);
+        setCurrentPage(newTotalPages);
+      }
+
+      setForm({ id: "", name: "", createdAt: "" });
+      setIsEditing(false);
+      setShowForm(false);
+    } catch (error) {
+      toast.error("Error saving category: " + error.message);
+    }
+  };
+
+  const handleEdit = (category) => {
+    setForm(category);
+    setIsEditing(true);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await categoryService.deleteCategory(id);
+      // Update local state
+      setCategories(prevCategories => {
+        const updatedCategories = prevCategories.filter(
+          category => category.id !== id
+        );
+        return updatedCategories;
+      });
+    } catch (error) {
+      toast.error("Error deleting category: " + error.message);
+    }
+  };
+
+  if (loading && categories.length === 0) {
+    return <div className="loading">Loading...</div>;
+  }
+
   return (
     <div className="container">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="container-management">
         <h2>Category Management</h2>
 
@@ -108,12 +131,15 @@ const CategoriesManagementAdPage = () => {
           categoriesPerPage={categoriesPerPage}
           setIsEditing={setIsEditing}
           setCurrentPage={setCurrentPage}
+          loading={loading}
         />
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-        />
+        {categories.length > categoriesPerPage && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
       </div>
     </div>
   );

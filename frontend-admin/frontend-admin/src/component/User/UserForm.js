@@ -3,8 +3,6 @@ import userService from '../../service/userService';
 import { toast } from 'react-toastify';
 
 const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(form.avatar || '');
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -80,7 +78,7 @@ const UserForm = ({ form, setForm, handleSubmit, closeForm, isEditing }) => {
             
             // Call parent's submit function
             handleSubmit(e, updatedForm);
-            toast.success(isEditing ? "User updated successfully!" : "User added successfully!");
+            toast.success(isEditing ? "✏️ User updated successfully!" : "✅ User added successfully!");
         } catch (error) {
             toast.error("Unable to save user information. Please try again later.");
         }

@@ -1,42 +1,52 @@
-    import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FaSearch } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { removeAccents } from "../../utils/helper";
 
-const ChapterTable = ({ 
-  chapters, 
-  handleEdit, 
-  handleDelete, 
+const ChapterTable = ({
+  chapters,
+  handleEdit,
+  handleDelete,
   setShowForm,
   selectedBookId,
-  bookMap
+  bookMap,
 }) => {
-  const [filteredChapters, setFilteredChapters] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredChapters, setFilteredChapters] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
+  // Update filtered chapters
   useEffect(() => {
-    // Filter chapters based on selected book and search term
     let filtered = chapters;
-    
-    // Filter by book if a specific book is selected
+
     if (selectedBookId && selectedBookId !== "all") {
-      filtered = filtered.filter(chapter => chapter.bookId === selectedBookId);
+      filtered = filtered.filter((chapter) => chapter.bookId === selectedBookId);
     }
-    
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(chapter => 
-        chapter.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        chapter.chapterNumber?.toString().includes(searchTerm)
+
+    const normalizedSearchTerm = removeAccents(searchTerm.toLowerCase());
+
+    if (normalizedSearchTerm) {
+      filtered = filtered.filter(
+        (chapter) =>
+          removeAccents((chapter.title || "").toLowerCase()).includes(normalizedSearchTerm) ||
+          removeAccents((chapter.content || "").toLowerCase()).includes(normalizedSearchTerm) ||
+          removeAccents((bookMap[chapter.bookId] || "").toLowerCase()).includes(normalizedSearchTerm)
       );
     }
-    
-    setFilteredChapters(filtered);
-  }, [chapters, selectedBookId, searchTerm]);
 
-  const handleAddChapter = () => {
-    setShowForm(true);
-  };
+    setFilteredChapters(filtered);
+    setCurrentPage(1); // luôn reset về trang 1 sau mỗi lần lọc
+  }, [chapters, selectedBookId, searchTerm, bookMap]);
+
+  // Tính currentChapters dựa trên currentPage
+  const currentChapters = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredChapters.slice(start, end);
+  }, [filteredChapters, currentPage]);
+
+  const totalPages = Math.ceil(filteredChapters.length / itemsPerPage);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -46,7 +56,7 @@ const ChapterTable = ({
       month: "short",
       day: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   };
 
@@ -61,10 +71,12 @@ const ChapterTable = ({
     return bookMap[bookId] || "Unknown Book";
   };
 
+  const handleDeleteClick = (chapterId) => {
+    handleDelete(chapterId);
+  };
+
   return (
     <div>
-      <ToastContainer position="top-right" autoClose={2000} />
-
       <div className="search-container">
         <FaSearch className="search-icon" />
         <input
@@ -74,9 +86,6 @@ const ChapterTable = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button className="add-button" onClick={handleAddChapter}>
-          ➕ Add Chapter
-        </button>
       </div>
 
       <table className="container-table">
@@ -92,8 +101,8 @@ const ChapterTable = ({
           </tr>
         </thead>
         <tbody>
-          {filteredChapters.length > 0 ? (
-            filteredChapters.map((chapter) => (
+          {currentChapters.length > 0 ? (
+            currentChapters.map((chapter) => (
               <tr key={chapter.id}>
                 <td>{chapter.chapterNumber}</td>
                 <td>{chapter.title || "Untitled"}</td>
@@ -101,19 +110,15 @@ const ChapterTable = ({
                 <td>{truncateContent(chapter.content)}</td>
                 <td>{formatDate(chapter.createdAt)}</td>
                 <td>{chapter.views || 0}</td>
-                <td className="button-group">
-                  <button
-                    className="edit-button"
-                    onClick={() => handleEdit(chapter)}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(chapter.id)}
-                  >
-                    🗑️ Delete
-                  </button>
+                <td>
+                  <div className="action-buttons">
+                    <button className="btn-edit" onClick={() => handleEdit(chapter)}>
+                      Edit
+                    </button>
+                    <button className="btn-delete" onClick={() => handleDeleteClick(chapter.id)}>
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
@@ -126,6 +131,27 @@ const ChapterTable = ({
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

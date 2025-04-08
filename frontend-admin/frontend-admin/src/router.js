@@ -1,7 +1,7 @@
 import React from "react";
 import { ADMIN_PATH, ROUTERS } from "./utils/router";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import LoginPage from "./pages/admin/loginPage";
+import LoginPage from "./pages/admin/loginPage/login";
 import MasterLayoutAdmin from "./pages/admin/theme/masterLayoutAdmin";
 import CategoriesManagementAdPage from "./pages/admin/categoriesManagementPage";
 import ChapterManagementPage from "./pages/admin/chapterManagementPage";

@@ -12,6 +12,14 @@ const bookService = {
             throw error;
         }
     },
+    getBooksFavorite: async () => {
+        try {
+            const response = await axios.get(API_URL + '/books/recommend-by-categories');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
 
     // Lấy chi tiết sách
     getBookById: async (bookId) => {

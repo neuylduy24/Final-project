@@ -1,95 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { Tabs, Tab, Typography } from '@mui/material';
-import BookRankingApi from '../../../api/BookRankingApi';
-import BookCard from '../../../component/Book/Card/bookDetailCard';
-import './topBooks.scss';
+import React, { useEffect, useState } from "react";
+import BookRankingApi from "../../../api/BookRankingApi";
+import BookCard from "../../../component/Book/Card/bookDetailCard";
+import "./topBooks.scss";
+import bookService from "service/bookService";
 
-const TopBooksPage = () => {
-    const [activeTab, setActiveTab] = useState(0);
-    const [dailyTop, setDailyTop] = useState([]);
-    const [weeklyTop, setWeeklyTop] = useState([]);
-    const [monthlyTop, setMonthlyTop] = useState([]);
-    const [loading, setLoading] = useState(true);
+const BookHotPage = () => {
+  const [books, setBooks] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
 
-    useEffect(() => {
-        const fetchRankings = async () => {
-            try {
-                setLoading(true);
-                const [
-                    dailyData,
-                    weeklyData,
-                    monthlyData
-                ] = await Promise.all([
-                    BookRankingApi.getTopDailyScore(),
-                    BookRankingApi.getTopWeeklyScore(),
-                    BookRankingApi.getTopMonthlyScore()
-                ]);
-
-                setDailyTop(dailyData);
-                setWeeklyTop(weeklyData);
-                setMonthlyTop(monthlyData);
-            } catch (error) {
-                console.error('Error fetching rankings:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchRankings();
-    }, []);
-
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        let data = [];
+        switch (activeFilter) {
+          case "day":
+            data = await BookRankingApi.getTop10BooksByViews();
+            break;
+          case "week":
+            data = await BookRankingApi.getAllBooksByFollow();
+            break;
+          case "topFollow":
+            data = await BookRankingApi.getTop10BooksByFollow();
+            break;
+          case "views":
+            data = await BookRankingApi.getBooksSortedByCreatedDateDesc();
+            break;
+          default:
+            data = await bookService.getBooksFavorite();
+            console.log("data", data);
+            break;
+        }
+        setBooks(data);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu sách:", error);
+      }
     };
 
-    const renderBookList = (books) => {
-        if (loading) {
-            return <Typography>Loading...</Typography>;
-        }
+    fetchBooks();
+  }, [activeFilter]); // chạy lại mỗi khi filter thay đổi
 
-        if (!books || books.length === 0) {
-            return <Typography>No books found</Typography>;
-        }
+  return (
+    <div className="book-hot-page">
+      <div className="filter-buttons">
+        <button
+          className={activeFilter === "all" ? "active" : ""}
+          onClick={() => setActiveFilter("all")}
+        >
+          All
+        </button>
+        <button
+          className={activeFilter === "day" ? "active" : ""}
+          onClick={() => setActiveFilter("day")}
+        >
+          Top View
+        </button>
+        <button
+          className={activeFilter === "week" ? "active" : ""}
+          onClick={() => setActiveFilter("week")}
+        >
+          Top Follow
+        </button>
+        <button
+          className={activeFilter === "views" ? "active" : ""}
+          onClick={() => setActiveFilter("views")}
+        >
+          Top Book New
+        </button>
+      </div>
 
-        return (
-            <div className="book-list">
-                {books.map((book, index) => (
-                    <BookCard 
-                        key={book.id} 
-                        book={book} 
-                        rank={index + 1}
-                        score={book.combinedScore.toFixed(1)}
-                    />
-                ))}
-            </div>
-        );
-    };
-
-    return (
-        <div className="top-books-page">
-            <Typography variant="h4" className="page-title">
-                Top Books
-            </Typography>
-
-            <Tabs 
-                value={activeTab} 
-                onChange={handleTabChange} 
-                className="ranking-tabs"
-                variant="scrollable"
-                scrollButtons="auto"
-            >
-                <Tab label="Top Daily" />
-                <Tab label="Top Weekly" />
-                <Tab label="Top Monthly" />
-            </Tabs>
-
-            <div className="book-list-container">
-                {activeTab === 0 && renderBookList(dailyTop)}
-                {activeTab === 1 && renderBookList(weeklyTop)}
-                {activeTab === 2 && renderBookList(monthlyTop)}
-            </div>
-        </div>
-    );
+      <div className="book-grid">
+        {books.map((book) => (
+          <BookCard key={book.id} book={book} />
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default TopBooksPage;
+export default BookHotPage;

@@ -11,30 +11,44 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends MongoRepository<Book, String> {
+
     Optional<Book> findByTitle(String title);
+    Optional<Book> findByImageHash(String imageHash);
+
     List<Book> findByAuthor(String author);
+
+    // Tìm theo từ khoá trong title hoặc description
+    List<Book> findByTitleContainingIgnoreCase(String keyword);
+    List<Book> findByDescriptionContainingIgnoreCase(String keyword);
+
+    // Full-text search (nếu đã tạo text index trong MongoDB)
     @Query("{ $text: { $search: ?0 } }")
     List<Book> searchBooks(String keyword);
 
-    List<Book> findByTitleContainingIgnoreCase(String keyword);
-    List<Book> findByDescriptionContainingIgnoreCase(String keyword);
-    Optional<Book> findByImageHash(String imageHash);
+    // Lấy sách theo danh sách tiêu đề
+    List<Book> findByTitleIn(List<String> titles);
+
+    // Lấy sách theo danh sách tên thể loại
+    @Query("{ 'categories.name': { $in: ?0 } }")
+    List<Book> findByCategoryNames(List<String> categoryNames);
+
+    // Sách mới nhất
     List<Book> findAllByOrderByCreatedAtDesc();
 
-
-
-    List<Book> findByTitleIn(List<String> titles);
-    // Lấy 8 sách có lượt xem nhiều nhất
-    List<Book> findTop8ByOrderByViewsDesc();
-
+    // Ngẫu nhiên n sách
     @Aggregation(pipeline = {
             "{ $sample: { size: ?0 } }"
     })
     List<Book> findRandomBooks(int size);
 
-    // Top 10 truyện có view lớn nhất
+    // Top 8 hoặc top 10 sách có lượt xem nhiều nhất
+    List<Book> findTop8ByOrderByViewsDesc();
     List<Book> findTop10ByOrderByViewsDesc();
 
-    // Lấy toàn bộ sách sắp xếp theo view giảm dần
+    // Toàn bộ sách sắp xếp theo view giảm dần
     List<Book> findAllByOrderByViewsDesc();
+
+    // Gợi ý các sách cùng thể loại nhưng không trùng ID (ví dụ loại trừ sách đã đọc)
+    @Query("{ 'categories.name': { $in: ?0 }, '_id': { $ne: ?1 } }")
+    List<Book> findByCategoryNamesAndIdNot(List<String> categoryNames, String excludeBookId);
 }

@@ -20,6 +20,15 @@ public class ReadingHistoryService {
         return readingHistoryRepository.findByEmailOrderByLastReadAtDesc(email);
     }
 
+    // 🔹 Lấy danh sách ID các truyện đã đọc gần đây nhất (loại trùng lặp)
+    public List<String> getRecentlyReadBookIds(String email) {
+        return readingHistoryRepository.findByEmailOrderByLastReadAtDesc(email).stream()
+                .map(ReadingHistory::getBookId)
+                .filter(id -> id != null && !id.isBlank())
+                .distinct()
+                .toList();
+    }
+
     // 🔹 Bắt đầu hoặc tiếp tục đọc sách
     public ReadingHistory startOrUpdateReading(String email, String userId, String bookId, String chapterId, int progress, long timeSpent) {
         Optional<ReadingHistory> existingHistory = readingHistoryRepository.findTopByEmailAndBookIdAndChapterIdOrderByLastReadAtDesc(email, bookId, chapterId);

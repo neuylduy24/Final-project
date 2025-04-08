@@ -199,7 +199,6 @@ public class BookController {
                 byte[] imageData = file.getBytes();
                 String imageHash = bookService.calculateImageHash(imageData);
 
-                // Kiểm tra trùng ảnh với sách khác
                 Optional<Book> duplicate = bookRepository.findByImageHash(imageHash);
                 if (duplicate.isPresent() && !duplicate.get().getId().equals(id)) {
                     return ResponseEntity.badRequest().body("This image is already used by another book.");
@@ -207,12 +206,17 @@ public class BookController {
 
                 book.setImageData(imageData);
                 book.setImageHash(imageHash);
-                book.setImage(null); // xóa image URL nếu có
-            } else if (imageUrl != null && !imageUrl.isBlank()) {
+                book.setImage(null); // clear image URL nếu dùng ảnh file
+            }
+
+            // Nếu có URL ảnh mới
+            else if (imageUrl != null && !imageUrl.isBlank()) {
                 book.setImage(imageUrl);
-                book.setImageData(null); // xóa imageData nếu có
+                book.setImageData(null); // clear ảnh file nếu dùng URL
                 book.setImageHash(null);
             }
+
+            // Nếu không có file mới và không có imageUrl thì giữ nguyên ảnh hiện tại
 
             Book updated = bookService.updateBook(id, book);
             return ResponseEntity.ok(updated);

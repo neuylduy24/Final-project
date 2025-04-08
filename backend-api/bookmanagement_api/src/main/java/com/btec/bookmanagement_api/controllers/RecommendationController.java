@@ -1,39 +1,36 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
-import com.btec.bookmanagement_api.services.RecommendationService;
-import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.security.JwtUtil;
+import com.btec.bookmanagement_api.services.PersonalizedRecommendationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping("/recommendations")
+@RequestMapping("/api/recommendations")
 @RequiredArgsConstructor
 public class RecommendationController {
 
-    private final BookService bookService;
-    private final RecommendationService recommendationService;
+    private final PersonalizedRecommendationService personalizedRecommendationService;
 
-    @GetMapping("/for-you")
-    public List<Book> getForYou(HttpServletRequest request) {
+    @GetMapping("/personalized")
+    public List<Book> getPersonalizedBooks(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Bỏ "Bearer "
+            String token = authHeader.substring(7);
             try {
                 String email = JwtUtil.extractEmail(token);
-                return recommendationService.recommendBooks(email);
+                return personalizedRecommendationService.recommendBooks(email);
             } catch (Exception e) {
-                // Token không hợp lệ hoặc đã hết hạn → trả về sách theo lượt xem
-                return bookService.getBooksByViews();
+                // Token lỗi → trả về rỗng hoặc có thể fallback
+                return List.of();
             }
         }
 
-        // Nếu không có token → trả về sách phổ biến
-        return bookService.getBooksByViews();
+        return List.of(); // Không có token → không gợi ý
     }
 }

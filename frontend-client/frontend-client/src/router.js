@@ -17,6 +17,7 @@ import UserComments from "pages/user/CommentPage/commentPage";
 import SearchPage from "pages/user/BookSearchPage/SearchPage";
 import TopBooksPage from "pages/user/TopBookPage/topBook";
 import BookNew from "pages/user/BookNewPage/bookNew";
+import ChooseCategoriesPage from "pages/user/RecomandationPage/ChooseCategoriesPage";
 
 const RouterCustom = () => {
     const location = useLocation();
@@ -48,6 +49,7 @@ const RouterCustom = () => {
                             <Route path={ROUTERS.USER.SEARCHBOOK} element={<SearchPage />} />
                             <Route path={ROUTERS.USER.BOOKRANK} element={<TopBooksPage />} />
                             <Route path={ROUTERS.USER.BOOKNEW} element={<BookNew />} />
+                            <Route path={ROUTERS.USER.CHOOSE} element={<ChooseCategoriesPage />} />
                         </Routes>
                     </MasterLayout>
                 }

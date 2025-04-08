@@ -69,8 +69,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
       );
       return isSelected
         ? prev.filter(
-            (cat) =>
-              cat.id !== category.id && cat.name !== category.name
+            (cat) => cat.id !== category.id && cat.name !== category.name
           )
         : [...prev, category];
     });
@@ -106,65 +105,67 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.title.trim()) {
-    toast.error("Vui lòng nhập tiêu đề sách");
-    return;
-  }
-
-  const categoryString = selectedCategories.map((cat) => cat.name).join(", ").trim();
-  if (!categoryString) {
-    toast.error("Vui lòng chọn ít nhất một thể loại");
-    return;
-  }
-
-  const formPayload = new FormData();
-  formPayload.append("title", formData.title);
-  formPayload.append("author", formData.author || "");
-  formPayload.append("description", formData.description || "");
-
-  // ✅ Nếu backend nhận 1 chuỗi category phân cách dấu phẩy
-  formPayload.append("category", categoryString);
-
-  // ✅ Nếu dùng ảnh URL
-  if (imageInputType === "url") {
-    if (!formData.image || !formData.image.trim()) {
-      toast.error("Vui lòng nhập URL ảnh");
+    if (!formData.title.trim()) {
+      toast.error("Vui lòng nhập tiêu đề sách");
       return;
     }
-    formPayload.append("imageUrl", formData.image.trim());
-  }
 
-  // ✅ Nếu upload ảnh file
-  if (imageInputType === "upload") {
-    if (!imageFile) {
-      toast.error("Vui lòng chọn ảnh để tải lên");
+    const categoryString = selectedCategories
+      .map((cat) => cat.name)
+      .join(", ")
+      .trim();
+    if (!categoryString) {
+      toast.error("Vui lòng chọn ít nhất một thể loại");
       return;
     }
-    formPayload.append("file", imageFile);
-  }
 
-  try {
-    const response = await axios.post(
-      "https://api.it-ebook.io.vn/api/books/create-with-image",
-      formPayload,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    const formPayload = new FormData();
+    formPayload.append("title", formData.title);
+    formPayload.append("author", formData.author || "");
+    formPayload.append("description", formData.description || "");
+
+    // ✅ Nếu backend nhận 1 chuỗi category phân cách dấu phẩy
+    formPayload.append("category", categoryString);
+
+    // ✅ Nếu dùng ảnh URL
+    if (imageInputType === "url") {
+      if (!formData.image || !formData.image.trim()) {
+        toast.error("Vui lòng nhập URL ảnh");
+        return;
       }
-    );
+      formPayload.append("imageUrl", formData.image.trim());
+    }
 
-    toast.success("Thêm sách thành công!");
-    onSave && onSave(response.data);
-    setShowForm(false);
-  } catch (error) {
-    console.error("Create book error:", error);
-    toast.error(error?.response?.data || "Đã xảy ra lỗi khi thêm sách.");
-  }
-};
+    // ✅ Nếu upload ảnh file
+    if (imageInputType === "upload") {
+      if (!imageFile) {
+        toast.error("Vui lòng chọn ảnh để tải lên");
+        return;
+      }
+      formPayload.append("file", imageFile);
+    }
 
+    try {
+      const response = await axios.post(
+        "https://api.it-ebook.io.vn/api/books/create-with-image",
+        formPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      toast.success("Thêm sách thành công!");
+      onSave && onSave(response.data);
+      setShowForm(false);
+    } catch (error) {
+      console.error("Create book error:", error);
+      toast.error(error?.response?.data || "Đã xảy ra lỗi khi thêm sách.");
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -209,9 +210,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
                     </span>
                   ))
                 ) : (
-                  <span className="no-categories">
-                    No categories selected
-                  </span>
+                  <span className="no-categories">No categories selected</span>
                 )}
               </div>
             </div>
@@ -272,7 +271,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             </div>
           )}
 
-          <div>
+          <div className="image-input-type-selector">
             <label>
               <input
                 type="radio"
@@ -302,11 +301,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
               placeholder="Enter image URL"
             />
           ) : (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
+            <input type="file" accept="image/*" onChange={handleImageUpload} />
           )}
 
           {imagePreview && (

@@ -10,27 +10,36 @@ const API_URL = "https://api.it-ebook.io.vn/api/books/recommend-by-categories";
 const HomePage = () => {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
+  const [hasToken, setHasToken] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-  
+    setHasToken(!!token);
     const fetchBooks = async () => {
       try {
-        const res = await axios.get(API_URL, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
+        let res;
+        if (token) {
+          // Nếu có token, lấy sách đề xuất theo danh mục (recommend/favorite)
+          res = await axios.get("https://api.it-ebook.io.vn/api/books/recommend-by-categories", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else {
+          // Nếu không có token, gọi API công khai để lấy tất cả sách
+          res = await axios.get("https://api.it-ebook.io.vn/api/books"); // 🔁 API này bạn cần confirm lại
+        }
   
-        const categoryData = res.data;
-        const allBooks = Object.values(categoryData).flat(); // ✅ gom tất cả sách lại thành 1 mảng
-  
-        setBooks(allBooks);
+        setBooks(res.data);
       } catch (error) {
-        console.error("Lỗi khi gọi API recommend-by-categories:", error);
+        console.error("Lỗi khi gọi API sách:", error);
       }
     };
   
     fetchBooks();
   }, []);
+  
+  
   
   
 
@@ -42,9 +51,10 @@ const HomePage = () => {
       <div className="container">
         <div className="featured">
           <div className="section-title">
-            <h2>Book hot</h2>
+          <h2>{hasToken ? "Book for you" : "Book hot"}</h2>
           </div>
           <BookHotPage books={memoizedBooks} navigate={navigate} />
+
         </div>
       </div>
     </>

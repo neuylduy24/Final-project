@@ -4,7 +4,8 @@ import BookCard from "../../../component/Book/Card/bookDetailCard";
 import "./topBooks.scss";
 import bookService from "service/bookService";
 
-const BookHotPage = () => {
+const BookHotPage = ({ books: booksFromProps }) => {
+
   const [books, setBooks] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
 
@@ -25,9 +26,9 @@ const BookHotPage = () => {
           case "views":
             data = await BookRankingApi.getBooksSortedByCreatedDateDesc();
             break;
+          case "all":
           default:
-            data = await bookService.getBooksFavorite();
-            console.log("data", data);
+            data = booksFromProps || [];
             break;
         }
         setBooks(data);
@@ -35,9 +36,10 @@ const BookHotPage = () => {
         console.error("Lỗi khi tải dữ liệu sách:", error);
       }
     };
-
+  
     fetchBooks();
-  }, [activeFilter]); // chạy lại mỗi khi filter thay đổi
+  }, [activeFilter, booksFromProps]);
+  
 
   return (
     <div className="book-hot-page">

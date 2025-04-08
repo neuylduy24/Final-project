@@ -30,6 +30,7 @@ const RouterCustom = () => {
     return (
         <Routes>
             <Route path={ROUTERS.USER.LOGINPAGE} element={<LoginPage />} />
+            <Route path={ROUTERS.USER.CHOOSE} element={<ChooseCategoriesPage />} />
             <Route path={ROUTERS.USER.REGISTER} element={<RegisterPage />} />
             <Route path={ROUTERS.USER.FORGOTPASSWORD} element={<ForgotPasswordPage />} />
 
@@ -49,7 +50,7 @@ const RouterCustom = () => {
                             <Route path={ROUTERS.USER.SEARCHBOOK} element={<SearchPage />} />
                             <Route path={ROUTERS.USER.BOOKRANK} element={<TopBooksPage />} />
                             <Route path={ROUTERS.USER.BOOKNEW} element={<BookNew />} />
-                            <Route path={ROUTERS.USER.CHOOSE} element={<ChooseCategoriesPage />} />
+                            {/* <Route path={ROUTERS.USER.CHOOSE} element={<ChooseCategoriesPage />} /> */}
                         </Routes>
                     </MasterLayout>
                 }

@@ -37,11 +37,12 @@ const ChooseCategoriesPage = () => {
       return;
     }
 
+    // Gửi trực tiếp mảng các id mà không cần tên
     axios
       .post(
         "https://api.it-ebook.io.vn/api/users/favorite-categories",
         {
-          favoriteCategories: selectedCategoryIds, // Gửi mảng ID
+          favoriteCategories: selectedCategoryIds, // Chỉ gửi mảng id
         },
         {
           headers: {
@@ -51,35 +52,39 @@ const ChooseCategoriesPage = () => {
       )
       .then(() => {
         toast.success("Đã lưu thể loại yêu thích!");
-        navigate(ROUTERS.USER.HOME); // Điều hướng về trang chính
+        navigate(ROUTERS.USER.HOME); // Điều hướng về trang chính sau khi lưu thành công
       })
       .catch((error) => {
         const msg =
-          error.response?.data?.message || "Lỗi không xác định khi lưu thể loại.";
+          error.response?.data?.message ||
+          "Lỗi không xác định khi lưu thể loại.";
         toast.error("Lỗi: " + msg);
       });
   };
 
   return (
     <div className="choose-categories-page">
-      <h2>Chọn thể loại bạn yêu thích</h2>
-      <div className="categories-grid">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className={`category-card ${
-              selectedCategoryIds.includes(cat.id) ? "selected" : ""
-            }`}
-            onClick={() => toggleCategory(cat.id)}
-          >
-            {cat.name}
-          </div>
-        ))}
+  <h2 className="question-title">What categories do you like best?</h2>
+  <div className="categories-grid">
+    {categories.map((cat) => (
+      <div
+        key={cat.id}
+        className={`category-card ${
+          selectedCategoryIds.includes(cat.name) ? "selected active" : ""
+        }`}
+        onClick={() => toggleCategory(cat.name)}
+      >
+        <span>{cat.name}</span>
       </div>
-      <button onClick={handleSubmit} className="submit-button">
-        Xác nhận
-      </button>
-    </div>
+    ))}
+  </div>
+  <div className="submit-section">
+    <button onClick={handleSubmit} className="submit-button">
+      Submit
+    </button>
+  </div>
+</div>
+
   );
 };
 

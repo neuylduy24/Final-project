@@ -1,0 +1,37 @@
+/* ChooseCategoriesPage.scss */
+.choose-categories-page {
+    padding: 2rem;
+    text-align: center;
+  
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+  
+    .category-card {
+      padding: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+  
+    .category-card.selected {
+      background-color: #4caf50;
+      color: white;
+      border-color: #4caf50;
+    }
+  
+    .submit-button {
+      padding: 0.75rem 2rem;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  }
+  

@@ -4,6 +4,7 @@ export const ROUTERS = {
     USER: {
         HOME: `${USER_PATH}`,
         LOGINPAGE: `${USER_PATH}/login`,
+        CHOOSE: `${USER_PATH}/choose-categories`,
         REGISTER: `${USER_PATH}/register`,
         FORGOTPASSWORD: `${USER_PATH}/forgot-password`,
         RESETPASSWORD: `${USER_PATH}/reset-password`,

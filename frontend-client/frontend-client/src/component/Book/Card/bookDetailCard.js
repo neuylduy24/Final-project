@@ -147,10 +147,12 @@ const BookCard = ({ book, onChapterClick }) => {
 
   useEffect(() => {
     if (book.id) {
-      fetchAverageRating();
-      fetchChaptersByBookId();
-      fetchBookStats();
-      fetchTotalComments();
+      Promise.all([
+        fetchAverageRating(),
+        fetchChaptersByBookId(),
+        fetchBookStats(),
+        fetchTotalComments(),
+      ]);
     }
   }, [book.id]);
 
@@ -198,10 +200,17 @@ const BookCard = ({ book, onChapterClick }) => {
       style={{ cursor: "pointer" }}
     >
       <div className="book-card">
-        <div
-          className="book-img"
-          style={{ backgroundImage: `url(${book.image})` }}
-        >
+        <div className="book-img">
+          {book.image ? (
+            <img src={book.image} alt="cover" />
+          ) : book.imageData ? (
+            <img src={`data:image/jpeg;base64,${book.imageData}`} alt="cover" />
+          ) : (
+            <img
+              src={`https://api.it-ebook.io.vn/api/books/${book.id}/image`}
+              alt="cover"
+            />
+          )}
           <span className="badge-time">{lastUpdated}</span>
           {averageRating >= 4 && <span className="badge-hot">Hot</span>}
           <div className="book-stats">

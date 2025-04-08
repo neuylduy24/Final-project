@@ -50,7 +50,7 @@ const LoginPage = () => {
         saveLoginInfo(data.email, rememberMe); // ✅ Luôn lưu email & trạng thái rememberMe
   
         toast.success("Login successful!");
-        setTimeout(() => navigate(ROUTERS.USER.HOME), 1500);
+        setTimeout(() => navigate(ROUTERS.USER.CHOOSE), 1500);
       } else {
         toast.error("Invalid email or password.");
       }

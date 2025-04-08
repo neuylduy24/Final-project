@@ -25,8 +25,8 @@ const SortedBookList = () => {
   }, []);
 
   return (
-    <div className="sorted-book-list container mt-4">
-      <h2 className="mb-4">📚 Sách theo thứ tự thời gian</h2>
+    <div className="sorted-book-list container">
+      <h2 className="mb-4">📚 New book update</h2>
       {loading ? (
         <p>Đang tải sách...</p>
       ) : books.length > 0 ? (

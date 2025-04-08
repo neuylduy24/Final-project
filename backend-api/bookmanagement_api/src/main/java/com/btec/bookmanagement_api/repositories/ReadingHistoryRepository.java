@@ -24,4 +24,8 @@ public interface ReadingHistoryRepository extends MongoRepository<ReadingHistory
 
     // 🔹 Find all reading history entries for a specific chapter
     List<ReadingHistory> findByChapterId(String chapterId);
+
+    List<ReadingHistory> findByEmail(String email);
+
+
 }

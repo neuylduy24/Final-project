@@ -7,6 +7,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
     id: "",
     title: "",
     author: "",
+    description: "",
     category: "",
     image: "",
     createdAt: new Date().toISOString().split("T")[0],
@@ -17,24 +18,22 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
-  const [imageInputType, setImageInputType] = useState("url"); // "url" or "upload"
+  const [imageInputType, setImageInputType] = useState("url");
 
   useEffect(() => {
     if (book && isEditing) {
       setFormData(book);
-      // If book has categories as array, keep it, otherwise need to convert
+
       if (book.image) {
         setImagePreview(book.image);
         setImageInputType("url");
       }
 
-      // Set selected categories
-      if (book.categories && Array.isArray(book.categories)) {
+      if (Array.isArray(book.categories)) {
         setSelectedCategories(book.categories);
       } else if (Array.isArray(book.category)) {
         setSelectedCategories(book.category);
       } else if (book.category) {
-        // If it's just a string, create a category object
         setSelectedCategories([{ id: "temp", name: book.category }]);
       }
     }
@@ -58,46 +57,34 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    // Update preview when image URL changes
     if (e.target.name === "image") {
       setImagePreview(e.target.value);
     }
   };
 
   const handleCategoryToggle = (category) => {
-    setSelectedCategories((prevSelected) => {
-      // Check if this category is already selected
-      const isSelected = prevSelected.some(
+    setSelectedCategories((prev) => {
+      const isSelected = prev.some(
         (cat) => cat.id === category.id || cat.name === category.name
       );
-
-      if (isSelected) {
-        // If selected, remove from selected list
-        return prevSelected.filter(
-          (cat) => cat.id !== category.id && cat.name !== category.name
-        );
-      } else {
-        // If not selected, add to selected list
-        return [...prevSelected, category];
-      }
+      return isSelected
+        ? prev.filter(
+            (cat) => cat.id !== category.id && cat.name !== category.name
+          )
+        : [...prev, category];
     });
   };
 
   const handleCategoriesSave = () => {
-    // Update formData with selected categories list
     setFormData((prev) => ({
       ...prev,
-      categories: selectedCategories,
-      // For API compatibility, keep category field as comma-separated category names
       category: selectedCategories.map((cat) => cat.name).join(", "),
     }));
-
     setShowCategoryModal(false);
   };
 
   const handleImageInputTypeChange = (e) => {
     setImageInputType(e.target.value);
-    // Clear image data when switching input type
     if (e.target.value === "url") {
       setImageFile(null);
       setImagePreview(formData.image);
@@ -111,11 +98,8 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      // Create preview URL for image
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
+      reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
@@ -123,74 +107,63 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!formData.title.trim()) {
-      toast.error("Please enter book title");
+      toast.error("Vui lòng nhập tiêu đề sách");
       return;
     }
 
-    if (!formData.author.trim()) {
-      toast.error("Please enter book author");
+    const categoryString = selectedCategories
+      .map((cat) => cat.name)
+      .join(", ")
+      .trim();
+    if (!categoryString) {
+      toast.error("Vui lòng chọn ít nhất một thể loại");
       return;
     }
 
-    if (selectedCategories.length === 0) {
-      toast.error("Please select at least one category");
-      return;
+    const formPayload = new FormData();
+    formPayload.append("title", formData.title);
+    formPayload.append("author", formData.author || "");
+    formPayload.append("description", formData.description || "");
+
+    // ✅ Nếu backend nhận 1 chuỗi category phân cách dấu phẩy
+    formPayload.append("category", categoryString);
+
+    // ✅ Nếu dùng ảnh URL
+    if (imageInputType === "url") {
+      if (!formData.image || !formData.image.trim()) {
+        toast.error("Vui lòng nhập URL ảnh");
+        return;
+      }
+      formPayload.append("imageUrl", formData.image.trim());
     }
 
-    // Validate image
-    if (imageInputType === "url" && !formData.image.trim()) {
-      toast.error("Please enter image URL");
-      return;
-    }
-
-    if (imageInputType === "upload" && !imageFile) {
-      toast.error("Please select an image file to upload");
-      return;
-    }
-
-    let updatedFormData = { ...formData };
-
-    // Ensure categories field exists
-    if (selectedCategories.length > 0) {
-      updatedFormData.categories = selectedCategories;
-      updatedFormData.category = selectedCategories
-        .map((cat) => cat.name)
-        .join(", ");
+    // ✅ Nếu upload ảnh file
+    if (imageInputType === "upload") {
+      if (!imageFile) {
+        toast.error("Vui lòng chọn ảnh để tải lên");
+        return;
+      }
+      formPayload.append("file", imageFile);
     }
 
     try {
-      // If upload type is selected and there's an image file, upload image first
-      if (imageInputType === "upload" && imageFile) {
-        try {
-          const formDataUpload = new FormData();
-          formDataUpload.append("image", imageFile);
-
-          // Replace with your actual image upload API here
-          const uploadResponse = await axios.post(
-            "https://api.it-ebook.io.vn/api/books/",
-            formDataUpload
-          );
-          updatedFormData.image = uploadResponse.data.imageUrl;
-        } catch (error) {
-          toast.error("Error uploading image. Please try again.");
-          return;
+      const response = await axios.post(
+        "https://api.it-ebook.io.vn/api/books/create-with-image",
+        formPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      }
-
-      await onSave(updatedFormData);
-
-      // Show success message
-      toast.success(
-        isEditing
-          ? "✏️ Book updated successfully"
-          : "📖 Book added successfully"
       );
 
+      toast.success("Thêm sách thành công!");
+      onSave && onSave(response.data);
       setShowForm(false);
     } catch (error) {
-      console.error("Error saving book:", error);
+      console.error("Create book error:", error);
+      toast.error(error?.response?.data || "Đã xảy ra lỗi khi thêm sách.");
     }
   };
 
@@ -299,25 +272,23 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
           )}
 
           <div className="image-input-type-selector">
-            <label className={imageInputType === "url" ? "active" : ""}>
+            <label>
               <input
                 type="radio"
-                name="imageInputType"
                 value="url"
                 checked={imageInputType === "url"}
                 onChange={handleImageInputTypeChange}
               />
-              Enter Image URL
+              Image URL
             </label>
-            <label className={imageInputType === "upload" ? "active" : ""}>
+            <label>
               <input
                 type="radio"
-                name="imageInputType"
                 value="upload"
                 checked={imageInputType === "upload"}
                 onChange={handleImageInputTypeChange}
               />
-              Upload Image
+              Upload File
             </label>
           </div>
 
@@ -325,9 +296,9 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             <input
               type="text"
               name="image"
-              placeholder="Image URL"
               value={formData.image}
               onChange={handleChange}
+              placeholder="Enter image URL"
             />
           ) : (
             <input type="file" accept="image/*" onChange={handleImageUpload} />

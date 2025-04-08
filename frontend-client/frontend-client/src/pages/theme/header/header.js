@@ -46,21 +46,6 @@ const Header = () => {
     {
       name: "Ranking",
       path: ROUTERS.USER.BOOKRANK,
-      isShowSubmenu: false,
-      child: [
-        {
-          name: "Top day",
-          path: ROUTERS.USER.TOPDAY,
-        },
-        {
-          name: "Top week",
-          path: ROUTERS.USER.TOPWEEK,
-        },
-        {
-          name: "Top month",
-          path: ROUTERS.USER.TOPMONTH,
-        },
-      ],
     },
     {
       name: "Follow",
@@ -172,7 +157,7 @@ const Header = () => {
         onClick={() => setShowMenuWrapper(false)}
       />
       <div className="chat-box">
-      <ChatboxButton/>
+        <ChatboxButton />
       </div>
       <div className={`menu_wrapper ${isShowMenuWrapper ? "show" : ""}`}>
         <div className="header_logo">

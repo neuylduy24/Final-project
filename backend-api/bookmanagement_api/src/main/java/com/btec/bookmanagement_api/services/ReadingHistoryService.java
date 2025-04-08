@@ -18,6 +18,7 @@ public class ReadingHistoryService {
         return readingHistoryRepository.findByEmailOrderByLastReadAtDesc(email);
     }
 
+
     public ReadingHistory startOrUpdateReading(String email, String userId, String bookId, String chapterId, int progress, long timeSpent) {
         Optional<ReadingHistory> existingHistory =
                 readingHistoryRepository.findTopByEmailAndBookIdAndChapterIdOrderByLastReadAtDesc(email, bookId, chapterId);
@@ -40,5 +41,29 @@ public class ReadingHistoryService {
         } else {
             throw new IllegalArgumentException("Reading history not found for id: " + id);
         }
+    }
+    // 🔹 Cập nhật tiến trình đọc (PUT)
+    public void updateReadingHistory(
+            String userId,
+            String email,
+            String bookId,
+            String chapterId,
+            int progress,
+            long timeSpent
+    ) {
+        Optional<ReadingHistory> optionalHistory = readingHistoryRepository
+                .findTopByEmailAndBookIdOrderByLastReadAtDesc(email, bookId);
+
+        ReadingHistory history;
+        if (optionalHistory.isPresent()) {
+            history = optionalHistory.get();
+            history.updateProgress(progress, timeSpent, chapterId);
+        } else {
+            history = ReadingHistory.startNewSession(email, userId, bookId, chapterId);
+            history.setProgress(progress);
+            history.setTimeSpent(timeSpent);
+        }
+
+        readingHistoryRepository.save(history);
     }
 }

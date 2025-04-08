@@ -39,7 +39,7 @@ const ChapterForm = ({
       }
     };
     fetchChapters();
-  }, [form.bookId, isEditing]);
+  }, [form.bookId, isEditing, setForm]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

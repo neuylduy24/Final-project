@@ -126,10 +126,10 @@ const ChapterDetail = () => {
         {/* Display chapter images if available */}
         {currentChapter.images && currentChapter.images.length > 0 && (
           <div className="chapter-images">
-          {currentChapter.images.map((imageUrl, index) => (
+          {currentChapter.images.map((images, index) => (
             <img 
               key={index} 
-              src={imageUrl} 
+              src={images} 
               alt={`${currentChapter.title} - ${index + 1}`} 
               className="chapter-image"
             />

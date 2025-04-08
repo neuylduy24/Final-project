@@ -33,7 +33,7 @@ public class Book {
     @Indexed
     private String imageHash;
     private String description;
-    private List<Chapter> chapters;
+
     private List<Category> categories;
     private int views = 0 ;
     @Transient  // Không lưu vào MongoDB

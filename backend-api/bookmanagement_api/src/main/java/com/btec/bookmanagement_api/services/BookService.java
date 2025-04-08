@@ -63,7 +63,6 @@ public class BookService {
             book.setAuthor(bookDetails.getAuthor());
             book.setImage(bookDetails.getImage());
             book.setDescription(bookDetails.getDescription());
-            book.setChapters(bookDetails.getChapters());
             book.setCategories(bookDetails.getCategories());
             book.setImageData(bookDetails.getImageData());
             book.setViews(bookDetails.getViews());

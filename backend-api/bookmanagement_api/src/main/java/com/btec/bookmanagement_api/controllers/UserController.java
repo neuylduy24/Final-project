@@ -54,12 +54,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{userId}/favorite-categories")
-    public User updateFavoriteCategories(@PathVariable String userId, @RequestBody List<String> categories) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setFavoriteCategories(categories);
-        return userRepository.save(user);
-    }
+//    @PutMapping("/{userId}/favorite-categories")
+//    public User updateFavoriteCategories(@PathVariable String userId, @RequestBody List<String> categories) {
+//        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+//        user.setFavoriteCategories(categories);
+//        return userRepository.save(user);
+//    }
 
 
 

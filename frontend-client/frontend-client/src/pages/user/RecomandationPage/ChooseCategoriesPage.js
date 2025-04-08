@@ -31,17 +31,18 @@ const ChooseCategoriesPage = () => {
       toast.error("Bạn cần đăng nhập để lưu thể loại.");
       return;
     }
-
+  
     if (selectedCategoryIds.length === 0) {
       toast.warning("Vui lòng chọn ít nhất một thể loại.");
       return;
     }
-
+  
+    // Gửi trực tiếp mảng các id mà không cần tên
     axios
       .post(
         "https://api.it-ebook.io.vn/api/users/favorite-categories",
         {
-          favoriteCategories: selectedCategoryIds, // Gửi mảng ID
+          favoriteCategories: selectedCategoryIds, // Chỉ gửi mảng id
         },
         {
           headers: {
@@ -51,7 +52,7 @@ const ChooseCategoriesPage = () => {
       )
       .then(() => {
         toast.success("Đã lưu thể loại yêu thích!");
-        navigate(ROUTERS.USER.HOME); // Điều hướng về trang chính
+        navigate(ROUTERS.USER.HOME); // Điều hướng về trang chính sau khi lưu thành công
       })
       .catch((error) => {
         const msg =
@@ -59,6 +60,9 @@ const ChooseCategoriesPage = () => {
         toast.error("Lỗi: " + msg);
       });
   };
+  
+  
+  
 
   return (
     <div className="choose-categories-page">
@@ -70,7 +74,7 @@ const ChooseCategoriesPage = () => {
             className={`category-card ${
               selectedCategoryIds.includes(cat.id) ? "selected" : ""
             }`}
-            onClick={() => toggleCategory(cat.id)}
+            onClick={() => toggleCategory(cat.name)}
           >
             {cat.name}
           </div>

@@ -61,7 +61,7 @@ const BookCard = ({ book, onChapterClick }) => {
           (chapter) =>
             axios
               .get(
-                `https://api.it-ebook.io.vn/api/feedbacks/comments/chapter/${chapter.id}`
+                `https://api.it-ebook.io.vn/api/feedbacks/comments/${chapter.id}`
               )
               .then((response) => {
                 if (response.status === 200 && Array.isArray(response.data)) {

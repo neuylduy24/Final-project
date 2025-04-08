@@ -34,7 +34,6 @@ const Chapter = () => {
     axios
       .get(`${API_BASE_URL}/api/chapters?bookId=${id}`)
       .then((response) => {
-        console.log("Chapters data for book ID:", id, response.data);
         const filteredChapters = response.data.filter(
           (chapter) => chapter.bookId === id
         );

@@ -3,10 +3,9 @@ package com.btec.bookmanagement_api.controllers;
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.security.JwtUtil;
 import com.btec.bookmanagement_api.services.BookService;
-import com.btec.bookmanagement_api.services.PersonalizedRecommendationService;
+import com.btec.bookmanagement_api.services.RecommendationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationController {
 
-    private final PersonalizedRecommendationService personalizedRecommendationService;
+    private final RecommendationService recommendationService; // ✅ Sử dụng AI
     private final BookService bookService;
 
     @GetMapping("/personalized")
@@ -27,13 +26,14 @@ public class RecommendationController {
             String token = authHeader.substring(7);
             try {
                 String email = JwtUtil.extractEmail(token);
-                return personalizedRecommendationService.recommendBooks(email);
+                return recommendationService.recommendBooks(email); // ✅ Gọi AI RecommendationService
             } catch (Exception e) {
-                // Token lỗi → trả về rỗng hoặc có thể fallback
+                // Nếu token lỗi → fallback bằng sách phổ biến
                 return bookService.getBooksByViews();
             }
         }
 
-        return bookService.getBooksByViews(); // Không có token → không gợi ý
+        // Nếu không có token → fallback bằng sách phổ biến
+        return bookService.getBooksByViews();
     }
 }

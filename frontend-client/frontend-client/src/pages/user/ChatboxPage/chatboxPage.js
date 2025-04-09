@@ -33,7 +33,7 @@ const ChatBox = ({ isOpen, onClose }) => {
 
     try {
       // Call OpenAI chatbot API through your backend
-      const response = await axios.post("https://api.it-ebook.io.vn/api/chatbot/ask", {
+      const response = await axios.post("https://api.it-ebook.io.vn/api/chatbot/recommend", {
         message: userMessage
       });
       

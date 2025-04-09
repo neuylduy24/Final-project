@@ -32,7 +32,7 @@ public class OpenAiService {
                     "messages", List.of(
                             Map.of("role", "user", "content", prompt)
                     ),
-                    "max_tokens", 100
+                    "max_tokens", 10000
             );
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);

@@ -21,7 +21,7 @@ public class ChatbotService {
 
     // ✅ 1. Gợi ý truyện bằng AI dựa theo người dùng
     public String recommendBookByAI(User user, String userInput) {
-        String prompt = buildPersonalizedPrompt(userInput);
+        String prompt = buildStructuredRecommendationPrompt(userInput);
         return openAiService.getRecommendation(prompt);
     }
 
@@ -40,55 +40,41 @@ public class ChatbotService {
 
     // 🔧 Hàm phụ trợ để tạo prompt cá nhân hóa từ danh sách truyện
 
-    private String buildPersonalizedPrompt(String userInput) {
+    private String buildStructuredRecommendationPrompt(String userInput) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("Bạn là một AI trợ lý đọc truyện, có nhiệm vụ giúp người dùng tìm truyện phù hợp.\n");
-        prompt.append("Phân tích dữ liệu các truyện dưới đây và đưa ra gợi ý phù hợp nhất với nhu cầu người dùng.\n\n");
-        List<Book> allBooks = bookService.getAllBooks();
+        prompt.append("Bạn là một AI gợi ý truyện cho người dùng dựa trên sở thích.\n");
+        prompt.append("Phân tích danh sách truyện sau và gợi ý từ 1 đến 3 truyện phù hợp với yêu cầu của người dùng.\n");
+        prompt.append("Quan trọng: Trả về dưới dạng mảng JSON với các thuộc tính: id, title, description, categories (mảng).\n");
+        prompt.append("Không cần giải thích, chỉ trả về JSON duy nhất.\n\n");
 
-        prompt.append("Dưới đây là danh sách các truyện hiện có:\n");
+        List<Book> allBooks = bookService.getAllBooks();
+        prompt.append("📚 Danh sách truyện:\n");
 
         for (Book book : allBooks) {
-            String title = book.getTitle();
-            String author = book.getAuthor();
-            String description = book.getDescription();
+            prompt.append("{\n");
+            prompt.append("  \"id\": \"").append(book.getId()).append("\",\n");
+            prompt.append("  \"title\": \"").append(book.getTitle()).append("\",\n");
+            prompt.append("  \"description\": \"").append(book.getDescription() != null ? book.getDescription().replace("\"", "'") : "").append("\",\n");
+            prompt.append("  \"categories\": [");
+
             List<Category> categories = book.getCategories();
-            int views = book.getViews();
-            long followers = followBookService.countFollowersByBookId(book.getId());
-            double rating = book.getAverageRating();
-
-            // Đếm số chương theo bookId
-            int chapterCount = countChaptersByBookId(book.getId());
-
-            prompt.append("📚 Tên truyện: ").append(title).append("\n");
-            if (author != null) {
-                prompt.append("✍️ Tác giả: ").append(author).append("\n");
-            }
-
             if (categories != null && !categories.isEmpty()) {
-                prompt.append("🏷️ Thể loại: ");
-                for (int i = 0; i < categories.size(); i++) {
-                    prompt.append(categories.get(i).getName());
-                    if (i < categories.size() - 1) prompt.append(", ");
-                }
-                prompt.append("\n");
+                String cats = categories.stream()
+                        .map(cat -> "\"" + cat.getName() + "\"")
+                        .collect(Collectors.joining(", "));
+                prompt.append(cats);
             }
 
-            if (description != null && !description.isBlank()) {
-                prompt.append("📖 Mô tả: ").append(description).append("\n");
-            }
-
-            prompt.append("👀 Lượt xem: ").append(views).append("\n");
-            prompt.append("⭐ Đánh giá trung bình: ").append(String.format("%.1f", rating)).append(" / 5.0\n");
-            prompt.append("👥 Người theo dõi: ").append(followers).append("\n");
-            prompt.append("📄 Số chương: ").append(chapterCount).append("\n\n");
+            prompt.append("]\n},\n");
         }
 
-        prompt.append("Yêu cầu của người dùng: ").append(userInput).append("\n");
-        prompt.append("→ Hãy gợi ý những truyện phù hợp từ danh sách trên và giải thích lý do lựa chọn.");
+        prompt.append("\n🎯 Yêu cầu người dùng: ").append(userInput).append("\n");
+        prompt.append("→ Trả kết quả là JSON duy nhất, không có giải thích, không text ngoài lề.\n");
 
         return prompt.toString();
     }
+
+
     private int countChaptersByBookId(String bookId) {
         // Giả sử bạn có ChapterService
         List<Chapter> chapters = chapterService.findByBookId(bookId);

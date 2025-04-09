@@ -92,4 +92,8 @@ public class ChapterService {
                 .mapToInt(Chapter::getViews)
                 .sum();
     }
+    public List<Chapter> findByBookId(String bookId) {
+        return chapterRepository.findByBookId(bookId);
+    }
+
 }

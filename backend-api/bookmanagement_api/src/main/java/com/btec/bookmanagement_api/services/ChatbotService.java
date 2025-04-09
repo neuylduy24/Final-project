@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChatboxService {
+public class ChatbotService {
 
     private final OpenAiService openAiService;
 

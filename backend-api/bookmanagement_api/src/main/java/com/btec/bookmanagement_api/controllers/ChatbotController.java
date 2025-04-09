@@ -1,12 +1,9 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
-import com.btec.bookmanagement_api.entities.User;
 import com.btec.bookmanagement_api.repositories.BookRepository;
-import com.btec.bookmanagement_api.services.ChatboxService;
+import com.btec.bookmanagement_api.services.ChatbotService;
 import com.btec.bookmanagement_api.services.UserService;
-import com.btec.bookmanagement_api.security.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +15,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ChatbotController {
 
-    private final ChatboxService chatboxService;
+    private final ChatbotService chatboxService;
     private final UserService userService;
     private final BookRepository bookRepository;
 

@@ -28,7 +28,7 @@ public class OpenAiService {
 
             // Tạo request body
             Map<String, Object> requestBody = Map.of(
-                    "model", "gpt-3.5-turbo",
+                    "model", "mistralai/Mixtral-8x7B-Instruct-v0.1",
                     "messages", List.of(
                             Map.of("role", "user", "content", prompt)
                     ),

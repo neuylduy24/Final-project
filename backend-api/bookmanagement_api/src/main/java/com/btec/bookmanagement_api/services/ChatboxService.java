@@ -94,8 +94,5 @@ public class ChatboxService {
         List<Chapter> chapters = chapterService.findByBookId(bookId);
         return chapters != null ? chapters.size() : 0;
     }
-
-
-
-
+    
 }

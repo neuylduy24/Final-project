@@ -111,3 +111,34 @@
     }
   }
 }
+.book-follow-button {
+  .follow-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-follow {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .btn-unfollow {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .follower-count {
+      font-size: 14px;
+      color: #555;
+    }
+  }
+}
+

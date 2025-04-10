@@ -76,6 +76,55 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
+<<<<<<< Updated upstream
+=======
+
+
+//    @PostMapping("/{id}/upload-image")
+//    public ResponseEntity<String> uploadImage(@PathVariable String id,
+//                                              @RequestParam("file") MultipartFile file) {
+//        Optional<Book> bookOpt = bookRepository.findById(id);
+//
+//        if (bookOpt.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body("Book not found with id " + id);
+//        }
+//
+//        Book book = bookOpt.get();
+//
+//        // Kiểm tra xem sách đã có ảnh bằng URL chưa
+//        if (book.getImage() != null && !book.getImage().isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body("This book already has an image URL. You cannot upload a new image.");
+//        }
+//
+//        // Tiến hành xử lý ảnh upload
+//        try {
+//            byte[] imageData = file.getBytes();
+//
+//            // Kiểm tra trùng ảnh (dùng hàm hash ảnh nếu có)
+//            String imageHash = bookService.calculateImageHash(imageData);  // Gọi phương thức calculateImageHash
+//            Optional<Book> duplicateImageBook = bookRepository.findByImageHash(imageHash);
+//
+//            if (duplicateImageBook.isPresent()) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                        .body("This image is already used by another book.");
+//            }
+//
+//            // Cập nhật ảnh cho sách
+//            book.setImageData(imageData);
+//            book.setImageHash(imageHash); // Lưu hash của ảnh vào sách
+//            bookRepository.save(book);
+//
+//            return ResponseEntity.ok("Image uploaded successfully");
+//
+//        } catch (IOException | NoSuchAlgorithmException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Failed to upload image");
+//        }
+//    }
+
+>>>>>>> Stashed changes
     @PostMapping("/create-with-image")
     public ResponseEntity<?> createBookWithImage(
             @RequestParam String title,
@@ -137,6 +186,7 @@ public class BookController {
 
         try {
             Book book = existingBookOpt.get();
+<<<<<<< Updated upstream
             boolean updated = false; // Flag to track if there's any change
 
             // Update title, author, and description if they are provided
@@ -154,14 +204,27 @@ public class BookController {
             }
 
             // Update category if provided
+=======
+
+            if (title != null) book.setTitle(title);
+            if (author != null) book.setAuthor(author);
+            if (description != null) book.setDescription(description);
+
+>>>>>>> Stashed changes
             if (category != null && !category.isBlank()) {
                 Category cat = new Category();
                 cat.setName(category);
                 book.setCategories(List.of(cat));
+<<<<<<< Updated upstream
                 updated = true;
             }
 
             // Handle image upload (file)
+=======
+            }
+
+            // Nếu có file ảnh mới
+>>>>>>> Stashed changes
             if (file != null && !file.isEmpty()) {
                 byte[] imageData = file.getBytes();
                 String imageHash = bookService.calculateImageHash(imageData);
@@ -173,6 +236,7 @@ public class BookController {
 
                 book.setImageData(imageData);
                 book.setImageHash(imageHash);
+<<<<<<< Updated upstream
                 book.setImage(null); // Clear image URL if using file
                 updated = true;
             }
@@ -194,6 +258,22 @@ public class BookController {
             Book updatedBook = bookService.updateBook(id, book);
             return ResponseEntity.ok(updatedBook);
 
+=======
+                book.setImage(null); // clear image URL nếu dùng ảnh file
+            }
+
+            // Nếu có URL ảnh mới
+            else if (imageUrl != null && !imageUrl.isBlank()) {
+                book.setImage(imageUrl);
+                book.setImageData(null); // clear ảnh file nếu dùng URL
+                book.setImageHash(null);
+            }
+
+            // Nếu không có file mới và không có imageUrl thì giữ nguyên ảnh hiện tại
+
+            Book updated = bookService.updateBook(id, book);
+            return ResponseEntity.ok(updated);
+>>>>>>> Stashed changes
         } catch (IOException | NoSuchAlgorithmException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to update book: " + e.getMessage());
@@ -201,7 +281,10 @@ public class BookController {
     }
 
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getBookImage(@PathVariable String id) {
         Optional<byte[]> imageOpt = bookService.getBookImage(id);

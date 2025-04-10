@@ -51,7 +51,11 @@ public class ChatbotService {
         prompt.append("Bạn là một AI gợi ý truyện cho người dùng dựa trên sở thích.\n");
         prompt.append("Phân tích danh sách truyện sau và gợi ý từ 1 đến 3 truyện phù hợp với yêu cầu của người dùng.\n");
         prompt.append("Quan trọng: Trả về dưới dạng mảng JSON với các thuộc tính: id, title, description, categories (mảng).\n");
+<<<<<<< Updated upstream
         prompt.append("Không cần giải thích, chỉ trả về JSON duy nhất.\n");
+=======
+        prompt.append("Không cần giải thích, chỉ trả về JSON duy nhất.\n\n");
+>>>>>>> Stashed changes
 
         List<Book> allBooks = bookService.getAllBooks();
         prompt.append("📚 Danh sách truyện:\n");
@@ -95,7 +99,11 @@ public class ChatbotService {
         List<Book> allBooks = bookService.getAllBooks();
         contextBuilder.append("Book statistics: ")
                      .append(allBooks.size())
+<<<<<<< Updated upstream
                      .append(" total books.");
+=======
+                     .append(" total books.\n");
+>>>>>>> Stashed changes
         
         // Add category statistics 
         List<Category> categories = categoryService.getAllCategories();
@@ -103,7 +111,11 @@ public class ChatbotService {
                      .append(categories.stream()
                              .map(Category::getName)
                              .collect(Collectors.joining(", ")))
+<<<<<<< Updated upstream
                      .append(".");
+=======
+                     .append(".\n");
+>>>>>>> Stashed changes
         
         // Add most popular books
         List<Book> popularBooks = bookService.getBooksByViews();

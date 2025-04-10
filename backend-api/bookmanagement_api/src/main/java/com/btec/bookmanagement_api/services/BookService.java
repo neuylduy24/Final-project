@@ -197,6 +197,7 @@ public class BookService {
 
     // Top 10 truyện có lượt view cao nhất
     public List<Book> getTop10BooksByViews() {
+<<<<<<< Updated upstream
         // Lấy tất cả sách từ cơ sở dữ liệu
         List<Book> books = bookRepository.findAll();
 
@@ -205,6 +206,9 @@ public class BookService {
                 .sorted((b1, b2) -> Integer.compare(b2.getViews(), b1.getViews())) // Sắp xếp giảm dần theo views
                 .limit(10) // Lấy 10 sách đầu tiên
                 .collect(Collectors.toList());
+=======
+        return bookRepository.findTop10ByOrderByViewsDesc();
+>>>>>>> Stashed changes
     }
 
     // Lấy toàn bộ truyện theo view giảm dần

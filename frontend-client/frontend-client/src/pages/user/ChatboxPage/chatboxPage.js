@@ -1,85 +1,89 @@
 import { useState, useEffect, useRef } from "react";
-import "../../../component/Action/ChatboxButton/ChatBox.scss";
 import { FaTimes, FaPaperPlane } from "react-icons/fa";
 import axios from "axios";
+import "../../../component/Action/ChatboxButton/ChatBox.scss";
 
 const ChatBox = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const chatboxRef = useRef(null); // ref for chatbox
-  const messageEndRef = useRef(null); // ref for scrolling to the bottom
+  const messageEndRef = useRef(null);
 
-  // Add initial welcome message when component mounts
+  const API_BASE_URL = "https://api.it-ebook.io.vn/api/chatbot";
+
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
-        { 
-          text: "Hello! I'm your book assistant. How can I help you today?", 
-          sender: "bot" 
-        }
+        {
+          text: "Hello! I'm your book assistant. How can I help you today?",
+          sender: "bot",
+          type: "welcome",
+        },
       ]);
     }
   }, []);
 
   const handleSendMessage = async () => {
-    if (input.trim() === "") return;
+    if (!input.trim()) return;
 
-    // Add user message to chat
-    setMessages([...messages, { text: input, sender: "user" }]);
+    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
     const userMessage = input;
     setInput("");
     setIsLoading(true);
 
     try {
-      // Call OpenAI chatbot API through your backend
-      const response = await axios.post("https://api.it-ebook.io.vn/api/chatbot/recommend", {
-        message: userMessage
-      });
-      
-      setMessages(prev => [
-        ...prev,
-        { text: response.data, sender: "bot" }
-      ]);
+      const response = await axios.post(`${API_BASE_URL}/ask`, { message: userMessage });
+      const { answer, displayType } = response.data;
+
+      if (displayType === "list") {
+        setMessages((prev) => [
+          ...prev,
+          { text: formatList(answer), sender: "bot", type: "list" },
+        ]);
+      } else if (displayType === "bookSuggestion") {
+        setMessages((prev) => [
+          ...prev,
+          { text: formatBookSuggestions(answer), sender: "bot", type: "bookSuggestion" },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { text: answer || "Sorry, I couldn't process that.", sender: "bot" },
+        ]);
+      }
     } catch (error) {
-      console.error("Error sending message:", error);
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
-        { 
-          text: "Sorry, I need to take a break. Please try again later.", 
-          sender: "bot" 
-        }
+        { text: "An error occurred. Please try again later.", sender: "bot", type: "error" },
       ]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const formatList = (text) => {
+    return text
+      .split("\n")
+      .map((line) => `• ${line.trim()}`)
+      .join("\n");
+  };
+
+  const formatBookSuggestions = (text) => {
+    return text
+      .split("\n")
+      .map((line) => `📚 ${line.trim()}`)
+      .join("\n");
+  };
+
   useEffect(() => {
-    // Scroll to the bottom when a new message is added
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    const handleMouseDownOutside = (event) => {
-      if (chatboxRef.current && !chatboxRef.current.contains(event.target)) {
-        onClose(); // Close chatbox if click is outside
-      }
-    };
-
-    document.addEventListener("mousedown", handleMouseDownOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleMouseDownOutside);
-    };
-  }, [onClose]);
-
   return (
-    <div className={`chatbox ${isOpen ? "open" : ""}`} ref={chatboxRef}>
+    <div className={`chatbox ${isOpen ? "open" : ""}`}>
       <div className="chatbox-header">
         <span>AI Book Assistant</span>
-        <div className="chatbox-controls">
-          <FaTimes className="close-icon" onClick={onClose} />
-        </div>
+        <FaTimes className="close-icon" onClick={onClose} />
       </div>
       <div className="chatbox-body">
         {messages.map((msg, index) => (
@@ -87,25 +91,22 @@ const ChatBox = ({ isOpen, onClose }) => {
             {msg.text}
           </div>
         ))}
-        {isLoading && (
-          <div className="message bot loading">
-            <span className="loading-dots">...</span>
-          </div>
-        )}
-        <div ref={messageEndRef} /> {/* Invisible element for scrolling */}
+        {isLoading && <div className="message bot loading">Typing...</div>}
+        <div ref={messageEndRef} />
       </div>
       <div className="chatbox-footer">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-          disabled={isLoading}
-        />
-        <button onClick={handleSendMessage} disabled={isLoading}>
-          <FaPaperPlane />
-        </button>
+        <div className="input-container">
+          <input
+            type="text"
+            placeholder="Type your message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          />
+          <button onClick={handleSendMessage} disabled={isLoading}>
+            <FaPaperPlane />
+          </button>
+        </div>
       </div>
     </div>
   );

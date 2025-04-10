@@ -1,0 +1,130 @@
+/* .choose-categories-page: Thiết lập cho trang tổng thể */
+.choose-categories-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f4f4f9 30%, #e8efff);
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Câu hỏi */
+.question-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  padding: 10px 0;
+  border-bottom: 2px solid #007bff;
+}
+
+/* .categories-grid: Thiết lập lưới cho các thẻ thể loại */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 0 15px;
+}
+
+/* category-card: Thiết lập thẻ thể loại với hiệu ứng hover và active */
+.category-card {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  font-size: 1.2rem;
+  color: #555;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #007bff, #00d4ff);
+  color: #fff;
+}
+
+.category-card.selected {
+  background: #007bff;
+  color: white;
+  border: 2px solid #0056b3;
+}
+
+.category-card .category-icon {
+  font-size: 3rem;
+  color: #fff;
+  margin-bottom: 15px;
+  background: #007bff;
+  border-radius: 50%;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.category-card.selected .category-icon {
+  background: #00d4ff;
+}
+
+.category-card span {
+  font-weight: 500;
+  color: inherit;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+  display: block;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.category-card.selected span {
+  color: #fff;
+}
+
+/* Nút Submit: Tạo hiệu ứng hover và màu sắc hấp dẫn */
+.submit-section {
+  margin-top: 30px;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #00d4ff, #007bff);
+  color: white;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  background: linear-gradient(135deg, #007bff, #00d4ff);
+  transform: translateY(-5px);
+
+}
+
+/* Responsive: Thiết lập cho màn hình nhỏ */
+@media (max-width: 768px) {
+  .choose-categories-page {
+    padding: 15px;
+  }
+
+  .question-title {
+    font-size: 1.8rem;
+  }
+
+  .category-card {
+    padding: 20px;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,479 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+$primary-color: #21afda;
+$secondary-color: #064e9a;
+$hot-badge-color: red;
+$rating-color: #f39c12;
+$text-color: #333;
+$white: #ffffff;
+$box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+.book-card {
+  position: relative;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  left: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  &:hover {
+    transform: translateY(-5px);
+
+    .overlay {
+      opacity: 1;
+    }
+  }
+
+  .book-img {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+
+    .book-stats {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13px;
+      align-items: center;
+
+      span {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .badge-time {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .badge-hot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 59, 48, 0.9);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+  }
+
+  .book-info {
+    padding: 12px;
+    z-index: 999999;
+    background: white;
+
+    h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    p {
+      margin: 7px 0;
+      font-size: 12px;
+      z-index: 99999999;
+      color: #333;
+      cursor: pointer;
+
+      &.has-chapter:hover {
+        color: #1e3c5c;
+      }
+
+      &.has-chapter {
+        color: #007bff; // Màu nổi bật khi có chapter
+        z-index: 999999;
+        text-decoration: underline;
+      }
+    }
+
+
+    .rating {
+      color: #ffc107;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+  }
+}
+
+
+/* Responsive */
+@include Responsive($DESKTOP) {
+  .book-card {
+    background: $white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: $box-shadow-light;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 220px;
+    min-height: 340px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    margin-right: 10px;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-img {
+      width: 100%;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      position: relative;
+      border-radius: 5px 5px 0 0;
+
+      .badge-time,
+      .badge-hot {
+        position: absolute;
+        top: 5px;
+        padding: 5px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        color: $white;
+      }
+
+      .badge-time {
+        left: 10px;
+        background: $primary-color;
+      }
+
+      .badge-hot {
+        right: 10px;
+        background: $hot-badge-color;
+        animation: pulse 1.5s infinite;
+      }
+    }
+
+    .book-info {
+      padding: 5px;
+      flex-grow: 1;
+
+      h4 {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+
+      .rating {
+        font-size: 14px;
+        color: $rating-color;
+      }
+    }
+  }
+}
+
+@include Responsive($MEDIUM_DEVICE) {
+  .book-card {
+    background: $white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: $box-shadow-light;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 220px;
+    min-height: 340px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    margin-right: 10px;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-img {
+      width: 100%;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      position: relative;
+      border-radius: 5px 5px 0 0;
+
+      .badge-time,
+      .badge-hot {
+        position: absolute;
+        top: 5px;
+        padding: 5px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        color: $white;
+      }
+
+      .badge-time {
+        left: 10px;
+        background: $primary-color;
+      }
+
+      .badge-hot {
+        right: 10px;
+        background: $hot-badge-color;
+        animation: pulse 1.5s infinite;
+      }
+    }
+
+    .book-info {
+      padding: 5px;
+      flex-grow: 1;
+
+      h4 {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+
+      p {
+        font-size: 12px;
+        z-index: 99999999;
+        color: #666;
+        min-height: 24px;
+      }
+
+      .rating {
+        font-size: 14px;
+        color: $rating-color;
+      }
+    }
+  }
+}
+
+@include Responsive($WIDE_MOBILE) {
+  .book-card {
+    background: $white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: $box-shadow-light;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 220px;
+    min-height: 340px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    margin-right: 10px;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-img {
+      width: 100%;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      position: relative;
+      border-radius: 5px 5px 0 0;
+
+      .badge-time,
+      .badge-hot {
+        position: absolute;
+        top: 5px;
+        padding: 5px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        color: $white;
+      }
+
+      .badge-time {
+        left: 10px;
+        background: $primary-color;
+      }
+
+      .badge-hot {
+        right: 10px;
+        background: $hot-badge-color;
+        animation: pulse 1.5s infinite;
+      }
+    }
+
+    .book-info {
+      padding: 5px;
+      flex-grow: 1;
+
+      h4 {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+
+      p {
+        font-size: 12px;
+        color: #666;
+        min-height: 24px;
+        z-index: 99999999;
+      }
+
+      .rating {
+        font-size: 14px;
+        color: $rating-color;
+      }
+    }
+  }
+}
+
+/* Responsive */
+@include Responsive($TABLET_DEVICE) {
+  .book-card {
+    background: $white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: $box-shadow-light;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    left: 45px;
+    width: 140px;
+    min-height: 230px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    margin-right: 10px;
+
+
+    .book-img {
+      width: 100%;
+      /* Đảm bảo hình ảnh co giãn theo cột */
+      background-size: cover;
+      /* Đảm bảo hình ảnh luôn được phủ kín */
+      background-position: center;
+      /* Căn giữa hình ảnh */
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      position: relative;
+      border-radius: 5px 5px 0 0;
+
+      .badge-time,
+      .badge-hot {
+        position: absolute;
+        top: 5px;
+        padding: 5px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        color: $white;
+      }
+
+      .badge-time {
+        left: 10px;
+        background: $primary-color;
+      }
+
+      .badge-hot {
+        right: 10px;
+        background: $hot-badge-color;
+        animation: pulse 1.5s infinite;
+      }
+    }
+
+    .book-info {
+      h4 {
+        font-size: 11px;
+      }
+
+      p {
+        font-size: 12px;
+        color: #666;
+        min-height: 24px;
+        z-index: 99999999;
+      }
+
+      .rating {
+        font-size: 12px;
+        color: $rating-color;
+      }
+    }
+  }
+}
+
+@include Responsive($SMALL_DEVICE) {
+  .book-card {
+    width: 140px;
+    min-height: 230px;
+
+
+    .book-img {
+      width: 100%;
+      /* Đảm bảo hình ảnh co giãn theo cột */
+      background-size: cover;
+      /* Đảm bảo hình ảnh luôn được phủ kín */
+      background-position: center;
+      /* Căn giữa hình ảnh */
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      position: relative;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .book-info h4 {
+      font-size: 12px;
+    }
+  }
+}

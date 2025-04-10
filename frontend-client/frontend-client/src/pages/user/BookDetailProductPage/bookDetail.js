@@ -41,8 +41,17 @@ const BookDetailProductPage = () => {
     setComments((prevComments) => [newComment, ...prevComments]);
   };
 
-  const emailColors = ["#ff5733", "#33ff57", "#3357ff", "#ff33a1", "#f39c12", "#18a6be", "#24e948"];
-  const getRandomColor = () => emailColors[Math.floor(Math.random() * emailColors.length)];
+  const emailColors = [
+    "#ff5733",
+    "#33ff57",
+    "#3357ff",
+    "#ff33a1",
+    "#f39c12",
+    "#18a6be",
+    "#24e948",
+  ];
+  const getRandomColor = () =>
+    emailColors[Math.floor(Math.random() * emailColors.length)];
 
   if (!book) return <p>Loading data...</p>;
 
@@ -51,12 +60,26 @@ const BookDetailProductPage = () => {
       <BreadCrumb name={location.state?.name || book.title || "Loading..."} />
       <div className="row-detail">
         <div className="col-lg-3 col-md-4 book-image">
-          <img src={book.image} alt={book.title} className="book-cover" />
+          <img
+            src={
+              book.image
+                ? book.image
+                : book.imageData
+                ? `data:image/jpeg;base64,${book.imageData}`
+                : "default-image-url.jpg" // fallback nếu không có cả hai
+            }
+            alt={book.title}
+            className="book-cover"
+          />
         </div>
         <BookInfo book={book} />
       </div>
       <Chapter />
-      <Comment bookId={bookId} token={token} onCommentAdded={handleCommentAdded} />
+      <Comment
+        bookId={bookId}
+        token={token}
+        onCommentAdded={handleCommentAdded}
+      />
 
       {/* ✅ Hiển thị danh sách comments */}
       <div className="comment-section">

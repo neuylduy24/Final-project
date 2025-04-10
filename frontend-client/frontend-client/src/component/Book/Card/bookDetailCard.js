@@ -6,7 +6,7 @@ import axios from "axios";
 import "./bookDetailCard.scss";
 import { useNavigate } from "react-router-dom";
 import { ROUTERS } from "utils/path";
-import { FaComment, FaEye, FaHeart, FaUserCheck } from "react-icons/fa6";
+import { FaComment, FaEye, FaUserCheck } from "react-icons/fa6";
 import chapterService from "service/chapterService";
 
 const BookCard = ({ book, onChapterClick }) => {

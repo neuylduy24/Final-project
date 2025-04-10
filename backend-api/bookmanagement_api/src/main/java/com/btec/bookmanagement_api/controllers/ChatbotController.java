@@ -15,18 +15,23 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ChatbotController {
 
-    private final ChatbotService chatboxService;
+    private final ChatbotService chatbotService;
     private final UserService userService;
     private final BookRepository bookRepository;
 
     // ✅ API: Chat hỏi AI tổng quát (KHÔNG cần đăng nhập)
     @PostMapping("/ask")
-    public ResponseEntity<String> chatWithAI(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> chatWithAI(@RequestBody Map<String, String> request) {
         String message = request.get("message");
 
-        // Gửi null vì không có user → AI trả lời không cá nhân hóa
-        String reply = chatboxService.chatWithAI(null, message);
-        return ResponseEntity.ok(reply);
+        // Sử dụng phương thức answerProjectDataQuestion thay vì chatWithAI
+        // để trả lời các câu hỏi liên quan đến dữ liệu của hệ thống
+        String reply = chatbotService.answerProjectDataQuestion(message);
+        
+        // Return as a JSON object with "answer" key
+        Map<String, String> response = new HashMap<>();
+        response.put("answer", reply);
+        return ResponseEntity.ok(response);
     }
 
     // ✅ API: Gợi ý truyện theo AI (KHÔNG cần đăng nhập)
@@ -35,7 +40,7 @@ public class ChatbotController {
         String input = request.get("message");
 
         // Gửi null vì không có user → AI gợi ý ngẫu nhiên / theo trend
-        String suggestion = chatboxService.recommendBookByAI(null, input);
+        String suggestion = chatbotService.recommendBookByAI(null, input);
         return ResponseEntity.ok(suggestion);
     }
 
@@ -49,7 +54,18 @@ public class ChatbotController {
         }
 
         Book selectedBook = matchedBooks.get(0);
-        String summary = chatboxService.summarizeBook(selectedBook);
+        String summary = chatbotService.summarizeBook(selectedBook);
         return ResponseEntity.ok(summary);
+    }
+
+    @PostMapping("/project-data")
+    public ResponseEntity<String> answerProjectDataQuestion(@RequestBody Map<String, String> request) {
+        String question = request.get("question");
+        if (question == null || question.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Please provide a question about the project data");
+        }
+        
+        String answer = chatbotService.answerProjectDataQuestion(question);
+        return ResponseEntity.ok(answer);
     }
 }

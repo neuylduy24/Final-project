@@ -340,37 +340,74 @@ public class ChatbotService {
             List<Book> recommendedBooks = new ArrayList<>();
             boolean hasGenreCriteria = false;
             
-            // Check for genre preferences
+            // Check for genre preferences - More defensive with null checks
             for (Category category : categoryService.getAllCategories()) {
-                if (lowercaseQuestion.contains(category.getName().toLowerCase())) {
-                    recommendedBooks.addAll(getBooksByCategory(category.getId()));
-                    hasGenreCriteria = true;
+                if (category.getName() != null && 
+                    lowercaseQuestion.contains(category.getName().toLowerCase())) {
+                    try {
+                        List<Book> categoryBooks = getBooksByCategory(category.getId());
+                        if (categoryBooks != null && !categoryBooks.isEmpty()) {
+                            recommendedBooks.addAll(categoryBooks);
+                            hasGenreCriteria = true;
+                        }
+                    } catch (Exception e) {
+                        // Log error but continue processing
+                        System.err.println("Error getting books for category: " + category.getName() + ": " + e.getMessage());
+                    }
                 }
             }
             
             // If no specific genre mentioned, recommend popular books
             if (!hasGenreCriteria) {
-                recommendedBooks.addAll(bookService.getBooksByViews());
+                try {
+                    List<Book> popularBooks = bookService.getBooksByViews();
+                    if (popularBooks != null) {
+                        recommendedBooks.addAll(popularBooks);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error getting popular books: " + e.getMessage());
+                }
             }
             
-            // Sort by view count
+            // Sort by view count - with null safety
             if (!recommendedBooks.isEmpty()) {
-                recommendedBooks.sort((b1, b2) -> b2.getViews() - b1.getViews());
-                data.put("recommendedBooks", recommendedBooks.stream().distinct().collect(Collectors.toList()));
+                try {
+                    recommendedBooks.sort((b1, b2) -> {
+                            int views1 = b1 != null ? b1.getViews() : 0;
+                            int views2 = b2 != null ? b2.getViews() : 0;
+                            return views2 - views1;
+                        });
+                    data.put("recommendedBooks", recommendedBooks.stream()
+                        .distinct()
+                        .collect(Collectors.toList()));
+                } catch (Exception e) {
+                    System.err.println("Error sorting recommended books: " + e.getMessage());
+                    // Still add unsorted books rather than failing
+                    data.put("recommendedBooks", recommendedBooks.stream()
+                        .distinct()
+                        .collect(Collectors.toList()));
+                }
             }
         }
         
         return data;
     }
 
-    // Get books by category ID - helper method
+    // Get books by category ID - helper method with better error handling
     private List<Book> getBooksByCategory(String categoryId) {
-        // Get all books then filter by category
+        if (categoryId == null || categoryId.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        // Get all books then filter by category - with defensive programming
         List<Book> allBooks = bookService.getAllBooks();
         return allBooks.stream()
-                .filter(book -> book.getCategories() != null && 
-                        book.getCategories().stream()
-                            .anyMatch(cat -> cat.getId().equals(categoryId)))
+                .filter(book -> book != null && 
+                       book.getCategories() != null && 
+                       !book.getCategories().isEmpty() && 
+                       book.getCategories().stream()
+                           .filter(cat -> cat != null && cat.getId() != null)
+                           .anyMatch(cat -> cat.getId().equals(categoryId)))
                 .collect(Collectors.toList());
     }
 

@@ -76,52 +76,6 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-
-
-//    @PostMapping("/{id}/upload-image")
-//    public ResponseEntity<String> uploadImage(@PathVariable String id,
-//                                              @RequestParam("file") MultipartFile file) {
-//        Optional<Book> bookOpt = bookRepository.findById(id);
-//
-//        if (bookOpt.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("Book not found with id " + id);
-//        }
-//
-//        Book book = bookOpt.get();
-//
-//        // Kiểm tra xem sách đã có ảnh bằng URL chưa
-//        if (book.getImage() != null && !book.getImage().isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body("This book already has an image URL. You cannot upload a new image.");
-//        }
-//
-//        // Tiến hành xử lý ảnh upload
-//        try {
-//            byte[] imageData = file.getBytes();
-//
-//            // Kiểm tra trùng ảnh (dùng hàm hash ảnh nếu có)
-//            String imageHash = bookService.calculateImageHash(imageData);  // Gọi phương thức calculateImageHash
-//            Optional<Book> duplicateImageBook = bookRepository.findByImageHash(imageHash);
-//
-//            if (duplicateImageBook.isPresent()) {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                        .body("This image is already used by another book.");
-//            }
-//
-//            // Cập nhật ảnh cho sách
-//            book.setImageData(imageData);
-//            book.setImageHash(imageHash); // Lưu hash của ảnh vào sách
-//            bookRepository.save(book);
-//
-//            return ResponseEntity.ok("Image uploaded successfully");
-//
-//        } catch (IOException | NoSuchAlgorithmException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Failed to upload image");
-//        }
-//    }
-
     @PostMapping("/create-with-image")
     public ResponseEntity<?> createBookWithImage(
             @RequestParam String title,
@@ -183,18 +137,31 @@ public class BookController {
 
         try {
             Book book = existingBookOpt.get();
+            boolean updated = false; // Flag to track if there's any change
 
-            if (title != null) book.setTitle(title);
-            if (author != null) book.setAuthor(author);
-            if (description != null) book.setDescription(description);
+            // Update title, author, and description if they are provided
+            if (title != null) {
+                book.setTitle(title);
+                updated = true;
+            }
+            if (author != null) {
+                book.setAuthor(author);
+                updated = true;
+            }
+            if (description != null) {
+                book.setDescription(description);
+                updated = true;
+            }
 
+            // Update category if provided
             if (category != null && !category.isBlank()) {
                 Category cat = new Category();
                 cat.setName(category);
                 book.setCategories(List.of(cat));
+                updated = true;
             }
 
-            // Nếu có file ảnh mới
+            // Handle image upload (file)
             if (file != null && !file.isEmpty()) {
                 byte[] imageData = file.getBytes();
                 String imageHash = bookService.calculateImageHash(imageData);
@@ -206,25 +173,33 @@ public class BookController {
 
                 book.setImageData(imageData);
                 book.setImageHash(imageHash);
-                book.setImage(null); // clear image URL nếu dùng ảnh file
+                book.setImage(null); // Clear image URL if using file
+                updated = true;
             }
 
-            // Nếu có URL ảnh mới
+            // Handle image URL update
             else if (imageUrl != null && !imageUrl.isBlank()) {
                 book.setImage(imageUrl);
-                book.setImageData(null); // clear ảnh file nếu dùng URL
+                book.setImageData(null); // Clear image file if using URL
                 book.setImageHash(null);
+                updated = true;
             }
 
-            // Nếu không có file mới và không có imageUrl thì giữ nguyên ảnh hiện tại
+            // If no changes were made, return the existing book
+            if (!updated) {
+                return ResponseEntity.ok(book); // No changes made
+            }
 
-            Book updated = bookService.updateBook(id, book);
-            return ResponseEntity.ok(updated);
+            // Save updated book
+            Book updatedBook = bookService.updateBook(id, book);
+            return ResponseEntity.ok(updatedBook);
+
         } catch (IOException | NoSuchAlgorithmException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to update book: " + e.getMessage());
         }
     }
+
 
 
     @GetMapping("/{id}/image")

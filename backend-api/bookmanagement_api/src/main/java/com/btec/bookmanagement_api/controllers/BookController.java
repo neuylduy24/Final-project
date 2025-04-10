@@ -2,7 +2,7 @@ package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.entities.Category;
-import com.btec.bookmanagement_api.entities.Feedback;
+
 import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.FeedbackService;
@@ -183,18 +183,31 @@ public class BookController {
 
         try {
             Book book = existingBookOpt.get();
+            boolean updated = false; // Flag to track if there's any change
 
-            if (title != null) book.setTitle(title);
-            if (author != null) book.setAuthor(author);
-            if (description != null) book.setDescription(description);
+            // Update title, author, and description if they are provided
+            if (title != null) {
+                book.setTitle(title);
+                updated = true;
+            }
+            if (author != null) {
+                book.setAuthor(author);
+                updated = true;
+            }
+            if (description != null) {
+                book.setDescription(description);
+                updated = true;
+            }
 
+            // Update category if provided
             if (category != null && !category.isBlank()) {
                 Category cat = new Category();
                 cat.setName(category);
                 book.setCategories(List.of(cat));
+                updated = true;
             }
 
-            // Nếu có file ảnh mới
+            // Handle image upload (file)
             if (file != null && !file.isEmpty()) {
                 byte[] imageData = file.getBytes();
                 String imageHash = bookService.calculateImageHash(imageData);
@@ -206,20 +219,27 @@ public class BookController {
 
                 book.setImageData(imageData);
                 book.setImageHash(imageHash);
-                book.setImage(null); // clear image URL nếu dùng ảnh file
+                book.setImage(null); // Clear image URL if using file
+                updated = true;
             }
 
-            // Nếu có URL ảnh mới
+            // Handle image URL update
             else if (imageUrl != null && !imageUrl.isBlank()) {
                 book.setImage(imageUrl);
-                book.setImageData(null); // clear ảnh file nếu dùng URL
+                book.setImageData(null); // Clear image file if using URL
                 book.setImageHash(null);
+                updated = true;
             }
 
-            // Nếu không có file mới và không có imageUrl thì giữ nguyên ảnh hiện tại
+            // If no changes were made, return the existing book
+            if (!updated) {
+                return ResponseEntity.ok(book); // No changes made
+            }
 
-            Book updated = bookService.updateBook(id, book);
-            return ResponseEntity.ok(updated);
+            // Save updated book
+            Book updatedBook = bookService.updateBook(id, book);
+            return ResponseEntity.ok(updatedBook);
+
         } catch (IOException | NoSuchAlgorithmException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to update book: " + e.getMessage());

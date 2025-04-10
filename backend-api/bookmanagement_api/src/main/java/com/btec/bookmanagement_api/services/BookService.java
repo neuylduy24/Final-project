@@ -195,14 +195,22 @@ public class BookService {
         // xóa cache -> lần sau request sẽ tính lại
     }
 
-    // Top 10 truyện có lượt view cao nhất
-    public List<Book> getTop10BooksByViews() {
-        return bookRepository.findTop10ByOrderByViewsDesc();
-    }
 
     // Lấy toàn bộ truyện theo view giảm dần
     public List<Book> getAllBooksByViewsDesc() {
         return bookRepository.findAllByOrderByViewsDesc();
+    }
+
+    // Top 10 truyện có lượt view cao nhất
+    public List<Book> getTop10BooksByViews() {
+        // Lấy tất cả sách từ cơ sở dữ liệu
+        List<Book> books = bookRepository.findAll();
+
+        // Sắp xếp sách theo lượt xem giảm dần
+        return books.stream()
+                .sorted((b1, b2) -> Integer.compare(b2.getViews(), b1.getViews())) // Sắp xếp giảm dần theo views
+                .limit(10) // Lấy 10 sách đầu tiên
+                .collect(Collectors.toList());
     }
 
 }

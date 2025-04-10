@@ -14,7 +14,7 @@ const HeaderAd = ({ ...props }) => {
   const location = useLocation();
   const [activePath, setActivePath] = useState(location.pathname);
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("");  // State chứa username
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -34,7 +34,12 @@ const HeaderAd = ({ ...props }) => {
           }
         );
 
-        setUsername(response.data.username);
+        // Kiểm tra nếu phản hồi từ API chứa username
+        if (response.data && response.data.username) {
+          setUsername(response.data.username); // Cập nhật state với username từ API
+        } else {
+          setUsername("Admin"); // Nếu không có username, đặt mặc định là Admin
+        }
       } catch (error) {
         console.error("Error fetching user information:", error);
         navigate(ROUTERS.ADMIN.LOGIN);
@@ -80,8 +85,9 @@ const HeaderAd = ({ ...props }) => {
           alt="Logo"
         />
       </div>
+      {/* Hiển thị username nếu có, nếu không sẽ hiển thị "Admin" */}
       <h2 className="admin_sidebar-title">
-        <FaUser /> {username || "Admin"}
+        <FaUser /> {username}
       </h2>
       <div className="menu_wrapper_navbar">
         <ul>

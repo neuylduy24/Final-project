@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class RecommendationService {
 
     private final BookRepository bookRepository;
-    private final OpenAiService openAiService;
+    private final GeminiService geminiService; 
     private final ReadingHistoryService readingHistoryService;
     private final FollowBookService followBookService;
     private final UserService userService;
@@ -33,9 +33,9 @@ public class RecommendationService {
         }
 
         String prompt = createPrompt(readBooks, followedBooks, favoriteCategories);
-        System.out.println("📌 Prompt gửi cho OpenAI:\n" + prompt); // log để debug
+        System.out.println("📌 Prompt gửi cho Gemini:\n" + prompt); 
 
-        String aiResponse = openAiService.getRecommendation(prompt);
+        String aiResponse = geminiService.getRecommendation(prompt); 
 
         List<String> titles = parseAiResponse(aiResponse)
                 .stream()
@@ -64,9 +64,6 @@ public class RecommendationService {
         // Bước 3: Truy vấn DB để lấy Book dựa trên danh sách bookId
         return bookRepository.findAllById(bookIds);
     }
-
-
-
 
     private String createPrompt(List<Book> readBooks, List<FollowBook> followedBooks, List<String> favoriteCategories) {
 

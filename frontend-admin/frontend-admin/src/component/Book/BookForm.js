@@ -34,7 +34,7 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
       } else if (Array.isArray(book.category)) {
         setSelectedCategories(book.category);
       } else if (book.category) {
-        setSelectedCategories([{ id: "temp", name: book.category }]);
+        setSelectedCategories([{ id: book.id, name: book.category }]);
       }
     }
   }, [book, isEditing]);

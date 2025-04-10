@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "./bookinfor.scss";
 
 const BookInfo = ({ book }) => {
-  const [totalViews, setTotalViews] = useState(book.views || 0);
+  const [totalViews, setTotalViews] = useState(0);
   const [userRating, setUserRating] = useState(0);
   const [followerCount, setFollowerCount] = useState(0); // ← Thêm dòng này
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -27,12 +27,24 @@ const BookInfo = ({ book }) => {
     // Lấy average rating và số lượng follower
     fetchAverageRating();
     fetchFollowerCount();
+    fetchBookStats();
 
     if (token) {
       fetchUserRating();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book.id, book.views, token]);
+  const fetchBookStats = async () => {
+    try {
+      // Fetch total views using chapterService if not available in book object
+      if (!book.views) {
+        const total = await chapterService.getTotalViewsByBookId(book.id);
+        setTotalViews(total);
+      }
+    } catch (error) {
+      console.error("Error fetching book stats:", error);
+    }
+  };
 
   const fetchFollowerCount = useCallback(async () => {
     try {

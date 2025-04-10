@@ -300,16 +300,17 @@ const Header = () => {
               Ranking
             </div>
             {isShowCategories && (
-              <ul>
-                {menu
-                  .find((item) => item.name === "Ranking")
-                  ?.child.map((rankingItem, key) => (
-                    <li key={key}>
-                      <Link to={rankingItem.path}>{rankingItem.name}</Link>
-                    </li>
-                  ))}
-              </ul>
-            )}
+  <ul>
+    {menu
+      .find((item) => item.name === "Ranking")
+      ?.child?.map((rankingItem, key) => (
+        <li key={key}>
+          <Link to={rankingItem.path}>{rankingItem.name}</Link>
+        </li>
+      ))}
+  </ul>
+)}
+
           </div>
           <SearchBar />
         </div>

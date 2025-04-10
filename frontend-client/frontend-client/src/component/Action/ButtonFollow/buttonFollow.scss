@@ -1,0 +1,144 @@
+@use "sass:map";
+@import "styles/pages/all";
+
+.book-follow-button {
+    margin-top: 20px;
+    display: flex;
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &-follow {
+            background: #40c057;
+            color: white;
+
+            &:hover {
+                background-color: darken(#40c057, 20%);
+            }
+
+            &:disabled {
+                background: #a5e3b6;
+                cursor: not-allowed;
+            }
+        }
+
+        &-unfollow {
+            background: #a933f7;
+            color: white;
+
+            &:hover {
+                background-color: darken(#a933f7, 20%);
+            }
+
+            &:disabled {
+                background: #d8aafc;
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .error-message {
+        color: #ff4d4d;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        button {
+            background: transparent;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+
+            &:hover {
+                color: #cc0000;
+            }
+        }
+    }
+}
+
+.follow-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f0f0f0;
+  color: #333;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &.loading {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
+  &.following {
+    background-color: #4caf50;
+    color: white;
+
+    &:hover {
+      background-color: #388e3c;
+    }
+  }
+
+  &:not(.following) {
+    background-color: #2196f3;
+    color: white;
+
+    &:hover {
+      background-color: #1976d2;
+    }
+  }
+}
+.book-follow-button {
+  .follow-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-follow {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .btn-unfollow {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .follower-count {
+      font-size: 14px;
+      color: #555;
+    }
+  }
+}
+

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaTimes, FaPaperPlane } from "react-icons/fa";
+import { FaTimes, FaPaperPlane, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import "../../../component/Action/ChatboxButton/ChatBox.scss";
 
@@ -10,9 +10,28 @@ const ChatBox = ({ isOpen, onClose }) => {
   const messageEndRef = useRef(null);
 
   const API_BASE_URL = "https://api.it-ebook.io.vn/api/chatbot";
+  const STORAGE_KEY = "chatbox_history";
 
+  // Load messages from localStorage when component mounts
   useEffect(() => {
-    if (messages.length === 0) {
+    try {
+      const savedMessages = localStorage.getItem(STORAGE_KEY);
+      
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      } else {
+        // Set welcome message if no history exists
+        setMessages([
+          {
+            text: "Hello! I'm your book assistant. How can I help you today?",
+            sender: "bot",
+            type: "welcome",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+      // Fallback to welcome message on error
       setMessages([
         {
           text: "Hello! I'm your book assistant. How can I help you today?",
@@ -22,6 +41,17 @@ const ChatBox = ({ isOpen, onClose }) => {
       ]);
     }
   }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      } catch (error) {
+        console.error("Error saving chat history:", error);
+      }
+    }
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -61,6 +91,15 @@ const ChatBox = ({ isOpen, onClose }) => {
     }
   };
 
+  const clearHistory = () => {
+    const welcomeMessage = {
+      text: "Chat history cleared. How can I help you today?",
+      sender: "bot",
+      type: "welcome",
+    };
+    setMessages([welcomeMessage]);
+  };
+
   const formatList = (text) => {
     return text
       .split("\n")
@@ -83,7 +122,14 @@ const ChatBox = ({ isOpen, onClose }) => {
     <div className={`chatbox ${isOpen ? "open" : ""}`}>
       <div className="chatbox-header">
         <span>AI Book Assistant</span>
-        <FaTimes className="close-icon" onClick={onClose} />
+        <div className="header-controls">
+          <FaTrash 
+            className="clear-icon" 
+            onClick={clearHistory} 
+            title="Clear chat history"
+          />
+          <FaTimes className="close-icon" onClick={onClose} />
+        </div>
       </div>
       <div className="chatbox-body">
         {messages.map((msg, index) => (

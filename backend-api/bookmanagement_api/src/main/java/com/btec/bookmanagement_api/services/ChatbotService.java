@@ -17,31 +17,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatbotService {
 
-    private final OpenAiService openAiService;
+    private final GeminiService geminiService; // Change to GeminiService
     private final BookService bookService;
     private final FollowBookService followBookService;
     private final ChapterService chapterService;
-    private final CategoryService categoryService; // Add this
-    private final ReadingHistoryService readingHistoryService; // Add this
-    private final FeedbackService feedbackService; // Add this
+    private final CategoryService categoryService;
+    private final ReadingHistoryService readingHistoryService;
+    private final FeedbackService feedbackService;
 
     // ✅ 1. Gợi ý truyện bằng AI dựa theo người dùng
     public String recommendBookByAI(User user, String userInput) {
         String prompt = buildStructuredRecommendationPrompt(userInput);
-        return openAiService.getRecommendation(prompt);
+        return geminiService.getRecommendation(prompt); // Use geminiService
     }
 
     // ✅ 2. Tóm tắt truyện
     public String summarizeBook(Book book) {
         String prompt = "Hãy tóm tắt truyện có tiêu đề \"" + book.getTitle() +
                 "\" với mô tả: " + book.getDescription();
-        return openAiService.getRecommendation(prompt);
+        return geminiService.getRecommendation(prompt); // Use geminiService
     }
 
     // ✅ 3. Chat hỏi AI tổng quát
     public String chatWithAI(User user, String message) {
         String prompt = "Bạn là một AI hỗ trợ người đọc truyện. Người dùng hỏi: " + message;
-        return openAiService.getRecommendation(prompt);
+        return geminiService.getRecommendation(prompt); // Use geminiService
     }
 
     // 🔧 Hàm phụ trợ để tạo prompt cá nhân hóa từ danh sách truyện
@@ -123,7 +123,7 @@ public class ChatbotService {
                         "\n\nUser question: " + question + 
                         "\n\nAnswer based on the provided data:";
         
-        return openAiService.getRecommendation(prompt);
+        return geminiService.getRecommendation(prompt); // Use geminiService
     }
 
     private Map<String, Object> fetchRelevantData(String question) {

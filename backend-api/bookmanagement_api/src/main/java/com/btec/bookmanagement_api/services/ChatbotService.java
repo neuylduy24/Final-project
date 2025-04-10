@@ -88,177 +88,307 @@ public class ChatbotService {
     }
 
     public String answerProjectDataQuestion(String question) {
-        // Get data relevant to the specific question
-        Map<String, Object> relevantData = fetchRelevantData(question);
-        StringBuilder contextBuilder = new StringBuilder();
-        
-        // Base statistics - always include
-        List<Book> allBooks = bookService.getAllBooks();
-        List<Category> categories = categoryService.getAllCategories();
-        
-        contextBuilder.append("Thông tin cơ sở dữ liệu: ")
-                     .append(allBooks.size())
-                     .append(" tổng số sách, ")
-                     .append(categories.size())
-                     .append(" thể loại: ")
-                     .append(categories.stream()
-                             .map(Category::getName)
-                             .collect(Collectors.joining(", ")))
-                     .append(".\n\n");
-        
-        // Book search results (when searching by title/keyword)
-        if (relevantData.containsKey("searchResults")) {
-            @SuppressWarnings("unchecked")
-            List<Book> bookResults = (List<Book>) relevantData.get("searchResults");
-            if (!bookResults.isEmpty()) {
-                contextBuilder.append("Kết quả tìm kiếm sách:\n");
-                bookResults.stream().limit(5).forEach(book -> {
-                    contextBuilder.append("- Tiêu đề: \"").append(book.getTitle()).append("\"\n");
-                    contextBuilder.append("  Tác giả: ").append(book.getAuthor() != null ? book.getAuthor() : "Không rõ").append("\n");
+        try {
+            Map<String, Object> relevantData = fetchRelevantData(question);
+            // Debug output of what data was found
+            System.out.println("Data keys found for query: " + String.join(", ", relevantData.keySet()));
+            
+            StringBuilder contextBuilder = new StringBuilder();
+            
+            // Base statistics - always include
+            List<Book> allBooks = bookService.getAllBooks();
+            List<Category> categories = categoryService.getAllCategories();
+            
+            contextBuilder.append("Thông tin cơ sở dữ liệu: ")
+                         .append(allBooks.size())
+                         .append(" tổng số sách, ")
+                         .append(categories.size())
+                         .append(" thể loại: ")
+                         .append(categories.stream()
+                                 .map(Category::getName)
+                                 .collect(Collectors.joining(", ")))
+                         .append(".\n\n");
+            
+            // Book search results (when searching by title/keyword)
+            if (relevantData.containsKey("searchResults")) {
+                @SuppressWarnings("unchecked")
+                List<Book> bookResults = (List<Book>) relevantData.get("searchResults");
+                if (!bookResults.isEmpty()) {
+                    contextBuilder.append("Kết quả tìm kiếm sách:\n");
+                    bookResults.stream().limit(5).forEach(book -> {
+                        contextBuilder.append("- Tiêu đề: \"").append(book.getTitle()).append("\"\n");
+                        contextBuilder.append("  Tác giả: ").append(book.getAuthor() != null ? book.getAuthor() : "Không rõ").append("\n");
+                        
+                        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
+                            contextBuilder.append("  Thể loại: ").append(
+                                book.getCategories().stream()
+                                    .map(Category::getName)
+                                    .collect(Collectors.joining(", "))
+                            ).append("\n");
+                        }
+                        
+                        contextBuilder.append("  Số chương: ").append(countChaptersByBookId(book.getId())).append("\n");
+                        contextBuilder.append("  Lượt xem: ").append(book.getViews()).append("\n\n");
+                    });
                     
-                    if (book.getCategories() != null && !book.getCategories().isEmpty()) {
-                        contextBuilder.append("  Thể loại: ").append(
-                            book.getCategories().stream()
-                                .map(Category::getName)
-                                .collect(Collectors.joining(", "))
-                        ).append("\n");
+                    if (bookResults.size() > 5) {
+                        contextBuilder.append("... và ").append(bookResults.size() - 5).append(" sách khác\n\n");
                     }
-                    
-                    contextBuilder.append("  Số chương: ").append(countChaptersByBookId(book.getId())).append("\n");
-                    contextBuilder.append("  Lượt xem: ").append(book.getViews()).append("\n\n");
-                });
+                }
+            }
+            
+            // Category-specific books
+            if (relevantData.containsKey("categoryBooks")) {
+                @SuppressWarnings("unchecked")
+                Map<String, List<Book>> booksByCategory = (Map<String, List<Book>>) relevantData.get("categoryBooks");
                 
-                if (bookResults.size() > 5) {
-                    contextBuilder.append("... và ").append(bookResults.size() - 5).append(" sách khác\n\n");
-                }
-            }
-        }
-        
-        // Category-specific books
-        if (relevantData.containsKey("categoryBooks")) {
-            @SuppressWarnings("unchecked")
-            Map<String, List<Book>> booksByCategory = (Map<String, List<Book>>) relevantData.get("categoryBooks");
-            
-            if (!booksByCategory.isEmpty()) {
-                contextBuilder.append("Sách theo thể loại:\n");
-                booksByCategory.forEach((categoryName, books) -> {
-                    contextBuilder.append("Thể loại \"").append(categoryName).append("\" (")
-                                .append(books.size()).append(" sách):\n");
-                    
-                    books.stream().limit(5).forEach(book -> 
-                        contextBuilder.append("- \"").append(book.getTitle())
-                                    .append("\" (").append(book.getViews()).append(" lượt xem)\n")
-                    );
-                    
-                    if (books.size() > 5) {
-                        contextBuilder.append("  ... và ").append(books.size() - 5).append(" sách khác\n");
-                    }
-                    contextBuilder.append("\n");
-                });
-            }
-        }
-        
-        // Chapter information
-        if (relevantData.containsKey("chapters")) {
-            @SuppressWarnings("unchecked")
-            Map<String, List<Chapter>> chapterData = (Map<String, List<Chapter>>) relevantData.get("chapters");
-            
-            if (!chapterData.isEmpty()) {
-                contextBuilder.append("Thông tin chương sách:\n");
-                chapterData.forEach((bookTitle, chapters) -> {
-                    contextBuilder.append("Sách \"").append(bookTitle).append("\" có ")
-                                .append(chapters.size()).append(" chương:\n");
-                    
-                    chapters.stream().limit(8).forEach(chapter -> 
-                        contextBuilder.append("- Chương ").append(chapter.getChapterNumber())
-                                    .append(": \"").append(chapter.getTitle()).append("\"\n")
-                    );
-                    
-                    if (chapters.size() > 8) {
-                        contextBuilder.append("  ... và ").append(chapters.size() - 8).append(" chương khác\n");
-                    }
-                    contextBuilder.append("\n");
-                });
-            }
-        }
-        
-        // Popular books
-        if (relevantData.containsKey("popularBooks")) {
-            @SuppressWarnings("unchecked")
-            List<Book> popularBooks = (List<Book>) relevantData.get("popularBooks");
-            
-            if (!popularBooks.isEmpty()) {
-                contextBuilder.append("Sách phổ biến nhất (theo lượt xem):\n");
-                for (int i = 0; i < Math.min(popularBooks.size(), 10); i++) {
-                    Book book = popularBooks.get(i);
-                    contextBuilder.append(i+1).append(". \"").append(book.getTitle())
-                                .append("\" (").append(book.getViews()).append(" lượt xem");
-                    
-                    if (book.getCategories() != null && !book.getCategories().isEmpty()) {
-                        contextBuilder.append(", Thể loại: ").append(
-                            book.getCategories().stream()
-                                .map(Category::getName)
-                                .collect(Collectors.joining(", "))
+                if (!booksByCategory.isEmpty()) {
+                    contextBuilder.append("Sách theo thể loại:\n");
+                    booksByCategory.forEach((categoryName, books) -> {
+                        contextBuilder.append("Thể loại \"").append(categoryName).append("\" (")
+                                    .append(books.size()).append(" sách):\n");
+                        
+                        books.stream().limit(5).forEach(book -> 
+                            contextBuilder.append("- \"").append(book.getTitle())
+                                        .append("\" (").append(book.getViews()).append(" lượt xem)\n")
                         );
-                    }
-                    
-                    contextBuilder.append(")\n");
+                        
+                        if (books.size() > 5) {
+                            contextBuilder.append("  ... và ").append(books.size() - 5).append(" sách khác\n");
+                        }
+                        contextBuilder.append("\n");
+                    });
                 }
+            }
+            
+            // Chapter information
+            if (relevantData.containsKey("chapters")) {
+                @SuppressWarnings("unchecked")
+                Map<String, List<Chapter>> chapterData = (Map<String, List<Chapter>>) relevantData.get("chapters");
+                
+                if (!chapterData.isEmpty()) {
+                    contextBuilder.append("Thông tin chương sách:\n");
+                    chapterData.forEach((bookTitle, chapters) -> {
+                        contextBuilder.append("Sách \"").append(bookTitle).append("\" có ")
+                                    .append(chapters.size()).append(" chương:\n");
+                        
+                        chapters.stream().limit(8).forEach(chapter -> 
+                            contextBuilder.append("- Chương ").append(chapter.getChapterNumber())
+                                        .append(": \"").append(chapter.getTitle()).append("\"\n")
+                        );
+                        
+                        if (chapters.size() > 8) {
+                            contextBuilder.append("  ... và ").append(chapters.size() - 8).append(" chương khác\n");
+                        }
+                        contextBuilder.append("\n");
+                    });
+                }
+            }
+            
+            // Popular books
+            if (relevantData.containsKey("popularBooks")) {
+                @SuppressWarnings("unchecked")
+                List<Book> popularBooks = (List<Book>) relevantData.get("popularBooks");
+                
+                if (!popularBooks.isEmpty()) {
+                    contextBuilder.append("Sách phổ biến nhất (theo lượt xem):\n");
+                    for (int i = 0; i < Math.min(popularBooks.size(), 10); i++) {
+                        Book book = popularBooks.get(i);
+                        contextBuilder.append(i+1).append(". \"").append(book.getTitle())
+                                    .append("\" (").append(book.getViews()).append(" lượt xem");
+                        
+                        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
+                            contextBuilder.append(", Thể loại: ").append(
+                                book.getCategories().stream()
+                                    .map(Category::getName)
+                                    .collect(Collectors.joining(", "))
+                            );
+                        }
+                        
+                        contextBuilder.append(")\n");
+                    }
+                    contextBuilder.append("\n");
+                }
+            }
+            
+            // Recommended books
+            if (relevantData.containsKey("recommendedBooks")) {
+                @SuppressWarnings("unchecked")
+                List<Book> recommendedBooks = (List<Book>) relevantData.get("recommendedBooks");
+                
+                if (!recommendedBooks.isEmpty()) {
+                    contextBuilder.append("Đề xuất sách phù hợp với yêu cầu:\n");
+                    for (int i = 0; i < Math.min(recommendedBooks.size(), 5); i++) {
+                        Book book = recommendedBooks.get(i);
+                        contextBuilder.append(i+1).append(". \"").append(book.getTitle()).append("\"\n");
+                        
+                        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
+                            contextBuilder.append("   Thể loại: ").append(
+                                book.getCategories().stream()
+                                    .map(Category::getName)
+                                    .collect(Collectors.joining(", "))
+                            ).append("\n");
+                        }
+                        
+                        if (book.getDescription() != null && !book.getDescription().isEmpty()) {
+                            String desc = book.getDescription().length() > 100 ? 
+                                book.getDescription().substring(0, 100) + "..." : 
+                                book.getDescription();
+                            contextBuilder.append("   Mô tả: ").append(desc).append("\n");
+                        }
+                        
+                        contextBuilder.append("   Số chương: ").append(countChaptersByBookId(book.getId())).append("\n\n");
+                    }
+                }
+            }
+            
+            // Specific book details - Add this section
+            if (relevantData.containsKey("specificBook")) {
+                Book book = (Book) relevantData.get("specificBook");
+                contextBuilder.append("Chi tiết về sách \"").append(book.getTitle()).append("\":\n");
+                
+                // Author
+                contextBuilder.append("- Tác giả: ").append(book.getAuthor() != null ? book.getAuthor() : "Không rõ").append("\n");
+                
+                // Categories
+                if (book.getCategories() != null && !book.getCategories().isEmpty()) {
+                    contextBuilder.append("- Thể loại: ").append(
+                        book.getCategories().stream()
+                            .map(Category::getName)
+                            .collect(Collectors.joining(", "))
+                    ).append("\n");
+                }
+                
+                // Description
+                if (book.getDescription() != null && !book.getDescription().trim().isEmpty()) {
+                    contextBuilder.append("- Mô tả: ").append(book.getDescription()).append("\n");
+                }
+                
+                // Views
+                contextBuilder.append("- Lượt xem: ").append(book.getViews()).append("\n");
+                
+                // Chapter count
+                int chapterCount = countChaptersByBookId(book.getId());
+                contextBuilder.append("- Số chương: ").append(chapterCount).append("\n");
+                
+                // Chapter information if available
+                if (relevantData.containsKey("specificBookChapters")) {
+                    @SuppressWarnings("unchecked")
+                    List<Chapter> chapters = (List<Chapter>) relevantData.get("specificBookChapters");
+                    contextBuilder.append("\nDanh sách chương (").append(Math.min(5, chapters.size())).append(" chương đầu):\n");
+                    
+                    chapters.stream().limit(5).forEach(chapter -> 
+                        contextBuilder.append("  + Chương ").append(chapter.getChapterNumber())
+                                    .append(": ").append(chapter.getTitle()).append("\n")
+                    );
+                    
+                    if (chapters.size() > 5) {
+                        contextBuilder.append("  + ... và ").append(chapters.size() - 5).append(" chương khác\n");
+                    }
+                }
+                
+                // Feedback information if available
+                if (relevantData.containsKey("specificBookFeedbacks")) {
+                    @SuppressWarnings("unchecked")
+                    List<Feedback> feedbacks = (List<Feedback>) relevantData.get("specificBookFeedbacks");
+                    
+                    // Calculate average rating
+                    double avgRating = feedbacks.stream()
+                        .mapToDouble(Feedback::getRating)
+                        .average()
+                        .orElse(0);
+                    
+                    contextBuilder.append("\n- Đánh giá trung bình: ").append(String.format("%.1f", avgRating))
+                                 .append(" sao (từ ").append(feedbacks.size()).append(" đánh giá)\n");
+                    
+                    // Sample a few reviews
+                    if (!feedbacks.isEmpty()) {
+                        contextBuilder.append("\nMột số nhận xét từ độc giả:\n");
+                        feedbacks.stream()
+                            .filter(f -> f.getContent() != null && !f.getContent().trim().isEmpty())
+                            .limit(3)
+                            .forEach(f -> contextBuilder.append("  \"").append(f.getContent()).append("\"\n"));
+                    }
+                }
+                
                 contextBuilder.append("\n");
             }
-        }
-        
-        // Recommended books
-        if (relevantData.containsKey("recommendedBooks")) {
-            @SuppressWarnings("unchecked")
-            List<Book> recommendedBooks = (List<Book>) relevantData.get("recommendedBooks");
             
-            if (!recommendedBooks.isEmpty()) {
-                contextBuilder.append("Đề xuất sách phù hợp với yêu cầu:\n");
-                for (int i = 0; i < Math.min(recommendedBooks.size(), 5); i++) {
-                    Book book = recommendedBooks.get(i);
-                    contextBuilder.append(i+1).append(". \"").append(book.getTitle()).append("\"\n");
-                    
-                    if (book.getCategories() != null && !book.getCategories().isEmpty()) {
-                        contextBuilder.append("   Thể loại: ").append(
-                            book.getCategories().stream()
-                                .map(Category::getName)
-                                .collect(Collectors.joining(", "))
-                        ).append("\n");
-                    }
-                    
-                    if (book.getDescription() != null && !book.getDescription().isEmpty()) {
-                        String desc = book.getDescription().length() > 100 ? 
-                            book.getDescription().substring(0, 100) + "..." : 
-                            book.getDescription();
-                        contextBuilder.append("   Mô tả: ").append(desc).append("\n");
-                    }
-                    
-                    contextBuilder.append("   Số chương: ").append(countChaptersByBookId(book.getId())).append("\n\n");
-                }
-            }
+            // Final prompt for AI
+            String prompt = "Bạn là trợ lý AI cho hệ thống sách. Dựa vào dữ liệu sau, hãy trả lời câu hỏi:\n\n" +
+                            contextBuilder.toString() + 
+                            "\nCâu hỏi: \"" + question + "\"\n\n" +
+                            "Trả lời rõ ràng, đầy đủ và thân thiện. Nếu bạn gợi ý sách, giải thích lý do đề xuất.";
+            
+            return geminiService.getRecommendation(prompt);
+        } catch (Exception e) {
+            System.err.println("Error processing question: " + e.getMessage());
+            e.printStackTrace();
+            return "Xin lỗi, tôi gặp lỗi khi xử lý câu hỏi của bạn. Chi tiết lỗi: " + e.getMessage();
         }
-        
-        // Final prompt for AI
-        String prompt = "Bạn là trợ lý AI cho hệ thống sách. Dựa vào dữ liệu sau, hãy trả lời câu hỏi:\n\n" +
-                        contextBuilder.toString() + 
-                        "\nCâu hỏi: \"" + question + "\"\n\n" +
-                        "Trả lời rõ ràng, đầy đủ và thân thiện. Nếu bạn gợi ý sách, giải thích lý do đề xuất.";
-        
-        return geminiService.getRecommendation(prompt);
     }
 
     private Map<String, Object> fetchRelevantData(String question) {
         Map<String, Object> data = new HashMap<>();
         String lowercaseQuestion = question.toLowerCase();
         
-        // BOOK SEARCH QUERIES
-        if (containsAny(lowercaseQuestion, "tìm sách", "tìm truyện", "sách tên", "truyện tên", "có sách", "search book")) {
-            String searchTerm = extractSearchTerm(question);
-            if (!searchTerm.isEmpty()) {
-                List<Book> results = bookService.searchBooksByTitle(searchTerm);
-                if (!results.isEmpty()) {
-                    data.put("searchResults", results);
+        // SPECIFIC BOOK QUERY - New section to handle detailed book inquiries
+        if (containsAny(lowercaseQuestion, "nói về", "kể về", "giới thiệu", "chi tiết", "thông tin", "nội dung", "cốt truyện")) {
+            // Try to identify a specific book in the question
+            Book specificBook = findSpecificBookInQuestion(question);
+            if (specificBook != null) {
+                // Add book details to the data map
+                data.put("specificBook", specificBook);
+                
+                // Add chapter information for this specific book
+                List<Chapter> chapters = chapterService.findByBookId(specificBook.getId());
+                if (chapters != null && !chapters.isEmpty()) {
+                    data.put("specificBookChapters", chapters);
+                }
+                
+                // Get feedback data for this book if available
+                List<Feedback> feedbacks = feedbackService.getFeedbacksByBookId(specificBook.getId());
+                if (feedbacks != null && !feedbacks.isEmpty()) {
+                    data.put("specificBookFeedbacks", feedbacks);
+                }
+            }
+        }
+        
+        // Enhanced book search detection with more patterns
+        if (containsAny(lowercaseQuestion, "tìm sách", "tìm truyện", "sách tên", "truyện tên", 
+                "có sách", "search book", "sách nào", "truyện nào", "cuốn sách", "cuốn truyện", 
+                "thông tin về sách", "thông tin về truyện", "tìm thông tin", "truy", "tìm hiểu về", 
+                "muốn đọc", "muốn biết về")) {
+            
+            // First check if there's a direct book match
+            Book specificBook = findSpecificBookInQuestion(question);
+            if (specificBook != null) {
+                data.put("specificBook", specificBook);
+                
+                // Add chapter and feedback data
+                List<Chapter> chapters = chapterService.findByBookId(specificBook.getId());
+                if (chapters != null && !chapters.isEmpty()) {
+                    data.put("specificBookChapters", chapters);
+                }
+                
+                List<Feedback> feedbacks = feedbackService.getFeedbacksByBookId(specificBook.getId());
+                if (feedbacks != null && !feedbacks.isEmpty()) {
+                    data.put("specificBookFeedbacks", feedbacks);
+                }
+            } else {
+                // Try standard search
+                String searchTerm = extractSearchTerm(question);
+                if (!searchTerm.isEmpty()) {
+                    List<Book> results = bookService.searchBooksByTitle(searchTerm);
+                    if (!results.isEmpty()) {
+                        data.put("searchResults", results);
+                    } else {
+                        // If no results, use the full question as search
+                        results = bookService.searchBooksByTitle(question);
+                        if (!results.isEmpty()) {
+                            data.put("searchResults", results);
+                        }
+                    }
                 }
             }
         }
@@ -391,6 +521,61 @@ public class ChatbotService {
         }
         
         return data;
+    }
+
+    // Improved book finding method with fuzzy matching and partial title support
+    private Book findSpecificBookInQuestion(String question) {
+        List<Book> allBooks = bookService.getAllBooks();
+        String lowercaseQuestion = question.toLowerCase();
+        
+        // First attempt: direct title matching (most precise)
+        for (Book book : allBooks) {
+            if (book.getTitle() != null && lowercaseQuestion.contains(book.getTitle().toLowerCase())) {
+                System.out.println("Found exact match for book: " + book.getTitle());
+                return book;
+            }
+        }
+        
+        // Second attempt: Check for quoted book titles
+        if (question.contains("\"")) {
+            int start = question.indexOf("\"");
+            int end = question.indexOf("\"", start + 1);
+            if (end > start) {
+                String quotedTitle = question.substring(start + 1, end).trim().toLowerCase();
+                for (Book book : allBooks) {
+                    if (book.getTitle() != null && book.getTitle().toLowerCase().contains(quotedTitle)) {
+                        System.out.println("Found quoted match for book: " + book.getTitle());
+                        return book;
+                    }
+                }
+            }
+        }
+        
+        // Third attempt: Partial matching (for each word in title)
+        for (Book book : allBooks) {
+            if (book.getTitle() != null) {
+                String[] titleWords = book.getTitle().toLowerCase().split("\\s+");
+                // If title has multiple words and is 4+ chars, check for matches
+                if (titleWords.length > 1) {
+                    for (String word : titleWords) {
+                        if (word.length() >= 4 && lowercaseQuestion.contains(word)) {
+                            System.out.println("Found partial match for book: " + book.getTitle() + " (matched word: " + word + ")");
+                            return book;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Last attempt: Use book service search directly
+        List<Book> searchResults = bookService.searchBooksByTitle(question);
+        if (!searchResults.isEmpty()) {
+            System.out.println("Found match via search service: " + searchResults.get(0).getTitle());
+            return searchResults.get(0);
+        }
+        
+        System.out.println("No book match found for query: " + question);
+        return null;
     }
 
     // Get books by category ID - helper method with better error handling

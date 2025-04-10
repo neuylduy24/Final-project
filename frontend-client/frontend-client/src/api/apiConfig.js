@@ -8,7 +8,7 @@ export const API_ENDPOINTS = {
   GET_USER_READING_HISTORY: "/api/reading-history",
 
   // Endpoint dùng để lưu lịch sử đọc, phải đúng với backend
-  UPDATE_READING_PROGRESS: "/api/reading-history/start",
+  UPDATE_READING_PROGRESS: "/api/reading-history/start-or-update",
 
   GET_BOOK_BY_ID: (bookId) => `/books/${bookId}`,
 };

@@ -15,9 +15,9 @@ const BookHistoriesPage = () => {
   useEffect(() => {
     const fetchHistoryBooks = async () => {
       try {
-        console.log(`Fetching: ${API_BASE_URL}/api/reading-history/${email}`);
+        console.log(`Fetching: ${API_BASE_URL}/api/reading-history/user/${email}`);
 
-        const response = await axios.get(`${API_BASE_URL}/api/reading-history/${email}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/reading-history/user/${email}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

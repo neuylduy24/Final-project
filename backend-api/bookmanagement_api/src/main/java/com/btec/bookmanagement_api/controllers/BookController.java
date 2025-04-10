@@ -37,14 +37,6 @@ public class BookController {
     }
 
 
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable String id) {
-        return bookService.getBookById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/title/{title}")
     public ResponseEntity<Book> getBookByTitle(@PathVariable String title) {
         return bookService.getBookByTitle(title)
@@ -282,12 +274,17 @@ public class BookController {
     }
 
     // 2️⃣ API lấy thông tin sách + Feedback & Rating
-    @GetMapping("/{id}/details")
-    public ResponseEntity<Book> getBookWithFeedback(@PathVariable String id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "false") boolean includeDetails) {
+
         return bookService.getBookById(id)
                 .map(book -> {
-                    book.setFeedbacks(feedbackService.getFeedbacksByBookId(id));
-                    book.setAverageRating(feedbackService.getAverageRating(id));
+                    if (includeDetails) {
+                        book.setFeedbacks(feedbackService.getFeedbacksByBookId(id));
+                        book.setAverageRating(feedbackService.getAverageRating(id));
+                    }
                     return ResponseEntity.ok(book);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

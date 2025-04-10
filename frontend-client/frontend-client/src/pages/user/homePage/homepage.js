@@ -54,7 +54,6 @@ const HomePage = () => {
           <h2>{hasToken ? "Book for you" : "Book hot"}</h2>
           </div>
           <BookHotPage books={memoizedBooks} navigate={navigate} />
-
         </div>
       </div>
     </>

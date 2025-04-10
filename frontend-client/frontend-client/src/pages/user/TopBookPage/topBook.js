@@ -5,28 +5,32 @@ import "./topBooks.scss";
 import bookService from "service/bookService";
 
 const BookHotPage = ({ books: booksFromProps }) => {
-
   const [books, setBooks] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
+      setLoading(true);
       try {
         let data = [];
         switch (activeFilter) {
-          case "day":
+          case "all":
+            data = await bookService.getAllBooks();
+            break;
+          case "topViewToday":
             data = await BookRankingApi.getTop10BooksByViews();
             break;
-          case "week":
+          case "topFollowThisWeek":
             data = await BookRankingApi.getAllBooksByFollow();
             break;
-          case "topFollow":
+          case "topFollowAllTime":
             data = await BookRankingApi.getTop10BooksByFollow();
             break;
-          case "views":
+          case "newestBooks":
             data = await BookRankingApi.getBooksSortedByCreatedDateDesc();
             break;
-          case "all":
+          case "recommendation":
           default:
             data = booksFromProps || [];
             break;
@@ -34,12 +38,13 @@ const BookHotPage = ({ books: booksFromProps }) => {
         setBooks(data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu sách:", error);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchBooks();
   }, [activeFilter, booksFromProps]);
-  
 
   return (
     <div className="book-hot-page">
@@ -51,29 +56,37 @@ const BookHotPage = ({ books: booksFromProps }) => {
           All
         </button>
         <button
-          className={activeFilter === "day" ? "active" : ""}
-          onClick={() => setActiveFilter("day")}
+          className={activeFilter === "recommendation" ? "active" : ""}
+          onClick={() => setActiveFilter("recommendation")}
         >
-          Top View
+          Recommendation
         </button>
         <button
-          className={activeFilter === "week" ? "active" : ""}
-          onClick={() => setActiveFilter("week")}
+          className={activeFilter === "topViewToday" ? "active" : ""}
+          onClick={() => setActiveFilter("topViewToday")}
         >
-          Top Follow
+          Top View Today
         </button>
         <button
-          className={activeFilter === "views" ? "active" : ""}
-          onClick={() => setActiveFilter("views")}
+          className={activeFilter === "topFollowThisWeek" ? "active" : ""}
+          onClick={() => setActiveFilter("topFollowThisWeek")}
+        >
+          Top Follow This Week
+        </button>
+        <button
+          className={activeFilter === "newestBooks" ? "active" : ""}
+          onClick={() => setActiveFilter("newestBooks")}
         >
           Top Book New
         </button>
       </div>
 
       <div className="book-grid">
-        {books.map((book) => (
-          <BookCard key={book.id} book={book} />
-        ))}
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          books.map((book) => <BookCard key={book.id} book={book} />)
+        )}
       </div>
     </div>
   );

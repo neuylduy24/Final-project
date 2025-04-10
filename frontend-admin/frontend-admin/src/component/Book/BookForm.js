@@ -84,15 +84,19 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
   };
 
   const handleImageInputTypeChange = (e) => {
-    setImageInputType(e.target.value);
-    if (e.target.value === "url") {
+    const value = e.target.value;
+    setImageInputType(value);
+  
+    if (value === "url") {
       setImageFile(null);
-      setImagePreview(formData.image);
+      setFormData((prev) => ({ ...prev, image: "" }));
+      setImagePreview(""); // cho phép người dùng nhập URL mới
     } else {
-      setFormData({ ...formData, image: "" });
+      setFormData((prev) => ({ ...prev, image: "" }));
       setImagePreview("");
     }
   };
+  
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -106,66 +110,75 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.title.trim()) {
       toast.error("Vui lòng nhập tiêu đề sách");
       return;
     }
-
+  
     const categoryString = selectedCategories
       .map((cat) => cat.name)
       .join(", ")
       .trim();
+  
     if (!categoryString) {
       toast.error("Vui lòng chọn ít nhất một thể loại");
       return;
     }
-
+  
     const formPayload = new FormData();
     formPayload.append("title", formData.title);
     formPayload.append("author", formData.author || "");
     formPayload.append("description", formData.description || "");
-
-    // ✅ Nếu backend nhận 1 chuỗi category phân cách dấu phẩy
     formPayload.append("category", categoryString);
-
-    // ✅ Nếu dùng ảnh URL
-    if (imageInputType === "url") {
-      if (!formData.image || !formData.image.trim()) {
-        toast.error("Vui lòng nhập URL ảnh");
-        return;
-      }
+  
+    // Nếu chọn URL ảnh
+    if (imageInputType === "url" && formData.image.trim()) {
       formPayload.append("imageUrl", formData.image.trim());
-    }
-
-    // ✅ Nếu upload ảnh file
-    if (imageInputType === "upload") {
-      if (!imageFile) {
-        toast.error("Vui lòng chọn ảnh để tải lên");
-        return;
-      }
+    } 
+  
+    // Nếu chọn upload file ảnh
+    else if (imageInputType === "upload" && imageFile) {
       formPayload.append("file", imageFile);
     }
-
+  
     try {
-      const response = await axios.post(
-        "https://api.it-ebook.io.vn/api/books/create-with-image",
-        formPayload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      toast.success("Thêm sách thành công!");
+      let response;
+      if (isEditing) {
+        // Gọi API cập nhật sách
+        response = await axios.put(
+          `https://api.it-ebook.io.vn/api/books/${book.id}/update-with-image`,
+          formPayload,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("Cập nhật sách thành công!");
+      } else {
+        // Gọi API tạo mới sách
+        response = await axios.post(
+          "https://api.it-ebook.io.vn/api/books/create-with-image",
+          formPayload,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("Thêm sách thành công!");
+      }
+  
       onSave && onSave(response.data);
       setShowForm(false);
     } catch (error) {
-      console.error("Create book error:", error);
-      toast.error(error?.response?.data || "Đã xảy ra lỗi khi thêm sách.");
+      console.error("Book save error:", error);
+      toast.error(error?.response?.data?.message || "Đã xảy ra lỗi khi lưu sách.");
     }
   };
+  
+  
 
   return (
     <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -187,6 +200,14 @@ const BookForm = ({ book = {}, onSave, setShowForm, isEditing }) => {
             placeholder="Author"
             value={formData.author}
             onChange={handleChange}
+          />
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            style={{ resize: "vertical", minHeight: "100px" }}
           />
 
           <div className="category-selector">

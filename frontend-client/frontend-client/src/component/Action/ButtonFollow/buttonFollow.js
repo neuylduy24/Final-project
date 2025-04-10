@@ -7,6 +7,7 @@ import "./buttonFollow.scss";
 const BookFollowButton = ({ bookId, hasFollow = true }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followId, setFollowId] = useState(null);
+  const [followerCount, setFollowerCount] = useState(0); // ← Thêm dòng này
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,6 +23,17 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
     return { email, token };
   }, []);
 
+  const fetchFollowerCount = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/follow-books/book/${bookId}/count`
+      );
+      setFollowerCount(response.data || 0);
+    } catch (err) {
+      console.error("Error fetching follower count", err);
+    }
+  }, [bookId]);
+
   const checkFollowStatus = useCallback(async () => {
     const authData = getAuthData();
     if (!authData) return;
@@ -32,8 +44,7 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
       setIsLoading(true);
       const response = await axios.get(
         `https://api.it-ebook.io.vn/api/follow-books/user/${email}/book/${bookId}`,
-        { headers: { Authorization: `Bearer ${token}` },
-      }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data) {
@@ -73,6 +84,7 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         toast.success("Unfollowed 📖", { autoClose: 1500 });
+        setFollowerCount((prev) => Math.max(0, prev - 1)); // Giảm số lượng
       } else {
         const response = await axios.post(
           "https://api.it-ebook.io.vn/api/follow-books",
@@ -81,6 +93,7 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
         );
         setFollowId(response.data.id);
         toast.success("Followed successfully 🌟", { autoClose: 1500 });
+        setFollowerCount((prev) => prev + 1); // Tăng số lượng
       }
 
       setIsFollowing(!isFollowing);
@@ -96,7 +109,8 @@ const BookFollowButton = ({ bookId, hasFollow = true }) => {
 
   useEffect(() => {
     checkFollowStatus();
-  }, [bookId, checkFollowStatus]);
+    fetchFollowerCount(); // ← Gọi API đếm follow khi render
+  }, [bookId, checkFollowStatus, fetchFollowerCount]);
 
   return (
     <div className="book-follow-button">

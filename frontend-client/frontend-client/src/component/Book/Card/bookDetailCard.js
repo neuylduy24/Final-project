@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import parseISO from "date-fns/parseISO";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { vi } from "date-fns/locale";
@@ -6,7 +6,7 @@ import axios from "axios";
 import "./bookDetailCard.scss";
 import { useNavigate } from "react-router-dom";
 import { ROUTERS } from "utils/path";
-import { FaComment, FaEye, FaHeart } from "react-icons/fa6";
+import { FaComment, FaEye, FaHeart, FaUserCheck } from "react-icons/fa6";
 import chapterService from "service/chapterService";
 
 const BookCard = ({ book, onChapterClick }) => {
@@ -15,6 +15,7 @@ const BookCard = ({ book, onChapterClick }) => {
   const [topChapterTitle, setTopChapterTitle] = useState("Loading...");
   const [topChapterId, setTopChapterId] = useState(null);
   const [totalViews, setTotalViews] = useState(book.views || 0);
+  const [followerCount, setFollowerCount] = useState(0); // ← Thêm dòng này
   const [totalFollows, setTotalFollows] = useState(0);
   const [totalComments, setTotalComments] = useState(0);
 
@@ -144,6 +145,16 @@ const BookCard = ({ book, onChapterClick }) => {
       setTopChapterTitle("Error loading chapters");
     }
   };
+  const fetchFollowerCount = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/follow-books/book/${book.id}/count`
+      );
+      setFollowerCount(response.data || 0);
+    } catch (err) {
+      console.error("Error fetching follower count", err);
+    }
+  }, [book.id]);
 
   useEffect(() => {
     if (book.id) {
@@ -152,6 +163,7 @@ const BookCard = ({ book, onChapterClick }) => {
         fetchChaptersByBookId(),
         fetchBookStats(),
         fetchTotalComments(),
+        fetchFollowerCount(),
       ]);
     }
   }, [book.id]);
@@ -221,6 +233,10 @@ const BookCard = ({ book, onChapterClick }) => {
             <span>
               <FaComment style={{ marginRight: "5px" }} />
               {formatNumber(totalComments)}
+            </span>
+            <span>
+              <FaUserCheck style={{ marginRight: "5px" }} />
+              {formatNumber(followerCount)}
             </span>
           </div>
         </div>

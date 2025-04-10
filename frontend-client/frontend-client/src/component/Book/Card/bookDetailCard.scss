@@ -17,8 +17,6 @@ $box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
   left: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
-  z-index: 99999;
-
   &:hover {
     transform: translateY(-5px);
 

@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const API_BASE_URL = "https://api.it-ebook.io.vn"; // 🔹 URL API chính xác
+export const API_BASE_URLL = "http://localhost:8080"; // 🔹 URL API chính xác
 
 export default API_BASE_URL;
 

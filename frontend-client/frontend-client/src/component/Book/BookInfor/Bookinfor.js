@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { FaEye, FaStar, FaRegStar } from "react-icons/fa6";
+import React, { useCallback, useEffect, useState } from "react";
+import { FaEye, FaStar, FaRegStar, FaUserCheck } from "react-icons/fa6";
 import { FaUser, FaBookOpen } from "react-icons/fa";
 import ButtonFollow from "component/Action/ButtonFollow/buttonFollow";
 import chapterService from "service/chapterService";
@@ -10,24 +10,41 @@ import "./bookinfor.scss";
 const BookInfo = ({ book }) => {
   const [totalViews, setTotalViews] = useState(book.views || 0);
   const [userRating, setUserRating] = useState(0);
+  const [followerCount, setFollowerCount] = useState(0); // ← Thêm dòng này
   const [hoveredRating, setHoveredRating] = useState(0);
   const [averageRating, setAverageRating] = useState(book.rating || 0);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (!book.views) {
+    // Lấy total views nếu không có sẵn
+    if (book.views === undefined) {
       chapterService
         .getTotalViewsByBookId(book.id)
         .then((total) => setTotalViews(total))
         .catch((error) => console.error("Error fetching total views:", error));
     }
-    fetchAverageRating();
 
-    // Fetch user's previous rating if logged in
+    // Lấy average rating và số lượng follower
+    fetchAverageRating();
+    fetchFollowerCount();
+
     if (token) {
       fetchUserRating();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book.id, book.views, token]);
+
+  const fetchFollowerCount = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://api.it-ebook.io.vn/api/follow-books/book/${book.id}/count`
+      );
+      setFollowerCount(response.data || 0);
+    } catch (err) {
+      console.error("Error fetching follower count", err);
+      toast.error("Unable to fetch follower count.");
+    }
+  }, [book.id]);
 
   const fetchAverageRating = async () => {
     try {
@@ -151,6 +168,9 @@ const BookInfo = ({ book }) => {
         </p>
         <p>
           <FaEye /> <b>View:</b> <span>{totalViews}</span>
+        </p>
+        <p>
+          <FaUserCheck /> <b>Follow:</b> <span>{followerCount}</span>
         </p>
         <p>
           <FaStar /> <b>Rating:</b>{" "}

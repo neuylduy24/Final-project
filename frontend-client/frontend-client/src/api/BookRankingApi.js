@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from './apiConfig';
+import { API_BASE_URL, API_BASE_URLL } from './apiConfig';
 
 const BookRankingApi = {
     // 📈 Lấy tất cả sách theo lượt follow (giảm dần)
@@ -38,7 +38,7 @@ const BookRankingApi = {
     // 🔥 Top 10 sách có lượt xem nhiều nhất
     getTop10BooksByViews: async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/books/top-views`);
+            const response = await axios.get(`${API_BASE_URLL}/api/books/top-views`);
             return response.data;
         } catch (error) {
             console.error('Lỗi khi lấy top 10 sách theo lượt xem:', error);

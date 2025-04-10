@@ -29,15 +29,16 @@ const BookHistoriesPage = () => {
           return;
         }
 
-        // Fetch chi tiết sách nếu chỉ có bookId
         const booksWithDetails = await Promise.all(
           response.data.map(async (history) => {
             try {
-              const bookResponse = await axios.get(`${API_BASE_URL}/api/books/${history.bookId}`);
+              const bookResponse = await axios.get(
+                `${API_BASE_URL}/api/books/${history.bookId}?includeDetails=true`
+              );
               return { ...history, book: bookResponse.data };
             } catch (err) {
               console.error(`Failed to fetch book ${history.bookId}:`, err);
-              return { ...history, book: null };
+              return { ...history, book: null }; // tránh lỗi views của null
             }
           })
         );
@@ -51,7 +52,6 @@ const BookHistoriesPage = () => {
       }
     };
 
-    // Kiểm tra xem người dùng đã đăng nhập chưa
     if (email && token) {
       fetchHistoryBooks();
     } else {
@@ -74,9 +74,11 @@ const BookHistoriesPage = () => {
 
         {!loading && !error && historyBooks.length > 0 && (
           <div className="book-list">
-            {historyBooks.map((history) => (
-              <BookCard key={history.bookId} book={history.book} />
-            ))}
+            {historyBooks.map((history) =>
+              history.book ? (
+                <BookCard key={history.bookId} book={history.book} />
+              ) : null
+            )}
           </div>
         )}
       </div>

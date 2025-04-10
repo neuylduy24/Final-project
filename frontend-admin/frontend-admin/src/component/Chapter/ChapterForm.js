@@ -25,12 +25,17 @@ const ChapterForm = ({
     const fetchChapters = async () => {
       if (form.bookId) {
         try {
-          const response = await chapterService.getChaptersByBookId(form.bookId);
+          const response = await chapterService.getChaptersByBookId(
+            form.bookId
+          );
           if (!isEditing) {
-            const maxChapterNumber = Math.max(...response.map(chapter => chapter.chapterNumber), 0);
-            setForm(prev => ({
+            const maxChapterNumber = Math.max(
+              ...response.map((chapter) => chapter.chapterNumber),
+              0
+            );
+            setForm((prev) => ({
               ...prev,
-              chapterNumber: maxChapterNumber + 1
+              chapterNumber: maxChapterNumber + 1,
             }));
           }
         } catch (error) {

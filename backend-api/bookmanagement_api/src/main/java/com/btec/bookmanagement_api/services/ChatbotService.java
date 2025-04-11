@@ -8,10 +8,7 @@ import com.btec.bookmanagement_api.entities.Feedback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,49 +90,45 @@ public class ChatbotService {
             StringBuilder contextBuilder = new StringBuilder();
 
             String baseBookUrl = "http://localhost:3000/user/chi-tiet-truyen/";
+            Set<String> seenBookIds = new HashSet<>();
 
-            contextBuilder.append("Dưới đây là danh sách truyện tương ứng với yêu cầu:\n\n");
+            List<Book> allBooks = new ArrayList<>();
 
             if (relevantData.containsKey("searchResults")) {
-                @SuppressWarnings("unchecked")
-                List<Book> bookResults = (List<Book>) relevantData.get("searchResults");
-                bookResults.stream().limit(10).forEach(book -> {
-                    contextBuilder.append("- [").append(book.getTitle()).append("](")
-                            .append(baseBookUrl).append(book.getId()).append(")\n");
-                });
+                allBooks.addAll((List<Book>) relevantData.get("searchResults"));
             }
 
             if (relevantData.containsKey("categoryBooks")) {
-                @SuppressWarnings("unchecked")
                 Map<String, List<Book>> booksByCategory = (Map<String, List<Book>>) relevantData.get("categoryBooks");
-                booksByCategory.forEach((categoryName, books) -> {
-                    books.stream().limit(10).forEach(book -> {
-                        contextBuilder.append("- [").append(book.getTitle()).append("](")
-                                .append(baseBookUrl).append(book.getId()).append(")\n");
-                    });
-                });
+                booksByCategory.values().forEach(allBooks::addAll);
             }
 
             if (relevantData.containsKey("popularBooks")) {
-                @SuppressWarnings("unchecked")
-                List<Book> popularBooks = (List<Book>) relevantData.get("popularBooks");
-                popularBooks.stream().limit(10).forEach(book -> {
-                    contextBuilder.append("- [").append(book.getTitle()).append("](")
-                            .append(baseBookUrl).append(book.getId()).append(")\n");
-                });
+                allBooks.addAll((List<Book>) relevantData.get("popularBooks"));
             }
 
             if (relevantData.containsKey("recommendedBooks")) {
-                @SuppressWarnings("unchecked")
-                List<Book> recommendedBooks = (List<Book>) relevantData.get("recommendedBooks");
-                recommendedBooks.stream().limit(10).forEach(book -> {
-                    contextBuilder.append("- [").append(book.getTitle()).append("](")
-                            .append(baseBookUrl).append(book.getId()).append(")\n");
-                });
+                allBooks.addAll((List<Book>) relevantData.get("recommendedBooks"));
             }
 
             if (relevantData.containsKey("specificBook")) {
-                Book book = (Book) relevantData.get("specificBook");
+                allBooks.add((Book) relevantData.get("specificBook"));
+            }
+
+            // Lọc bỏ truyện trùng lặp theo ID
+            List<Book> uniqueBooks = allBooks.stream()
+                    .filter(book -> seenBookIds.add(book.getId()))
+                    .limit(10)
+                    .collect(Collectors.toList());
+
+            // Nếu không có truyện nào
+            if (uniqueBooks.isEmpty()) {
+                return "Xin lỗi, trong cơ sở dữ liệu không có truyện phù hợp với yêu cầu của bạn.";
+            }
+
+            contextBuilder.append("Dưới đây là danh sách truyện tương ứng với yêu cầu:\n\n");
+
+            for (Book book : uniqueBooks) {
                 contextBuilder.append("- [").append(book.getTitle()).append("](")
                         .append(baseBookUrl).append(book.getId()).append(")\n");
             }
@@ -152,6 +145,7 @@ public class ChatbotService {
             return "Xin lỗi, tôi gặp lỗi khi xử lý câu hỏi của bạn. Chi tiết lỗi: " + e.getMessage();
         }
     }
+
 
 
 

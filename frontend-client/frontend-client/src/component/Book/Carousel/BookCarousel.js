@@ -14,33 +14,41 @@ const responsive = {
 
 const BookCarousel = ({ navigate }) => {
   const [books, setBooks] = useState([]); // State để lưu danh sách sách
-  const [loading, setLoading] = useState(true); // Trạng thái loading
 
   // Lấy dữ liệu sách từ API
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get("https://api.it-ebook.io.vn/api/books");
+        const response = await axios.get(
+          "https://api.it-ebook.io.vn/api/recommendations/personalized"
+        );
         setBooks(response.data); // Cập nhật dữ liệu sách vào state
       } catch (error) {
         console.error("Error fetching books:", error);
-      } finally {
-        setLoading(false); // Đặt loading là false khi dữ liệu đã được lấy
       }
     };
 
     fetchBooks();
   }, []); // Chạy khi component mount
 
-  if (loading) {
-    return <div>Loading...</div>; // Hiển thị thông báo loading khi đang tải dữ liệu
-  }
-
   return (
     <div className="container_categories_slider">
-      <Carousel className="categories_slider" responsive={responsive} autoPlay={true} autoPlaySpeed={3500} infinite={true} arrows={true}>
+      <Carousel
+        className="categories_slider"
+        responsive={responsive}
+        autoPlay={true}
+        autoPlaySpeed={3500}
+        infinite={true}
+        arrows={true}
+      >
         {books.map((book) => (
-          <div className="carousel-item" key={book.id} onClick={() => navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.id)}`)}>
+          <div
+            className="carousel-item"
+            key={book.id}
+            onClick={() =>
+              navigate(`${ROUTERS.USER.BOOKDETAIL.replace(":id", book.id)}`)
+            }
+          >
             <img
               src={
                 book.image

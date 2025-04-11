@@ -104,10 +104,7 @@ const BookCard = ({ book, onChapterClick }) => {
       if (response.data) {
         setTotalFollows(response.data.follows || 0);
       }
-    } catch (error) {
-      console.error("Error fetching book stats:", error);
-      setTotalFollows(0);
-    }
+    } catch (error) {}
   };
 
   // Fetch average rating

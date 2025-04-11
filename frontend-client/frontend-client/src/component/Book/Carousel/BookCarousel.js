@@ -20,7 +20,7 @@ const BookCarousel = ({ navigate }) => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get(
-          "https://api.it-ebook.io.vn/api/recommendations/personalized"
+          "https://api.it-ebook.io.vn/api/books"
         );
         setBooks(response.data); // Cập nhật dữ liệu sách vào state
       } catch (error) {

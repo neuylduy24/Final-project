@@ -1,6 +1,7 @@
 package com.btec.bookmanagement_api.controllers;
 
 import com.btec.bookmanagement_api.entities.Chapter;
+import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.ChapterService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class ChapterController {
     @Autowired
     private ChapterService chapterService;
+    private BookService bookService;
 
     // ✅ Lấy tất cả chapter
     @GetMapping
@@ -74,5 +76,11 @@ public class ChapterController {
     public ResponseEntity<Integer> getTotalViewsByBookId(@PathVariable String bookId) {
         int totalViews = chapterService.getTotalViewsByBookId(bookId);
         return ResponseEntity.ok(totalViews);
+    }
+
+    @GetMapping("/book/{bookId}/count")
+    public ResponseEntity<Long> countFollowers(@PathVariable String bookId) {
+        long count = bookService.countViewsByBookId(bookId);
+        return ResponseEntity.ok(count);
     }
 }

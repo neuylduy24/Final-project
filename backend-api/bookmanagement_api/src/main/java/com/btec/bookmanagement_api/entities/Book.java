@@ -36,6 +36,8 @@ public class Book {
 
     private List<Category> categories;
     private int views = 0 ;
+
+
     @Transient  // Không lưu vào MongoDB
     private List<Feedback> feedbacks;
     @CreatedDate
@@ -43,7 +45,6 @@ public class Book {
 
     @Transient
     private double averageRating;
-    @Transient
     private long totalFollows;
 
 }

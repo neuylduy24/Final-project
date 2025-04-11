@@ -3,6 +3,7 @@ package com.btec.bookmanagement_api.services;
 import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.repositories.BookRepository;
 import com.btec.bookmanagement_api.repositories.CategoryRepository;
+import com.btec.bookmanagement_api.repositories.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +44,7 @@ public class BookService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    private ChapterRepository chapterRepository;
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
@@ -211,6 +213,10 @@ public class BookService {
                 .sorted((b1, b2) -> Integer.compare(b2.getViews(), b1.getViews())) // Sắp xếp giảm dần theo views
                 .limit(10) // Lấy 10 sách đầu tiên
                 .collect(Collectors.toList());
+    }
+
+    public long countViewsByBookId(String bookId) {
+        return chapterRepository.countByBookId(bookId);
     }
 
 }

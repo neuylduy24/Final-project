@@ -4,6 +4,7 @@ import com.btec.bookmanagement_api.entities.Book;
 import com.btec.bookmanagement_api.entities.Category;
 
 import com.btec.bookmanagement_api.repositories.BookRepository;
+import com.btec.bookmanagement_api.repositories.CategoryRepository;
 import com.btec.bookmanagement_api.services.BookService;
 import com.btec.bookmanagement_api.services.FeedbackService;
 
@@ -30,6 +31,7 @@ public class BookController {
     private FeedbackService feedbackService;
     @Autowired
     private BookRepository bookRepository;
+    private CategoryRepository categoryRepository;
 
     @GetMapping
     public List<Book> getAllBooks() {
@@ -113,50 +115,55 @@ public class BookController {
 //                    .body("Failed to upload image");
 //        }
 //    }
+@PostMapping("/create-with-image")
+public ResponseEntity<?> createBookWithImage(
+        @RequestParam String title,
+        @RequestParam(required = false) String author,
+        @RequestParam(required = false) String description,
+        @RequestParam(required = false) List<String> categoryIds, // 👈 Nhận danh sách ID
+        @RequestParam(required = false) String imageUrl,
+        @RequestParam(required = false) MultipartFile file
+) {
+    try {
+        Book book = new Book();
+        book.setTitle(title);
+        book.setAuthor(author);
+        book.setDescription(description);
 
-    @PostMapping("/create-with-image")
-    public ResponseEntity<?> createBookWithImage(
-            @RequestParam String title,
-            @RequestParam(required = false) String author,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String imageUrl,
-            @RequestParam(required = false) MultipartFile file
-    ) {
-        try {
-            Book book = new Book();
-            book.setTitle(title);
-            book.setAuthor(author);
-            book.setDescription(description);
-
-            if (category != null && !category.isBlank()) {
-                Category cat = new Category();
-                cat.setName(category);
-                book.setCategories(List.of(cat));
-            }
-
-            if (file != null && !file.isEmpty()) {
-                byte[] imageData = file.getBytes();
-                String imageHash = bookService.calculateImageHash(imageData);
-
-                Optional<Book> duplicate = bookRepository.findByImageHash(imageHash);
-                if (duplicate.isPresent()) {
-                    return ResponseEntity.badRequest().body("This image is already used by another book.");
-                }
-
-                book.setImageData(imageData);
-                book.setImageHash(imageHash);
-            } else if (imageUrl != null && !imageUrl.isBlank()) {
-                book.setImage(imageUrl);
-            }
-
-            Book created = bookService.createBook(book);
-            return ResponseEntity.ok(created);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image: " + e.getMessage());
+        // ✅ Tìm Category theo ID
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> categories = categoryIds.stream()
+                    .map(id -> categoryRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("Category not found: " + id)))
+                    .toList();
+            book.setCategories(categories);
         }
+
+        if (file != null && !file.isEmpty()) {
+            byte[] imageData = file.getBytes();
+            String imageHash = bookService.calculateImageHash(imageData);
+
+            Optional<Book> duplicate = bookRepository.findByImageHash(imageHash);
+            if (duplicate.isPresent()) {
+                return ResponseEntity.badRequest().body("This image is already used by another book.");
+            }
+
+            book.setImageData(imageData);
+            book.setImageHash(imageHash);
+        } else if (imageUrl != null && !imageUrl.isBlank()) {
+            book.setImage(imageUrl);
+        }
+
+        Book created = bookService.createBook(book);
+        return ResponseEntity.ok(created);
+
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (IOException | NoSuchAlgorithmException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to upload image: " + e.getMessage());
     }
+}
 
     @PutMapping("/{id}/update-with-image")
     public ResponseEntity<?> updateBookWithImage(
@@ -313,4 +320,5 @@ public class BookController {
     public ResponseEntity<List<Book>> getAllBooksByViewsDesc() {
         return ResponseEntity.ok(bookService.getAllBooksByViewsDesc());
     }
+
 }
